@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useCallback } from "react";
 import { NeerCredLogo } from "@/components/NeerCredLogo";
-import { BRAND } from "@/lib/brand";
 import { IconMenu, IconX, IconSmartphone } from "@/components/icons";
 
 const navLinks = [
@@ -16,9 +15,6 @@ const navLinks = [
   { href: "/track", label: "Track" },
   { href: "/dashboard", label: "Dashboard" },
 ];
-
-/** Matches the cream tone baked into neercred-logo-lockup.png */
-const LOGO_BAY_BG = BRAND.colors.logoBay;
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -32,106 +28,93 @@ export function Header() {
   }, [pathname]);
 
   return (
-    <header className="sticky top-0 z-50 shadow-[0_10px_40px_rgba(11,18,32,0.35)]">
-      <div className="flex items-stretch">
-        {/* Logo bay — same cream as lockup PNG, no white card */}
+    <header className="sticky top-0 z-50 border-b border-slate-200/90 bg-white/98 shadow-sm backdrop-blur-xl">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2.5 sm:py-3">
         <Link
           href="/"
           onClick={goHome}
           aria-label="NeerCred — Go to homepage"
-          className="group relative flex shrink-0 items-center transition-colors hover:bg-white"
-          style={{ backgroundColor: LOGO_BAY_BG }}
+          className="flex shrink-0 items-center"
         >
-          <span
-            className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-r from-[#fefefe] via-[#e8edf2] to-neercred-navy sm:w-20"
-            aria-hidden
-          />
-          <NeerCredLogo className="relative z-[1] h-[60px] w-auto px-4 py-2 sm:h-[74px] sm:px-6 sm:py-2.5 lg:h-[84px] lg:px-8" />
+          <NeerCredLogo size={64} className="h-14 w-auto sm:h-[4.25rem] lg:h-[4.75rem]" />
         </Link>
 
-        {/* Navy navigation bay */}
-        <div className="flex min-w-0 flex-1 flex-col bg-neercred-navy">
-          <div className="flex flex-1 items-center justify-between gap-2 px-3 py-2 sm:gap-4 sm:px-5 lg:py-2.5">
-            <nav className="hidden items-center gap-0.5 lg:flex xl:gap-1" aria-label="Main navigation">
-              {navLinks.map((link) => {
-                const active = pathname === link.href;
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`rounded-lg px-2.5 py-2 text-[13px] font-semibold tracking-wide transition-all xl:px-3.5 xl:text-sm ${
-                      active
-                        ? "bg-neercred-gold/20 text-neercred-gold ring-1 ring-neercred-gold/35"
-                        : "text-white hover:bg-white/10 hover:text-neercred-gold"
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                );
-              })}
+        <nav className="hidden items-center gap-1 lg:flex" aria-label="Main navigation">
+          {navLinks.map((link) => {
+            const active = pathname === link.href;
+            return (
               <Link
-                href="/compliance"
-                className={`rounded-lg px-2.5 py-2 text-[13px] font-semibold tracking-wide transition-all xl:px-3.5 xl:text-sm ${
-                  pathname === "/compliance"
-                    ? "bg-neercred-gold/20 text-neercred-gold ring-1 ring-neercred-gold/35"
-                    : "text-white hover:bg-white/10 hover:text-neercred-gold"
+                key={link.href}
+                href={link.href}
+                className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${
+                  active
+                    ? "bg-teal-50 text-neercred-teal"
+                    : "text-slate-700 hover:bg-slate-50 hover:text-neercred-teal"
                 }`}
               >
-                Compliance
+                {link.label}
               </Link>
-            </nav>
+            );
+          })}
+          <Link
+            href="/compliance"
+            className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${
+              pathname === "/compliance"
+                ? "bg-teal-50 text-neercred-teal"
+                : "text-slate-700 hover:bg-slate-50 hover:text-neercred-teal"
+            }`}
+          >
+            Compliance
+          </Link>
+        </nav>
 
-            <div className="ml-auto flex items-center gap-2 sm:gap-3 lg:ml-0">
-              <Link
-                href="/app"
-                className="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-white/85 transition hover:bg-white/10 hover:text-white md:flex"
-              >
-                <IconSmartphone size={14} /> App
-              </Link>
-              <Link
-                href="/apply"
-                className="rounded-full bg-gradient-to-r from-neercred-gold via-amber-400 to-amber-500 px-4 py-2.5 text-xs font-bold text-neercred-navy shadow-lg shadow-black/25 transition hover:brightness-110 sm:px-6 sm:text-sm"
-              >
-                Apply Now
-              </Link>
-              <button
-                type="button"
-                className="rounded-lg p-2 text-white hover:bg-white/10 lg:hidden"
-                aria-label="Toggle menu"
-                onClick={() => setMenuOpen((open) => !open)}
-              >
-                {menuOpen ? <IconX size={22} /> : <IconMenu size={22} />}
-              </button>
-            </div>
-          </div>
-
-          {menuOpen && (
-            <nav className="border-t border-white/10 px-4 py-4 lg:hidden" aria-label="Mobile navigation">
-              <div className="flex flex-col gap-1">
-                <Link
-                  href="/"
-                  onClick={goHome}
-                  className="rounded-lg px-3 py-2.5 text-sm font-semibold text-neercred-gold hover:bg-white/5"
-                >
-                  Home
-                </Link>
-                {[...navLinks, { href: "/compliance", label: "Compliance" }, { href: "/security", label: "Security" }].map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className="rounded-lg px-3 py-2.5 text-sm font-medium text-white/90 hover:bg-white/5 hover:text-neercred-gold"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </div>
-            </nav>
-          )}
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Link
+            href="/app"
+            className="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-slate-600 transition hover:text-neercred-teal md:flex"
+          >
+            <IconSmartphone size={14} /> App
+          </Link>
+          <Link
+            href="/apply"
+            className="rounded-full bg-neercred-cta px-5 py-2.5 text-sm font-bold text-white shadow-neercred transition hover:brightness-110"
+          >
+            Apply Now
+          </Link>
+          <button
+            type="button"
+            className="rounded-lg p-2 text-slate-700 hover:bg-slate-100 lg:hidden"
+            aria-label="Toggle menu"
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            {menuOpen ? <IconX size={22} /> : <IconMenu size={22} />}
+          </button>
         </div>
       </div>
 
-      <div className="h-px bg-gradient-to-r from-neercred-gold/30 via-neercred-gold/60 to-transparent" />
+      {menuOpen && (
+        <nav className="border-t border-slate-100 bg-white px-4 py-4 lg:hidden" aria-label="Mobile navigation">
+          <div className="flex flex-col gap-1">
+            <Link
+              href="/"
+              onClick={goHome}
+              className="rounded-lg px-3 py-2.5 text-sm font-semibold text-neercred-teal hover:bg-slate-50"
+            >
+              Home
+            </Link>
+            {[...navLinks, { href: "/compliance", label: "Compliance" }, { href: "/security", label: "Security" }].map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-neercred-teal"
+                onClick={() => setMenuOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        </nav>
+      )}
     </header>
   );
 }
