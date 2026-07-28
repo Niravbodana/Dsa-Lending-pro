@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { BRAND } from "@/lib/brand";
+import { NeerCredLogo } from "@/components/NeerCredLogo";
 import { IconMenu, IconX, IconSmartphone } from "@/components/icons";
 
 const navLinks = [
@@ -21,18 +21,8 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/95 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5">
-        <Link href="/" className="flex items-center gap-3" onClick={() => setMenuOpen(false)}>
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-slate-900 to-teal-800 text-sm font-black tracking-tight text-white shadow-lg">
-            NL
-          </div>
-          <div>
-            <p className="text-base font-extrabold tracking-tight text-slate-900">
-              Neer <span className="text-teal-700">Loan</span>
-            </p>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-400">
-              {BRAND.tagline}
-            </p>
-          </div>
+        <Link href="/" className="flex items-center" onClick={() => setMenuOpen(false)}>
+          <NeerCredLogo size={40} />
         </Link>
 
         <nav className="hidden items-center gap-5 xl:flex">

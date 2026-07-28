@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
+import { NeerCredLogo } from "@/components/NeerCredLogo";
 
 export function Footer() {
   return (
@@ -7,9 +8,7 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-16">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-6">
           <div className="lg:col-span-2">
-            <p className="text-xl font-black text-white">
-              Neer <span className="text-teal-400">Loan Solutions</span>
-            </p>
+            <NeerCredLogo size={44} dark />
             <p className="mt-3 text-sm leading-relaxed">
               India&apos;s premium personal loan marketplace. Compare offers from 15+ regulated
               partner banks and NBFCs.

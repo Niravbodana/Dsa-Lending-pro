@@ -10,9 +10,13 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: `${BRAND.name} | Personal Loan in Minutes`,
+  title: `${BRAND.appName} | ${BRAND.legalName} — Personal Loan in Minutes`,
   description:
-    "Compare personal loan offers from top partner banks & NBFCs. Get up to ₹5,00,000 with instant eligibility check. Fully digital, RBI LSP compliant.",
+    "NeerCred by Neer Loan Solutions — compare personal loan offers from top partner banks & NBFCs. Up to ₹5,00,000, instant eligibility, RBI LSP compliant.",
+  icons: {
+    icon: "/neercred-icon.svg",
+    apple: "/neercred-icon.svg",
+  },
 };
 
 export default function RootLayout({

@@ -1,7 +1,16 @@
 export const BRAND = {
   name: "Neer Loan Solutions",
-  shortName: "Neer Loan",
-  tagline: "Smart Loans. Simple Process.",
+  legalName: "Neer Loan Solutions",
+  appName: "NeerCred",
+  shortName: "NeerCred",
+  tagline: "Trusted Credit. Pure & Simple.",
+  logoTagline: "by Neer Loan Solutions",
+  colors: {
+    navy: "#0B1220",
+    teal: "#0F766E",
+    cyan: "#0891B2",
+    gold: "#D4A017",
+  },
   email: "support@neerloansolutions.com",
   grievanceEmail: "grievance@neerloansolutions.com",
   dpoEmail: "dpo@neerloansolutions.com",
