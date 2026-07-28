@@ -12,6 +12,7 @@ import {
   IconBank,
   IconStar,
 } from "@/components/icons";
+import { INDIAN_IMAGES } from "@/lib/indian-images";
 
 const stats = [
   { value: "₹5L+", label: "Max Loan", Icon: IconRupee },
@@ -30,25 +31,25 @@ const loanCards = [
   {
     title: "Personal",
     href: "/loans",
-    image: "https://images.unsplash.com/photo-1554224311-0fb870a1d0ef?w=600&h=400&fit=crop",
+    image: INDIAN_IMAGES.loans.personal,
     rate: "10.99%",
   },
   {
     title: "Medical",
     href: "/loans",
-    image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&h=400&fit=crop",
+    image: INDIAN_IMAGES.loans.medical,
     rate: "11.49%",
   },
   {
     title: "Wedding",
     href: "/loans",
-    image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=600&h=400&fit=crop",
+    image: INDIAN_IMAGES.loans.wedding,
     rate: "11.99%",
   },
   {
     title: "Business",
     href: "/loans",
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop",
+    image: INDIAN_IMAGES.loans.business,
     rate: "12.49%",
   },
 ];
@@ -57,14 +58,14 @@ const lifestyleBlocks = [
   {
     title: "Home, Wedding, Dreams — All Possible",
     desc: "Neer Loan Solutions connects you with India's trusted banks and NBFCs. Compare offers, choose the best rate, and receive funds directly in your account.",
-    image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=900&h=600&fit=crop",
+    image: INDIAN_IMAGES.lifestyle.familyHome,
     cta: "Explore Loans",
     href: "/loans",
   },
   {
     title: "100% Digital. Zero Branch Visits.",
     desc: "OTP login, Aadhaar eKYC, bank verification, digital eSign — the entire process from your phone. Get approved from home.",
-    image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=900&h=600&fit=crop",
+    image: INDIAN_IMAGES.lifestyle.mobileIndia,
     cta: "Start Application",
     href: "/apply",
     reverse: true,
@@ -142,7 +143,7 @@ export function Hero() {
             <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-amber-400/20 to-teal-400/20 blur-2xl" />
             <div className="relative overflow-hidden rounded-[2rem] border-4 border-white/20 shadow-2xl">
               <Image
-                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&h=750&fit=crop&crop=faces"
+                src={INDIAN_IMAGES.hero.customer}
                 alt="Neer Loan Solutions customer"
                 width={600}
                 height={750}
@@ -284,20 +285,14 @@ export function LoanProductsStrip() {
 }
 
 export function TrustGallery() {
-  const images = [
-    "https://images.unsplash.com/photo-1521737711862-ece3fdac9ca2?w=400&h=300&fit=crop",
-    "https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?w=400&h=300&fit=crop",
-    "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=400&h=300&fit=crop",
-    "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=400&h=300&fit=crop",
-  ];
+  const images = INDIAN_IMAGES.trust;
 
   return (
     <section className="relative overflow-hidden bg-slate-950 py-24 text-white">
       <div
         className="image-parallax absolute inset-0 opacity-20"
         style={{
-          backgroundImage:
-            "url(https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&h=600&fit=crop)",
+          backgroundImage: `url(${INDIAN_IMAGES.pages.trustBg})`,
         }}
       />
       <div className="relative mx-auto max-w-7xl px-4">
@@ -327,7 +322,7 @@ export function AppDownloadBanner() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-r from-slate-900 to-teal-900 py-16 text-white">
       <Image
-        src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&h=400&fit=crop"
+        src={INDIAN_IMAGES.misc.appBanner}
         alt=""
         fill
         className="object-cover opacity-20"
@@ -360,7 +355,7 @@ export function ReferBanner() {
         <ScrollReveal variant="left" className="flex items-center gap-6">
           <div className="relative hidden h-24 w-24 overflow-hidden rounded-2xl ring-2 ring-white/20 sm:block">
             <Image
-              src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&h=200&fit=crop"
+              src={INDIAN_IMAGES.misc.referThumb}
               alt="Referral program"
               fill
               className="object-cover"
@@ -383,10 +378,10 @@ export function ReferBanner() {
 
 export function HowItWorks() {
   const steps = [
-    { num: "01", title: "Verify Mobile", desc: "Secure OTP login — 30 seconds", image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400&h=260&fit=crop" },
-    { num: "02", title: "Enter Details", desc: "PAN, income, city — simple form", image: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=400&h=260&fit=crop" },
-    { num: "03", title: "Compare Offers", desc: "Choose the best rate from 15+ lenders", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=260&fit=crop" },
-    { num: "04", title: "Money in Account", desc: "Direct disbursal from partner bank", image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400&h=260&fit=crop" },
+    { num: "01", title: "Verify Mobile", desc: "Secure OTP login — 30 seconds", image: INDIAN_IMAGES.howItWorks.mobile },
+    { num: "02", title: "Enter Details", desc: "PAN, income, city — simple form", image: INDIAN_IMAGES.howItWorks.form },
+    { num: "03", title: "Compare Offers", desc: "Choose the best rate from 15+ lenders", image: INDIAN_IMAGES.howItWorks.compare },
+    { num: "04", title: "Money in Account", desc: "Direct disbursal from partner bank", image: INDIAN_IMAGES.howItWorks.disbursal },
   ];
 
   return (

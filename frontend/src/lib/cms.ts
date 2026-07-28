@@ -1,3 +1,5 @@
+import { INDIAN_IMAGES } from "@/lib/indian-images";
+
 export type SiteConfig = {
   hero: {
     badge: string;
@@ -46,8 +48,7 @@ export const FALLBACK_CONFIG: SiteConfig = {
     ],
     cta_primary: "Get My Loan Offer",
     cta_secondary: "View Interest Rates",
-    image_url:
-      "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=600&h=750&fit=crop&crop=faces",
+    image_url: INDIAN_IMAGES.hero.customer,
     testimonial_quote: "The process was seamless — offer selected, KYC done, and funds credited within 48 hours.",
     testimonial_author: "Rahul Mehta, Bengaluru",
     approval_card_label: "Loan Disbursed",
@@ -79,19 +80,19 @@ export const FALLBACK_CONFIG: SiteConfig = {
       {
         title: "Dream Wedding",
         desc: "Venue, jewellery, honeymoon — fund it all",
-        image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=600&h=400&fit=crop",
+        image: INDIAN_IMAGES.dream.wedding,
         cta: "Wedding Loan",
       },
       {
         title: "Dream Home",
         desc: "Renovation, deposit, interiors made easy",
-        image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&h=400&fit=crop",
+        image: INDIAN_IMAGES.dream.home,
         cta: "Home Loan",
       },
       {
         title: "Dream Business",
         desc: "Inventory, equipment, working capital",
-        image: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=600&h=400&fit=crop",
+        image: INDIAN_IMAGES.dream.business,
         cta: "Business Loan",
       },
     ],

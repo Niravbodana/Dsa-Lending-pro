@@ -14,7 +14,7 @@ DEFAULT_SITE_CONFIG: dict = {
         ],
         "cta_primary": "Get My Loan Offer",
         "cta_secondary": "View Interest Rates",
-        "image_url": "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=600&h=750&fit=crop&crop=faces",
+        "image_url": "https://images.unsplash.com/photo-1580894900229-4d866a746e2a?w=600&h=750&fit=crop&crop=faces",
         "testimonial_quote": "The process was seamless — offer selected, KYC done, and funds credited within 48 hours.",
         "testimonial_author": "Rahul Mehta, Bengaluru",
         "approval_card_label": "Loan Disbursed",
@@ -50,7 +50,7 @@ DEFAULT_SITE_CONFIG: dict = {
             {
                 "title": "Dream Wedding",
                 "desc": "Venue, jewellery, honeymoon — fund it all",
-                "image": "https://images.unsplash.com/photo-1519741497674-611481863552?w=600&h=400&fit=crop",
+                "image": "https://images.unsplash.com/photo-1595158214979-06c4eaff2f1a?w=600&h=400&fit=crop",
                 "cta": "Wedding Loan",
             },
             {
@@ -62,7 +62,7 @@ DEFAULT_SITE_CONFIG: dict = {
             {
                 "title": "Dream Business",
                 "desc": "Inventory, equipment, working capital",
-                "image": "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=600&h=400&fit=crop",
+                "image": "https://images.unsplash.com/photo-1607746880709-26b54e3ede7d?w=600&h=400&fit=crop",
                 "cta": "Business Loan",
             },
         ],

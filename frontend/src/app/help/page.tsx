@@ -2,6 +2,7 @@ import Link from "next/link";
 import { PageShell } from "@/components/PageShell";
 import { InnerHero } from "@/components/InnerHero";
 import { BRAND } from "@/lib/brand";
+import { INDIAN_IMAGES } from "@/lib/indian-images";
 
 export const metadata = { title: `Help Center | ${BRAND.name}` };
 
@@ -47,7 +48,7 @@ export default function HelpPage() {
         badge="HELP CENTER"
         title="How Can We Help?"
         subtitle="Answers to common questions about loans, KYC, EMI, and tracking."
-        image="https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=1920&h=600&fit=crop"
+        image={INDIAN_IMAGES.pages.help}
       />
       <div className="mx-auto max-w-4xl px-4 py-16">
         <div className="mb-8 flex flex-wrap gap-3">

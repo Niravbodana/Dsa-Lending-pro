@@ -1,6 +1,7 @@
 import { PageShell } from "@/components/PageShell";
 import { InnerHero } from "@/components/InnerHero";
 import { BRAND } from "@/lib/brand";
+import { INDIAN_IMAGES } from "@/lib/indian-images";
 
 export const metadata = { title: `Platform | ${BRAND.name}` };
 
@@ -29,7 +30,7 @@ export default function PlatformPage() {
         badge="TECHNOLOGY"
         title="Enterprise Platform Architecture"
         subtitle="Six-phase product roadmap — built for scale, compliance, and partner integration."
-        image="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920&h=600&fit=crop"
+        image={INDIAN_IMAGES.pages.platform}
       />
       <div className="mx-auto max-w-5xl px-4 py-16">
         <h2 className="text-2xl font-black text-slate-900">System Architecture</h2>

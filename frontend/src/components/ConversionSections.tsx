@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ScrollReveal, ScrollRevealAlternate } from "@/components/ScrollReveal";
 import type { SiteConfig } from "@/lib/cms";
+import { INDIAN_IMAGES } from "@/lib/indian-images";
 
 export function DreamSection({ config }: { config: SiteConfig }) {
   if (!config.sections.dream_section) return null;
@@ -71,7 +72,7 @@ export function EmotionalCtaBand() {
   return (
     <section className="relative overflow-hidden py-20">
       <Image
-        src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&h=600&fit=crop"
+        src={INDIAN_IMAGES.lifestyle.celebration}
         alt="Happy customers"
         fill
         className="object-cover"

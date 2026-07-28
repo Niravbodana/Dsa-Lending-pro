@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { NeerCredLogo } from "@/components/NeerCredLogo";
+import { MadeInIndiaStrip } from "@/components/MadeInIndiaStrip";
 
 export function Footer() {
   return (
@@ -70,6 +71,7 @@ export function Footer() {
           <p className="text-slate-500">Licensed marketplace · Regulated partners only</p>
         </div>
       </div>
+      <MadeInIndiaStrip />
     </footer>
   );
 }

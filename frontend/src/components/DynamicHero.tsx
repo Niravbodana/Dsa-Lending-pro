@@ -15,6 +15,7 @@ import {
   IconStar,
 } from "@/components/icons";
 import type { SiteConfig } from "@/lib/cms";
+import { INDIAN_IMAGES } from "@/lib/indian-images";
 
 const STAT_ICONS = [IconRupee, IconChart, IconBolt, IconUsers];
 
@@ -26,7 +27,7 @@ export function DynamicHero({ config }: Props) {
 
   return (
     <section className="gradient-hero relative min-h-[95vh] overflow-hidden text-white">
-      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&h=1080&fit=crop')] bg-cover bg-center opacity-[0.07]" />
+      <div className="absolute inset-0 bg-cover bg-center opacity-[0.07]" style={{ backgroundImage: `url('${INDIAN_IMAGES.hero.skyline}')` }} />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(251,191,36,0.2)_0%,_transparent_55%)]" />
       <div className="absolute -left-32 top-20 h-[28rem] w-[28rem] rounded-full bg-amber-400/10 blur-3xl" />
       <div className="absolute -right-32 bottom-10 h-[28rem] w-[28rem] rounded-full bg-cyan-400/15 blur-3xl" />

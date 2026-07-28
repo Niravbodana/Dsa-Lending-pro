@@ -10,13 +10,13 @@ from app.services.cms_defaults import DEFAULT_SITE_CONFIG
 from app.services.cms_store import deep_merge, get_default_config
 
 PRESET_IMAGES = {
-    "wedding": "https://images.unsplash.com/photo-1519741497674-611481863552?w=600&h=750&fit=crop",
+    "wedding": "https://images.unsplash.com/photo-1595158214979-06c4eaff2f1a?w=600&h=750&fit=crop",
     "home": "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&h=750&fit=crop",
-    "business": "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=600&h=750&fit=crop",
+    "business": "https://images.unsplash.com/photo-1607746880709-26b54e3ede7d?w=600&h=750&fit=crop",
     "medical": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&h=750&fit=crop",
     "travel": "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&h=750&fit=crop",
-    "family": "https://images.unsplash.com/photo-1511895426328-dc8714191300?w=600&h=750&fit=crop",
-    "professional": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&h=750&fit=crop",
+    "family": "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&h=750&fit=crop",
+    "professional": "https://images.unsplash.com/photo-1580894900229-4d866a746e2a?w=600&h=750&fit=crop&crop=faces",
     "happy": "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&h=750&fit=crop",
 }
 

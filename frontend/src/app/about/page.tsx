@@ -1,6 +1,7 @@
 import { PageShell } from "@/components/PageShell";
 import { InnerHero } from "@/components/InnerHero";
 import { BRAND } from "@/lib/brand";
+import { INDIAN_IMAGES } from "@/lib/indian-images";
 import { IconTarget, IconChart, IconShield, IconBolt } from "@/components/icons";
 
 export const metadata = { title: `About Us | ${BRAND.name}` };
@@ -26,7 +27,7 @@ export default function AboutPage() {
         title="About Neer Loan Solutions"
         subtitle="India's premium loan marketplace — personalized offers and a transparent process built for you."
         cta={{ label: "Apply for Loan", href: "/apply" }}
-        image="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1920&h=600&fit=crop"
+        image={INDIAN_IMAGES.pages.about}
       />
       <div className="mx-auto max-w-4xl px-4 py-16">
         <div className="rounded-3xl bg-white p-8 shadow-lg md:p-12">
