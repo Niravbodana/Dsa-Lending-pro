@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { DynamicHero } from "@/components/DynamicHero";
-import { UrgencyBar, PromoStrip, LiveSocialProof } from "@/components/ConversionBars";
+import { PremiumTrustStrip } from "@/components/ConversionBars";
 import {
   DreamSection,
   EmotionalCtaBand,
@@ -52,9 +52,8 @@ export function HomePage() {
 
   return (
     <main className="min-h-screen pb-20 md:pb-0">
-      <UrgencyBar config={config} />
       <Header />
-      <PromoStrip config={config} />
+      <PremiumTrustStrip />
       <DynamicHero config={config} />
       {config.sections.metrics_ticker !== false && <MetricsTicker />}
       <DreamSection config={config} />
@@ -73,7 +72,6 @@ export function HomePage() {
       <AppDownloadBanner />
       <FAQ />
       <Footer />
-      <LiveSocialProof config={config} />
       <BugReportWidget />
       <AIChatWidget />
       <FloatingCTA />

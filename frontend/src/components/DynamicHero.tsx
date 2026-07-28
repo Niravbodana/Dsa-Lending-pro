@@ -33,8 +33,8 @@ export function DynamicHero({ config }: Props) {
 
       <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-16 lg:grid-cols-2 lg:py-24">
         <ScrollReveal variant="left">
-          <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/15 px-4 py-2 text-sm font-semibold text-amber-100 shadow-lg shadow-amber-900/20">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-amber-400" />
+          <div className="inline-flex items-center gap-2 rounded-full border border-neercred-gold/30 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-100">
+            <IconShield size={16} className="text-neercred-gold" />
             {h.badge}
           </div>
 
@@ -62,14 +62,13 @@ export function DynamicHero({ config }: Props) {
           <div className="mt-10 flex flex-wrap gap-4">
             <Link
               href="/apply"
-              className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 px-10 py-4 text-lg font-extrabold text-slate-900 shadow-2xl shadow-amber-500/40 transition hover:scale-[1.03] hover:shadow-amber-500/50"
+              className="rounded-2xl bg-gradient-to-r from-neercred-gold to-amber-500 px-10 py-4 text-lg font-bold text-neercred-navy shadow-xl shadow-amber-900/20 transition hover:brightness-110"
             >
-              <span className="relative z-10">{h.cta_primary}</span>
-              <span className="absolute inset-0 -translate-x-full bg-white/30 transition group-hover:translate-x-full duration-700" />
+              {h.cta_primary}
             </Link>
             <Link
               href="/rates"
-              className="rounded-2xl border-2 border-white/40 bg-white/10 px-8 py-4 text-lg font-bold backdrop-blur transition hover:bg-white/20"
+              className="rounded-2xl border border-white/25 bg-white/5 px-8 py-4 text-lg font-semibold text-white backdrop-blur transition hover:bg-white/10"
             >
               {h.cta_secondary}
             </Link>
@@ -115,20 +114,20 @@ export function DynamicHero({ config }: Props) {
                 </p>
               </div>
             </div>
-            <div className="glass-card animate-float absolute -bottom-4 -left-4 max-w-[240px] rounded-2xl p-4 shadow-2xl lg:-left-8">
+            <div className="glass-card absolute -bottom-4 -left-4 max-w-[240px] rounded-2xl p-4 shadow-2xl lg:-left-8">
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-teal-50 text-neercred-teal">
                   <IconCheckCircle size={22} />
                 </div>
                 <div>
                   <p className="text-xs font-medium text-slate-500">{h.approval_card_label}</p>
-                  <p className="text-xl font-black text-emerald-600">{h.approval_card_amount}</p>
+                  <p className="text-xl font-bold text-neercred-navy">{h.approval_card_amount}</p>
                 </div>
               </div>
             </div>
-            <div className="absolute -right-2 top-6 rotate-3 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 px-5 py-4 text-center font-black text-slate-900 shadow-2xl lg:-right-6">
-              <p className="text-3xl leading-none">{h.roi_badge}</p>
-              <p className="mt-1 text-[10px] uppercase tracking-widest">{h.roi_badge_label}</p>
+            <div className="absolute -right-2 top-6 rounded-2xl border border-neercred-gold/30 bg-neercred-navy/90 px-5 py-4 text-center text-white shadow-2xl backdrop-blur lg:-right-6">
+              <p className="text-3xl font-bold leading-none text-neercred-gold">{h.roi_badge}</p>
+              <p className="mt-1 text-[10px] uppercase tracking-widest text-slate-300">{h.roi_badge_label}</p>
             </div>
           </div>
         </ScrollReveal>

@@ -78,24 +78,23 @@ export function EmotionalCtaBand() {
       />
       <div className="absolute inset-0 bg-gradient-to-r from-teal-900/95 via-teal-800/90 to-slate-900/85" />
       <div className="relative mx-auto max-w-4xl px-4 text-center text-white">
-        <p className="text-sm font-bold uppercase tracking-[0.25em] text-amber-300">Don&apos;t wait for tomorrow</p>
-        <h2 className="mt-4 text-4xl font-black md:text-5xl">
-          Your dream is <span className="text-amber-400">one click</span> away
+        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-neercred-gold">Institutional-grade lending</p>
+        <h2 className="mt-4 text-4xl font-bold md:text-5xl">
+          Compare offers with <span className="text-neercred-gold">confidence</span>
         </h2>
-        <p className="mx-auto mt-4 max-w-2xl text-lg text-teal-100">
-          Thousands of Indians got their loan approved today. Compare offers from top banks, pick the
-          lowest EMI, and get money in your account — without stepping out.
+        <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-300">
+          Select from regulated partner lenders, review terms transparently, and complete your application entirely online.
         </p>
         <div className="mt-10 flex flex-wrap justify-center gap-4">
           <Link
             href="/apply"
-            className="rounded-2xl bg-amber-400 px-10 py-4 text-lg font-extrabold text-slate-900 shadow-xl hover:bg-amber-300"
+            className="rounded-2xl bg-gradient-to-r from-neercred-gold to-amber-500 px-10 py-4 text-lg font-bold text-neercred-navy shadow-xl transition hover:brightness-110"
           >
-            Yes, I Want My Loan →
+            Start Application
           </Link>
           <Link
             href="/loans"
-            className="rounded-2xl border-2 border-white/50 px-8 py-4 text-lg font-bold hover:bg-white/10"
+            className="rounded-2xl border border-white/30 px-8 py-4 text-lg font-semibold text-white transition hover:bg-white/10"
           >
             Explore Loan Types
           </Link>
@@ -107,12 +106,12 @@ export function EmotionalCtaBand() {
 
 export function MobileStickyCTA() {
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-teal-700/30 bg-gradient-to-r from-teal-700 to-cyan-700 p-3 shadow-2xl md:hidden">
+    <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-neercred-navy/98 p-3 shadow-2xl backdrop-blur md:hidden">
       <Link
         href="/apply"
-        className="flex items-center justify-center gap-2 rounded-xl bg-amber-400 py-3.5 text-center text-base font-extrabold text-slate-900"
+        className="flex items-center justify-center rounded-xl bg-gradient-to-r from-neercred-gold to-amber-500 py-3.5 text-center text-base font-bold text-neercred-navy"
       >
-        Get Loan Offer — Free · 5 Min
+        Apply for Loan
       </Link>
     </div>
   );

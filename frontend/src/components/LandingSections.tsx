@@ -114,7 +114,7 @@ export function Hero() {
               href="/apply"
               className="rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 px-8 py-4 text-lg font-extrabold text-slate-900 shadow-2xl shadow-amber-500/30 transition hover:scale-[1.02]"
             >
-              Apply Now — Free
+              Apply Now
             </Link>
             <Link
               href="/rates"
@@ -151,7 +151,7 @@ export function Hero() {
               />
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-900/95 via-slate-900/70 to-transparent p-6">
                 <p className="text-lg font-bold text-white">
-                  &ldquo;₹4.2 lakh approved in 3 minutes.&rdquo;
+                  &ldquo;Clear terms, smooth KYC, and timely disbursal.&rdquo;
                 </p>
                 <p className="mt-1 flex items-center gap-2 text-sm text-teal-200">
                   — Priya Sharma, Mumbai
@@ -169,8 +169,8 @@ export function Hero() {
                   <IconCheckCircle size={20} />
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-slate-500">Just Approved</p>
-                  <p className="text-lg font-black text-emerald-600">₹3,50,000</p>
+                  <p className="text-xs font-medium text-slate-500">Loan Disbursed</p>
+                  <p className="text-lg font-bold text-neercred-navy">₹3,50,000</p>
                 </div>
               </div>
             </div>

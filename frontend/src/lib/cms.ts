@@ -36,24 +36,24 @@ export const FALLBACK_CONFIG: SiteConfig = {
     badge: "RBI LSP Registered · Premium Marketplace",
     headline_line1: "Dream Big.",
     headline_highlight: "Borrow Smart.",
-    headline_sub: "Up to ₹10,00,000 — approved in 5 minutes.",
+    headline_sub: "Personal loans up to ₹10,00,000",
     description:
-      "Neer Loan Solutions brings you personalized offers from HDFC, ICICI, Bajaj & 15+ trusted lenders.",
+      "Compare curated offers from HDFC, ICICI, Bajaj and 15+ regulated lenders — one transparent platform, zero branch visits.",
     bullet_points: [
-      "Wedding, home, medical, travel — every dream funded",
-      "Lowest ROI from 10.99% — compare & choose",
-      "100% digital — OTP to disbursal on your phone",
+      "Wedding, home, medical, travel — tailored loan options",
+      "Rates from 10.99% p.a. — compare and choose with clarity",
+      "End-to-end digital journey from eligibility to disbursal",
     ],
-    cta_primary: "Get My Loan Offer — Free",
-    cta_secondary: "Check Eligibility",
+    cta_primary: "Get My Loan Offer",
+    cta_secondary: "View Interest Rates",
     image_url:
       "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=600&h=750&fit=crop&crop=faces",
-    testimonial_quote: "₹5 lakh approved while I was having chai!",
-    testimonial_author: "Rahul Mehta, Bangalore",
-    approval_card_label: "Just Approved",
+    testimonial_quote: "The process was seamless — offer selected, KYC done, and funds credited within 48 hours.",
+    testimonial_author: "Rahul Mehta, Bengaluru",
+    approval_card_label: "Loan Disbursed",
     approval_card_amount: "₹4,80,000",
     roi_badge: "10.99%",
-    roi_badge_label: "Starting ROI",
+    roi_badge_label: "From",
   },
   stats: [
     { value: "₹10L+", label: "Max Loan" },
@@ -62,16 +62,16 @@ export const FALLBACK_CONFIG: SiteConfig = {
     { value: "50K+", label: "Happy Customers" },
   ],
   urgency_bar: {
-    enabled: true,
-    text: "847 people applied for a loan today",
-    emoji: "🔥",
+    enabled: false,
+    text: "",
+    emoji: "",
   },
   promo_strip: {
-    enabled: true,
-    text: "ZERO processing fee on first loan — Offer ends soon",
-    highlight: "ZERO processing fee",
+    enabled: false,
+    text: "",
+    highlight: "",
   },
-  social_proof: { enabled: true, viewers_base: 142, label: "people comparing loan offers right now" },
+  social_proof: { enabled: false, viewers_base: 0, label: "" },
   dream_section: {
     title: "Your Dreams Deserve the Best Rate",
     subtitle: "Whether it's a dream wedding, your child's education, or expanding your business — we make borrowing feel effortless.",
@@ -98,9 +98,9 @@ export const FALLBACK_CONFIG: SiteConfig = {
   },
   theme: { accent: "teal", hero_style: "premium" },
   sections: {
-    urgency_bar: true,
-    promo_strip: true,
-    social_proof: true,
+    urgency_bar: false,
+    promo_strip: false,
+    social_proof: false,
     dream_section: true,
     metrics_ticker: true,
     emi_calculator: true,
@@ -113,7 +113,22 @@ export async function fetchSiteConfig(): Promise<SiteConfig> {
     const res = await fetch(`${API_BASE}/api/cms/config`, { cache: "no-store" });
     if (!res.ok) return FALLBACK_CONFIG;
     const data = await res.json();
-    return { ...FALLBACK_CONFIG, ...data.config };
+    const merged: SiteConfig = {
+      ...FALLBACK_CONFIG,
+      ...data.config,
+      hero: { ...FALLBACK_CONFIG.hero, ...data.config?.hero },
+      sections: {
+        ...FALLBACK_CONFIG.sections,
+        ...data.config?.sections,
+        urgency_bar: false,
+        promo_strip: false,
+        social_proof: false,
+      },
+      urgency_bar: { enabled: false, text: "", emoji: "" },
+      promo_strip: { enabled: false, text: "", highlight: "" },
+      social_proof: { enabled: false, viewers_base: 0, label: "" },
+    };
+    return merged;
   } catch {
     return FALLBACK_CONFIG;
   }

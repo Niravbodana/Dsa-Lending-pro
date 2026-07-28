@@ -21,24 +21,25 @@ export function Header() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-teal-900/10 bg-white/90 shadow-sm backdrop-blur-xl">
-      <div className="h-0.5 bg-gradient-to-r from-neercred-gold via-neercred-teal to-neercred-cyan" />
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
-        <Link href="/" className="flex items-center" onClick={() => setMenuOpen(false)}>
-          <NeerCredLogo size={42} />
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-neercred-navy/97 shadow-[0_8px_32px_rgba(11,18,32,0.35)] backdrop-blur-xl">
+      <div className="h-px bg-gradient-to-r from-transparent via-neercred-gold/50 to-transparent" />
+
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2 lg:gap-6 lg:py-2.5">
+        <Link href="/" className="flex shrink-0 items-center" onClick={() => setMenuOpen(false)}>
+          <NeerCredLogo size={58} className="rounded-xl bg-white/95 px-2 py-1 shadow-sm" />
         </Link>
 
-        <nav className="hidden items-center gap-1 xl:flex">
+        <nav className="hidden items-center gap-0.5 xl:flex">
           {navLinks.map((link) => {
             const active = pathname === link.href;
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
+                className={`rounded-lg px-3.5 py-2 text-[13px] font-semibold tracking-wide transition ${
                   active
-                    ? "bg-teal-50 text-neercred-teal"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-neercred-teal"
+                    ? "bg-white/10 text-neercred-gold"
+                    : "text-slate-300 hover:bg-white/5 hover:text-white"
                 }`}
               >
                 {link.label}
@@ -47,7 +48,7 @@ export function Header() {
           })}
           <Link
             href="/compliance"
-            className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 hover:text-neercred-teal"
+            className="rounded-lg px-3.5 py-2 text-[13px] font-semibold tracking-wide text-slate-300 transition hover:bg-white/5 hover:text-white"
           >
             Compliance
           </Link>
@@ -56,19 +57,19 @@ export function Header() {
         <div className="flex items-center gap-2 sm:gap-3">
           <Link
             href="/app"
-            className="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-slate-500 transition hover:bg-teal-50 hover:text-neercred-teal md:flex"
+            className="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-slate-400 transition hover:bg-white/5 hover:text-white md:flex"
           >
             <IconSmartphone size={14} /> App
           </Link>
           <Link
             href="/apply"
-            className="rounded-full bg-neercred-cta px-4 py-2.5 text-sm font-bold text-white shadow-neercred transition hover:brightness-110 sm:px-5"
+            className="rounded-full bg-gradient-to-r from-neercred-gold to-amber-500 px-5 py-2.5 text-sm font-bold text-neercred-navy shadow-lg shadow-amber-900/25 transition hover:brightness-110 sm:px-6"
           >
             Apply Now
           </Link>
           <button
             type="button"
-            className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 xl:hidden"
+            className="rounded-lg p-2 text-slate-300 hover:bg-white/10 hover:text-white xl:hidden"
             aria-label="Toggle menu"
             onClick={() => setMenuOpen((open) => !open)}
           >
@@ -78,13 +79,13 @@ export function Header() {
       </div>
 
       {menuOpen && (
-        <nav className="border-t border-slate-100 bg-white px-4 py-4 xl:hidden">
+        <nav className="border-t border-white/10 bg-neercred-navy px-4 py-4 xl:hidden">
           <div className="flex flex-col gap-1">
             {[...navLinks, { href: "/compliance", label: "Compliance" }, { href: "/security", label: "Security" }, { href: "/refer", label: "Refer & Earn" }].map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-teal-50 hover:text-neercred-teal"
+                className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-200 hover:bg-white/5 hover:text-neercred-gold"
                 onClick={() => setMenuOpen(false)}
               >
                 {link.label}
