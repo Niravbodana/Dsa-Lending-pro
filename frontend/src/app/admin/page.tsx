@@ -18,8 +18,9 @@ import {
   Lead,
   updateBug,
 } from "@/lib/api";
+import { SiteBuilderChat } from "@/components/SiteBuilderChat";
 
-type Tab = "dashboard" | "leads" | "applications" | "consents" | "bugs";
+type Tab = "dashboard" | "leads" | "applications" | "consents" | "sitebuilder" | "bugs";
 
 const statusColors: Record<string, string> = {
   open: "bg-red-100 text-red-700",
@@ -179,6 +180,7 @@ export default function AdminPage() {
               { id: "leads" as Tab, label: "👥 Leads" },
               { id: "applications" as Tab, label: "Applications" },
               { id: "consents" as Tab, label: "Legal Consents" },
+              { id: "sitebuilder" as Tab, label: "Site Builder AI" },
               { id: "bugs" as Tab, label: "Bug Fixer" },
             ]
           ).map((item) => (
@@ -207,7 +209,13 @@ export default function AdminPage() {
       <div className="ml-64 p-8">
         <div className="mb-8 flex items-center justify-between">
           <h1 className="text-2xl font-black text-slate-900 capitalize">
-            {tab === "bugs" ? "Bug Fixer" : tab === "consents" ? "Legal Consents" : tab}
+            {tab === "bugs"
+              ? "Bug Fixer"
+              : tab === "consents"
+                ? "Legal Consents"
+                : tab === "sitebuilder"
+                  ? "Site Builder AI"
+                  : tab}
           </h1>
           <button
             onClick={loadData}
@@ -432,6 +440,10 @@ export default function AdminPage() {
               </tbody>
             </table>
           </div>
+        )}
+
+        {tab === "sitebuilder" && token && (
+          <SiteBuilderChat token={token} />
         )}
 
         {/* Bugs */}

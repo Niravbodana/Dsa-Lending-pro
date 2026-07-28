@@ -47,6 +47,22 @@ User consents are **persisted in the database** (`user_consents` table) with ver
 
 View records in **Admin → Legal Consents**. Policy version: `2026.1` (see `backend/app/services/consent.py`).
 
+## Admin Site Builder (AI Chat CMS)
+
+Edit the **homepage live** from Admin → **Site Builder AI**:
+
+```
+change headline to Dream Big. Borrow Smart.
+set roi to 9.99%
+change photo to wedding
+change button text to Apply Karo Abhi
+show urgency bar
+urgency text: 500 people applied today
+reset website to default
+```
+
+Homepage auto-refreshes every 15 seconds. Public config API: `GET /api/cms/config`.
+
 ## Quick Start (Mac / Linux)
 
 ```bash
