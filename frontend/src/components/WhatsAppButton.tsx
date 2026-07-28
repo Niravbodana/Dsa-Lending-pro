@@ -1,8 +1,9 @@
 import { BRAND } from "@/lib/brand";
+import { IconWhatsApp } from "@/components/icons";
 
 const phone = BRAND.whatsapp;
 const message = encodeURIComponent(
-  `Hi ${BRAND.name}! I want to apply for a personal loan. Please help me.`
+  `Hi ${BRAND.name}, I would like assistance with a personal loan application.`
 );
 
 export function WhatsAppButton() {
@@ -11,10 +12,11 @@ export function WhatsAppButton() {
       href={`https://wa.me/${phone}?text=${message}`}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-24 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-green-500 text-2xl text-white shadow-2xl shadow-green-500/30 transition hover:scale-110 hover:bg-green-600"
+      className="fixed bottom-24 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-2xl shadow-green-600/30 transition hover:scale-105"
       title="Chat with us on WhatsApp"
+      aria-label="WhatsApp support"
     >
-      💬
+      <IconWhatsApp size={28} />
     </a>
   );
 }

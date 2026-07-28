@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { sendChatMessage, type ChatMessage } from "@/lib/api";
 import { BRAND } from "@/lib/brand";
+import { IconSparkles } from "@/components/icons";
 
 const WELCOME: ChatMessage = {
   role: "assistant",
@@ -93,11 +94,11 @@ export function AIChatWidget() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed bottom-40 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 text-2xl text-white shadow-2xl shadow-violet-600/40 transition hover:scale-110"
+        className="fixed bottom-40 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-slate-800 to-slate-900 text-white shadow-2xl transition hover:scale-105"
         title="Neer AI Assistant"
         aria-label="Open Neer AI Assistant"
       >
-        ✨
+        <IconSparkles size={22} />
       </button>
 
       {open && (
@@ -109,13 +110,13 @@ export function AIChatWidget() {
             onClick={() => setOpen(false)}
           />
           <div className="relative flex h-[min(640px,90vh)] w-full max-w-md flex-col overflow-hidden rounded-3xl bg-white shadow-2xl">
-            <div className="flex items-center gap-3 bg-gradient-to-r from-violet-600 to-indigo-600 px-5 py-4 text-white">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/20 text-xl">
-                ✨
+            <div className="flex items-center gap-3 bg-slate-900 px-5 py-4 text-white">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10">
+                <IconSparkles size={22} />
               </div>
               <div className="flex-1">
                 <p className="font-bold">Neer AI Assistant</p>
-                <p className="text-xs text-violet-100">{BRAND.name} · Loan expert</p>
+                <p className="text-xs text-slate-300">{BRAND.name} · Loan Intelligence</p>
               </div>
               <button
                 type="button"

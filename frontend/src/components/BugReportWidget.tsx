@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { reportBug } from "@/lib/api";
+import { IconBug, IconCheckCircle } from "@/components/icons";
 
 export function BugReportWidget() {
   const [open, setOpen] = useState(false);
@@ -39,10 +40,10 @@ export function BugReportWidget() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 left-6 z-40 flex items-center gap-2 rounded-full bg-slate-800 px-4 py-3 text-sm font-semibold text-white shadow-xl transition hover:bg-slate-700"
+        className="fixed bottom-6 left-6 z-40 flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-xl transition hover:bg-slate-50"
         title="Report a bug"
       >
-        🐛 Bug Report
+        <IconBug size={16} /> Support
       </button>
 
       {open && (
@@ -50,7 +51,7 @@ export function BugReportWidget() {
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
             {done ? (
               <div className="text-center">
-                <p className="text-4xl">✅</p>
+                <IconCheckCircle size={48} className="mx-auto text-emerald-500" />
                 <p className="mt-4 text-lg font-bold text-slate-900">Report Submitted!</p>
                 <p className="mt-2 text-sm text-slate-500">
                   Our team will fix it soon. Thank you!
@@ -64,7 +65,7 @@ export function BugReportWidget() {
               </div>
             ) : (
               <>
-                <h3 className="text-xl font-bold text-slate-900">🐛 Report a Bug</h3>
+                <h3 className="text-xl font-bold text-slate-900">Report an Issue</h3>
                 <p className="mt-1 text-sm text-slate-500">Found a problem? We&apos;ll fix it!</p>
                 {error && (
                   <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>

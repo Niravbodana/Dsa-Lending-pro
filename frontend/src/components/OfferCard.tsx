@@ -35,7 +35,7 @@ export function OfferCard({
     >
       {offer.is_best_deal && (
         <div className="absolute -top-3 left-6 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 px-4 py-1 text-xs font-extrabold text-slate-900 shadow-lg">
-          ⭐ BEST DEAL
+          BEST DEAL
         </div>
       )}
 
@@ -105,7 +105,7 @@ export function OfferCard({
             : "bg-teal-600 hover:bg-teal-700"
         }`}
       >
-        {loading ? "Processing..." : offer.is_best_deal ? "⭐ Select Best Deal →" : "Select This Offer →"}
+        {loading ? "Processing..." : offer.is_best_deal ? "Select Best Deal" : "Select This Offer"}
       </button>
     </div>
   );

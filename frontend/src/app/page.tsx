@@ -9,6 +9,12 @@ import {
   AppDownloadBanner,
   ReferBanner,
 } from "@/components/LandingSections";
+import {
+  BusinessModelFlow,
+  PlatformCapabilities,
+  PremiumFeaturesGrid,
+  MetricsTicker,
+} from "@/components/PremiumSections";
 import { Footer } from "@/components/Footer";
 import { EmiCalculator } from "@/components/EmiCalculator";
 import { Testimonials } from "@/components/Testimonials";
@@ -23,11 +29,15 @@ export default function Home() {
     <main className="min-h-screen">
       <Header />
       <Hero />
+      <MetricsTicker />
+      <BusinessModelFlow />
       <LoanProductsStrip />
       <LifestyleShowcase />
       <HowItWorks />
+      <PremiumFeaturesGrid />
       <EmiCalculator />
       <Testimonials />
+      <PlatformCapabilities />
       <TrustGallery />
       <Partners />
       <ReferBanner />

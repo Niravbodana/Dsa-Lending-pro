@@ -7,12 +7,12 @@ import { Footer } from "@/components/Footer";
 
 type Tab = "rbi" | "dpdp" | "privacy" | "terms" | "grievance";
 
-const tabs: { id: Tab; label: string; icon: string }[] = [
-  { id: "rbi", label: "RBI LSP Guidelines", icon: "🏛️" },
-  { id: "dpdp", label: "Data Protection (DPDP)", icon: "🔒" },
-  { id: "privacy", label: "Privacy Policy", icon: "📋" },
-  { id: "terms", label: "Terms of Service", icon: "📜" },
-  { id: "grievance", label: "Grievance Redressal", icon: "📞" },
+const tabs: { id: Tab; label: string }[] = [
+  { id: "rbi", label: "RBI LSP Guidelines" },
+  { id: "dpdp", label: "Data Protection (DPDP)" },
+  { id: "privacy", label: "Privacy Policy" },
+  { id: "terms", label: "Terms of Service" },
+  { id: "grievance", label: "Grievance Redressal" },
 ];
 
 const content: Record<Tab, { title: string; sections: { heading: string; body: string }[] }> = {
@@ -174,8 +174,7 @@ export default function CompliancePage() {
                   : "text-slate-600 hover:bg-slate-50"
               }`}
             >
-              <span>{t.icon}</span>
-              <span className="hidden sm:inline">{t.label}</span>
+              {t.label}
             </button>
           ))}
         </div>

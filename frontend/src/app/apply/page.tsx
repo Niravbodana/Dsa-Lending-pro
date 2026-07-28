@@ -382,7 +382,7 @@ export default function ApplyPage() {
               {eligibility && (
                 <div className="mb-6 rounded-xl bg-green-50 p-4">
                   <p className="font-bold text-green-800">
-                    ✅ Eligible — Score {eligibility.score}/100
+                    Eligible — Score {eligibility.score}/100
                   </p>
                   <p className="text-sm text-green-700">
                     Max loan: ₹{eligibility.max_loan_amount.toLocaleString("en-IN")} • DTI:{" "}

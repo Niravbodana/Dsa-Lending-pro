@@ -1,6 +1,7 @@
 import { PageShell } from "@/components/PageShell";
 import { InnerHero } from "@/components/InnerHero";
 import { BRAND } from "@/lib/brand";
+import { IconTarget, IconChart, IconShield, IconBolt } from "@/components/icons";
 
 export const metadata = { title: `About Us | ${BRAND.name}` };
 
@@ -12,10 +13,10 @@ export default function AboutPage() {
   ];
 
   const values = [
-    { icon: "🎯", title: "Transparency", desc: "No hidden charges. Everything is clear upfront." },
-    { icon: "⚡", title: "Speed", desc: "Eligibility in 5 minutes. Same-day approval possible." },
-    { icon: "🔒", title: "Security", desc: "Bank-grade encryption. DPDP Act compliant." },
-    { icon: "🤝", title: "Trust", desc: "Full compliance with RBI LSP guidelines." },
+    { title: "Transparency", desc: "No hidden charges. Everything is clear upfront.", Icon: IconTarget },
+    { title: "Speed", desc: "Eligibility in 5 minutes. Same-day approval possible.", Icon: IconBolt },
+    { title: "Security", desc: "Bank-grade encryption. DPDP Act compliant.", Icon: IconShield },
+    { title: "Trust", desc: "Full compliance with RBI LSP guidelines.", Icon: IconChart },
   ];
 
   return (
@@ -24,7 +25,7 @@ export default function AboutPage() {
         badge="OUR STORY"
         title="About Neer Loan Solutions"
         subtitle="India's premium loan marketplace — personalized offers and a transparent process built for you."
-        cta={{ label: "Apply for Loan →", href: "/apply" }}
+        cta={{ label: "Apply for Loan", href: "/apply" }}
         image="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1920&h=600&fit=crop"
       />
       <div className="mx-auto max-w-4xl px-4 py-16">
@@ -34,10 +35,6 @@ export default function AboutPage() {
             <strong>{BRAND.name}</strong> is a Loan Service Provider (LSP) that connects borrowers with
             India&apos;s best banks and NBFCs. We do not lend directly — we guide you to the right lender
             at the best rate with minimum paperwork.
-          </p>
-          <p className="mt-4 leading-relaxed text-slate-600">
-            Founded in Mumbai, we now facilitate personal loans across India — for weddings, medical
-            needs, travel, business, education, and more.
           </p>
         </div>
 
@@ -55,7 +52,9 @@ export default function AboutPage() {
         <div className="mt-8 grid gap-6 md:grid-cols-2">
           {values.map((v) => (
             <div key={v.title} className="flex gap-4 rounded-2xl bg-white p-6 shadow">
-              <span className="text-3xl">{v.icon}</span>
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700">
+                <v.Icon size={22} />
+              </div>
               <div>
                 <h3 className="font-bold text-slate-900">{v.title}</h3>
                 <p className="mt-1 text-sm text-slate-500">{v.desc}</p>
