@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ScrollReveal } from "@/components/ScrollReveal";
+import { ScrollReveal, ScrollRevealAlternate } from "@/components/ScrollReveal";
 import type { SiteConfig } from "@/lib/cms";
 
 export function DreamSection({ config }: { config: SiteConfig }) {
@@ -24,7 +24,7 @@ export function DreamSection({ config }: { config: SiteConfig }) {
 
         <div className="mt-16 grid gap-8 md:grid-cols-3">
           {d.cards.map((card, i) => (
-            <ScrollReveal key={card.title} variant="up" delay={i * 100}>
+            <ScrollRevealAlternate key={card.title} index={i} delay={i * 100}>
               <Link
                 href="/apply"
                 className="group block overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-slate-100 transition hover:-translate-y-2 hover:shadow-2xl"
@@ -49,7 +49,7 @@ export function DreamSection({ config }: { config: SiteConfig }) {
                   </span>
                 </div>
               </Link>
-            </ScrollReveal>
+            </ScrollRevealAlternate>
           ))}
         </div>
 

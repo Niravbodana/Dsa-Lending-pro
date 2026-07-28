@@ -9,11 +9,13 @@ export function ScrollReveal({
   className = "",
   variant = "up",
   delay = 0,
+  duration = 1000,
 }: {
   children: ReactNode;
   className?: string;
   variant?: RevealVariant;
   delay?: number;
+  duration?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -29,7 +31,7 @@ export function ScrollReveal({
           observer.unobserve(el);
         }
       },
-      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
+      { threshold: 0.08, rootMargin: "0px 0px -8% 0px" }
     );
 
     observer.observe(el);
@@ -48,9 +50,29 @@ export function ScrollReveal({
     <div
       ref={ref}
       className={`reveal ${variantClass} ${visible ? "reveal-visible" : ""} ${className}`}
-      style={{ transitionDelay: `${delay}ms` }}
+      style={{ transitionDelay: `${delay}ms`, transitionDuration: `${duration}ms` }}
     >
       {children}
     </div>
+  );
+}
+
+/** Alternates left/right motion for list items while scrolling. */
+export function ScrollRevealAlternate({
+  index,
+  children,
+  className = "",
+  delay = 0,
+}: {
+  index: number;
+  children: ReactNode;
+  className?: string;
+  delay?: number;
+}) {
+  const variant = index % 2 === 0 ? "left" : "right";
+  return (
+    <ScrollReveal variant={variant} delay={delay} className={className}>
+      {children}
+    </ScrollReveal>
   );
 }

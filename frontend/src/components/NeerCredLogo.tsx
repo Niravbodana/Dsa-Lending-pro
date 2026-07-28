@@ -8,13 +8,12 @@ type NeerCredLogoProps = {
   className?: string;
 };
 
-/** Original approved lockup asset — do not redraw in SVG (design drift). */
 const LOCKUP_SRC = "/neercred-logo-lockup.png";
 const LOCKUP_WIDTH = 1536;
 const LOCKUP_HEIGHT = 1024;
 const LOCKUP_ASPECT = LOCKUP_WIDTH / LOCKUP_HEIGHT;
 
-function LockupImage({ height, className = "" }: { height: number; className?: string }) {
+function LockupImage({ height, className = "" }: { height?: number; className?: string }) {
   return (
     <Image
       src={LOCKUP_SRC}
@@ -22,13 +21,12 @@ function LockupImage({ height, className = "" }: { height: number; className?: s
       width={LOCKUP_WIDTH}
       height={LOCKUP_HEIGHT}
       className={`w-auto object-contain ${className}`}
-      style={{ height, maxHeight: height }}
+      style={height ? { height, maxHeight: height } : undefined}
       priority
     />
   );
 }
 
-/** Icon-only crop from the approved lockup (left mark). */
 function LockupIcon({ size, className = "" }: { size: number; className?: string }) {
   return (
     <span
@@ -55,37 +53,32 @@ function LockupIcon({ size, className = "" }: { size: number; className?: string
 
 export function NeerCredLogo({
   variant = "full",
-  size = 40,
+  size,
   dark = false,
   className = "",
 }: NeerCredLogoProps) {
   if (variant === "icon") {
-    return <LockupIcon size={size} className={className} />;
+    return <LockupIcon size={size ?? 40} className={className} />;
   }
+
+  const height = size ?? 48;
+  const logo = <LockupImage height={className ? undefined : height} className={className} />;
 
   if (variant === "wordmark" || variant === "stacked") {
-    const height = variant === "stacked" ? size * 1.35 : size;
-    const logo = <LockupImage height={height} />;
     return (
-      <span className={`inline-flex flex-col items-center ${className}`}>
-        {dark ? (
-          <span className="inline-flex rounded-xl bg-white px-3 py-1.5 shadow-sm">{logo}</span>
-        ) : (
-          logo
-        )}
-      </span>
-    );
-  }
-
-  const logo = <LockupImage height={size} />;
-
-  if (dark) {
-    return (
-      <span className={`inline-flex items-center rounded-xl bg-white px-3 py-1.5 shadow-sm ${className}`}>
+      <span className={`inline-flex flex-col items-center ${dark ? "rounded-xl bg-white px-3 py-1.5 shadow-sm" : ""}`}>
         {logo}
       </span>
     );
   }
 
-  return <span className={`inline-flex items-center ${className}`}>{logo}</span>;
+  if (dark) {
+    return (
+      <span className={`inline-flex items-center rounded-xl bg-white px-3 py-1.5 shadow-sm ${className}`}>
+        <LockupImage height={className ? undefined : height} />
+      </span>
+    );
+  }
+
+  return <span className="inline-flex items-center">{logo}</span>;
 }

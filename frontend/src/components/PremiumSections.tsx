@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ScrollReveal } from "@/components/ScrollReveal";
+import { ScrollReveal, ScrollRevealAlternate } from "@/components/ScrollReveal";
 import {
   IconCpu,
   IconShield,
@@ -82,13 +82,13 @@ export function BusinessModelFlow() {
         </ScrollReveal>
         <div className="mt-14 grid gap-4 md:grid-cols-3 lg:grid-cols-6">
           {flowSteps.map((s, i) => (
-            <ScrollReveal key={s.step} variant="up" delay={i * 60}>
+            <ScrollRevealAlternate key={s.step} index={i} delay={i * 80}>
               <div className="relative rounded-2xl border border-slate-100 bg-slate-50 p-5 transition hover:border-teal-200 hover:shadow-lg">
                 <span className="text-xs font-bold text-teal-600">{s.step}</span>
                 <h3 className="mt-2 font-bold text-slate-900">{s.title}</h3>
                 <p className="mt-1 text-xs leading-relaxed text-slate-500">{s.desc}</p>
               </div>
-            </ScrollReveal>
+            </ScrollRevealAlternate>
           ))}
         </div>
       </div>
@@ -117,7 +117,7 @@ export function PlatformCapabilities() {
         </ScrollReveal>
         <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {capabilities.map((c, i) => (
-            <ScrollReveal key={c.phase} variant="up" delay={i * 80}>
+            <ScrollRevealAlternate key={c.phase} index={i} delay={i * 80}>
               <div className="h-full rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-500/20 text-teal-300">
@@ -137,7 +137,7 @@ export function PlatformCapabilities() {
                   ))}
                 </ul>
               </div>
-            </ScrollReveal>
+            </ScrollRevealAlternate>
           ))}
         </div>
       </div>
@@ -157,13 +157,13 @@ export function PremiumFeaturesGrid() {
         </ScrollReveal>
         <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {premiumFeatures.map((f, i) => (
-            <ScrollReveal key={f.title} variant="up" delay={i * 70}>
+            <ScrollRevealAlternate key={f.title} index={i} delay={i * 70}>
               <div className="h-full rounded-2xl border border-slate-100 bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
                 <div className="h-1 w-12 rounded-full bg-gradient-to-r from-teal-500 to-amber-400" />
                 <h3 className="mt-5 text-lg font-bold text-slate-900">{f.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-slate-500">{f.desc}</p>
               </div>
-            </ScrollReveal>
+            </ScrollRevealAlternate>
           ))}
         </div>
       </div>
@@ -181,13 +181,15 @@ export function MetricsTicker() {
   ];
 
   return (
-    <section className="border-b border-slate-200 bg-slate-900 py-6">
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-12 gap-y-4 px-4">
-        {metrics.map((m) => (
-          <div key={m.label} className="text-center">
-            <p className="text-xl font-black text-white">{m.value}</p>
-            <p className="text-xs uppercase tracking-wider text-slate-400">{m.label}</p>
-          </div>
+    <section className="border-b border-neercred-gold/20 bg-neercred-navy py-8">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-10 gap-y-4 px-4 sm:gap-x-14">
+        {metrics.map((m, i) => (
+          <ScrollRevealAlternate key={m.label} index={i} delay={i * 50}>
+            <div className="text-center">
+              <p className="text-2xl font-bold text-neercred-gold">{m.value}</p>
+              <p className="mt-0.5 text-[11px] uppercase tracking-widest text-slate-400">{m.label}</p>
+            </div>
+          </ScrollRevealAlternate>
         ))}
       </div>
     </section>

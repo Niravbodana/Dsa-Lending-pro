@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ScrollReveal, ScrollRevealAlternate } from "@/components/ScrollReveal";
 
 const faqs = [
   {
@@ -35,28 +36,31 @@ export function FAQ() {
   return (
     <section id="faq" className="bg-slate-50 py-24">
       <div className="mx-auto max-w-3xl px-4">
-        <div className="text-center">
+        <ScrollReveal variant="up" className="text-center">
           <h2 className="text-4xl font-black text-slate-900">
             Questions? <span className="text-teal-600">We Have Answers</span>
           </h2>
           <p className="mt-3 text-slate-500">Full transparency — no hidden charges</p>
-        </div>
+        </ScrollReveal>
         <div className="mt-12 space-y-3">
           {faqs.map((faq, i) => (
-            <div key={i} className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-              <button
-                onClick={() => setOpen(open === i ? null : i)}
-                className="flex w-full items-center justify-between px-6 py-5 text-left font-bold text-slate-900 transition hover:bg-slate-50"
-              >
-                {faq.q}
-                <span className="text-2xl text-teal-600">{open === i ? "−" : "+"}</span>
-              </button>
-              {open === i && (
-                <div className="border-t border-slate-100 px-6 py-4 leading-relaxed text-slate-600">
-                  {faq.a}
-                </div>
-              )}
-            </div>
+            <ScrollRevealAlternate key={faq.q} index={i} delay={i * 60}>
+              <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                <button
+                  type="button"
+                  onClick={() => setOpen(open === i ? null : i)}
+                  className="flex w-full items-center justify-between px-6 py-5 text-left font-bold text-slate-900 transition hover:bg-slate-50"
+                >
+                  {faq.q}
+                  <span className="text-2xl text-teal-600">{open === i ? "−" : "+"}</span>
+                </button>
+                {open === i && (
+                  <div className="border-t border-slate-100 px-6 py-4 leading-relaxed text-slate-600">
+                    {faq.a}
+                  </div>
+                )}
+              </div>
+            </ScrollRevealAlternate>
           ))}
         </div>
       </div>

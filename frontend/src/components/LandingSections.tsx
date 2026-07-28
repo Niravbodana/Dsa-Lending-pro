@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ScrollReveal } from "@/components/ScrollReveal";
+import { ScrollReveal, ScrollRevealAlternate } from "@/components/ScrollReveal";
 import {
   IconRupee,
   IconChart,
@@ -250,7 +250,7 @@ export function LoanProductsStrip() {
         </ScrollReveal>
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {loanCards.map((c, i) => (
-            <ScrollReveal key={c.title} variant="up" delay={i * 100}>
+            <ScrollRevealAlternate key={c.title} index={i} delay={i * 100}>
               <Link
                 href={c.href}
                 className="group block overflow-hidden rounded-3xl bg-white shadow-lg transition hover:-translate-y-2 hover:shadow-2xl"
@@ -270,7 +270,7 @@ export function LoanProductsStrip() {
                   <span className="text-sm font-bold text-teal-600">Apply →</span>
                 </div>
               </Link>
-            </ScrollReveal>
+            </ScrollRevealAlternate>
           ))}
         </div>
         <ScrollReveal variant="fade" className="mt-10 text-center">
@@ -355,25 +355,25 @@ export function AppDownloadBanner() {
 
 export function ReferBanner() {
   return (
-    <section className="relative overflow-hidden bg-amber-50 py-14">
+    <section className="relative overflow-hidden border-y border-neercred-gold/20 bg-gradient-to-r from-neercred-navy to-neercred-teal py-16 text-white">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-6 px-4">
         <ScrollReveal variant="left" className="flex items-center gap-6">
-          <div className="relative hidden h-24 w-24 overflow-hidden rounded-2xl sm:block">
+          <div className="relative hidden h-24 w-24 overflow-hidden rounded-2xl ring-2 ring-white/20 sm:block">
             <Image
               src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&h=200&fit=crop"
-              alt="Friends referring"
+              alt="Referral program"
               fill
               className="object-cover"
             />
           </div>
           <div>
-            <p className="text-2xl font-black text-amber-900">Refer &amp; Earn ₹2,000</p>
-            <p className="text-amber-700">Refer friends and earn on every successful disbursal</p>
+            <p className="text-2xl font-bold">Refer &amp; Earn</p>
+            <p className="text-slate-300">Earn rewards on every successful referral disbursal</p>
           </div>
         </ScrollReveal>
         <ScrollReveal variant="right">
-          <Link href="/refer" className="rounded-xl bg-amber-500 px-8 py-4 font-bold text-slate-900 shadow-lg">
-            Refer Now →
+          <Link href="/refer" className="rounded-xl bg-gradient-to-r from-neercred-gold to-amber-500 px-8 py-4 font-bold text-neercred-navy shadow-lg transition hover:brightness-110">
+            View Program
           </Link>
         </ScrollReveal>
       </div>
@@ -400,7 +400,7 @@ export function HowItWorks() {
         </ScrollReveal>
         <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
           {steps.map((step, i) => (
-            <ScrollReveal key={step.num} variant="up" delay={i * 100}>
+            <ScrollRevealAlternate key={step.num} index={i} delay={i * 100}>
               <div className="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-lg transition hover:-translate-y-2 hover:shadow-2xl">
                 <div className="relative h-36">
                   <Image src={step.image} alt={step.title} fill className="object-cover" />
@@ -415,7 +415,7 @@ export function HowItWorks() {
                   <p className="mt-2 text-slate-500">{step.desc}</p>
                 </div>
               </div>
-            </ScrollReveal>
+            </ScrollRevealAlternate>
           ))}
         </div>
       </div>
