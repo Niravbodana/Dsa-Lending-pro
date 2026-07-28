@@ -1,6 +1,6 @@
 # Neer Loan Solutions — Complete A to Z Loan Marketplace
 
-Personal Loan Marketplace (LSP model) — MoneyView/Navi style. Connect customers with partner banks, earn commission on disbursal.
+Personal Loan Marketplace (LSP model) — premium digital lending platform. Connect customers with partner banks, earn commission on disbursal.
 
 ## Full Platform Features
 

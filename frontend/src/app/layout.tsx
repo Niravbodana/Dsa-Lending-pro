@@ -11,7 +11,7 @@ const geistSans = Geist({
 export const metadata: Metadata = {
   title: `${BRAND.name} | Personal Loan in Minutes`,
   description:
-    "Compare personal loan offers from top partner banks & NBFCs. Get up to ₹5,00,000 with instant eligibility check. Like MoneyView & Navi.",
+    "Compare personal loan offers from top partner banks & NBFCs. Get up to ₹5,00,000 with instant eligibility check. Fully digital, RBI LSP compliant.",
 };
 
 export default function RootLayout({

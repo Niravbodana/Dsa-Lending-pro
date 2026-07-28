@@ -12,7 +12,7 @@ export function Footer() {
             </p>
             <p className="mt-3 text-sm leading-relaxed text-slate-400">
               India&apos;s smart personal loan marketplace. Compare offers from 15+ partner banks
-              &amp; NBFCs — MoneyView &amp; Navi style, made for you.
+              &amp; NBFCs — transparent, digital, RBI-compliant.
             </p>
             <div className="mt-4 flex gap-3">
               <Link href="/app" className="rounded-lg bg-slate-800 px-4 py-2 text-xs font-semibold hover:bg-slate-700">

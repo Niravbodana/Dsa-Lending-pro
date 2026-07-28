@@ -4,6 +4,8 @@ import {
   HowItWorks,
   Partners,
   LoanProductsStrip,
+  LifestyleShowcase,
+  TrustGallery,
   AppDownloadBanner,
   ReferBanner,
 } from "@/components/LandingSections";
@@ -22,9 +24,11 @@ export default function Home() {
       <Header />
       <Hero />
       <LoanProductsStrip />
+      <LifestyleShowcase />
       <HowItWorks />
       <EmiCalculator />
       <Testimonials />
+      <TrustGallery />
       <Partners />
       <ReferBanner />
       <AppDownloadBanner />

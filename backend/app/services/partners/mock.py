@@ -57,9 +57,9 @@ PARTNER_PROFILES = [
         "amount_offset": 30000,
     },
     {
-        "partner_id": "moneyview",
-        "lender_name": "MoneyView NBFC",
-        "lender_logo": "MV",
+        "partner_id": "neo_finance",
+        "lender_name": "Neo Finance NBFC",
+        "lender_logo": "NEO",
         "interest_rate": 14.49,
         "tenure_months": 36,
         "processing_fee": "3%",

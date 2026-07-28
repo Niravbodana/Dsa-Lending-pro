@@ -78,8 +78,8 @@ def fetch_partner_offers(
             "features": ["No hidden charges", "Online KYC"],
         },
         {
-            "offer_id": "moneyview-pl-005",
-            "lender_name": "MoneyView NBFC",
+            "offer_id": "neo-pl-005",
+            "lender_name": "Neo Finance NBFC",
             "lender_logo": "MV",
             "interest_rate": 14.49,
             "tenure_months": 36,

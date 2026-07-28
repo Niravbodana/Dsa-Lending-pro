@@ -18,7 +18,7 @@ export default function ReferPage() {
       <InnerHero
         badge="REFER & EARN"
         title="Dosto Ko Refer Karo, ₹2,000 Kamao"
-        subtitle="Har successful disbursal pe ₹2,000 — Navi Refer & Earn jaisa program."
+        subtitle="Har successful disbursal pe ₹2,000 — apne dosto ko Neer Loan Solutions se connect karo."
         cta={{ label: "Start Referring →", href: "/apply" }}
       />
       <div className="mx-auto max-w-4xl px-4 py-16">

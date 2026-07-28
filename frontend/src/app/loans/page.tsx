@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { PageShell } from "@/components/PageShell";
 import { InnerHero } from "@/components/InnerHero";
 import { BRAND } from "@/lib/brand";
@@ -8,63 +9,57 @@ export const metadata = { title: `Loan Products | ${BRAND.name}` };
 const products = [
   {
     slug: "personal",
-    icon: "💰",
     title: "Personal Loan",
     amount: "₹50K – ₹5L",
     rate: "10.99% onwards",
     desc: "Kisi bhi personal need ke liye — no questions asked.",
     features: ["Instant eligibility", "No collateral", "Flexible tenure"],
-    color: "from-teal-500 to-cyan-600",
+    image: "https://images.unsplash.com/photo-1554224311-0fb870a1d0ef?w=600&h=360&fit=crop",
   },
   {
     slug: "medical",
-    icon: "🏥",
     title: "Medical Emergency Loan",
     amount: "₹1L – ₹5L",
     rate: "11.49% onwards",
     desc: "Medical emergency? Same-day approval possible.",
     features: ["Fast disbursal", "Minimal docs", "Priority processing"],
-    color: "from-red-500 to-rose-600",
+    image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&h=360&fit=crop",
   },
   {
     slug: "wedding",
-    icon: "💍",
     title: "Wedding Loan",
     amount: "₹2L – ₹5L",
     rate: "11.99% onwards",
     desc: "Sapno ki shaadi — budget tension free.",
     features: ["High loan amount", "Long tenure", "Special rates"],
-    color: "from-pink-500 to-purple-600",
+    image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=600&h=360&fit=crop",
   },
   {
     slug: "business",
-    icon: "📈",
     title: "Business Loan",
     amount: "₹1L – ₹5L",
     rate: "12.49% onwards",
     desc: "Business grow karo — working capital ke liye.",
     features: ["Self-employed friendly", "Quick approval", "No property needed"],
-    color: "from-amber-500 to-orange-600",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=360&fit=crop",
   },
   {
     slug: "education",
-    icon: "🎓",
     title: "Education Loan",
     amount: "₹50K – ₹3L",
     rate: "11.25% onwards",
     desc: "Padhai ke sapne poore karo.",
     features: ["Student friendly", "Moratorium option", "Low EMI"],
-    color: "from-blue-500 to-indigo-600",
+    image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&h=360&fit=crop",
   },
   {
     slug: "travel",
-    icon: "✈️",
     title: "Travel Loan",
     amount: "₹50K – ₹2L",
     rate: "12.99% onwards",
     desc: "Dream vacation — ab EMI mein possible.",
     features: ["Quick process", "No advance", "Digital only"],
-    color: "from-sky-500 to-blue-600",
+    image: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&h=360&fit=crop",
   },
 ];
 
@@ -74,20 +69,24 @@ export default function LoansPage() {
       <InnerHero
         badge="LOAN PRODUCTS"
         title="Saari Loan Types, Ek Platform"
-        subtitle="MoneyView & Navi jaisa — compare karo, best offer choose karo."
+        subtitle="Ek platform pe saari loan types — compare karo, best offer choose karo."
         cta={{ label: "Check Eligibility →", href: "/apply" }}
+        image="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920&h=600&fit=crop"
       />
       <div className="mx-auto max-w-6xl px-4 py-16">
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {products.map((p) => (
             <div
               key={p.slug}
-              className="overflow-hidden rounded-3xl bg-white shadow-lg transition hover:-translate-y-1 hover:shadow-xl"
+              className="overflow-hidden rounded-3xl bg-white shadow-lg transition hover:-translate-y-2 hover:shadow-2xl"
             >
-              <div className={`bg-gradient-to-br ${p.color} p-6 text-white`}>
-                <span className="text-4xl">{p.icon}</span>
-                <h2 className="mt-4 text-xl font-black">{p.title}</h2>
-                <p className="mt-1 text-sm text-white/80">{p.amount}</p>
+              <div className="relative h-44">
+                <Image src={p.image} alt={p.title} fill className="object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent" />
+                <div className="absolute bottom-4 left-4 text-white">
+                  <h2 className="text-xl font-black">{p.title}</h2>
+                  <p className="text-sm text-white/80">{p.amount}</p>
+                </div>
               </div>
               <div className="p-6">
                 <p className="text-slate-600">{p.desc}</p>

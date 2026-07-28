@@ -11,7 +11,7 @@ const rateTable = [
   { lender: "Bajaj Finserv", min: "12.99%", max: "16.99%", fee: "2.5%", tenure: "12–60 mo" },
   { lender: "Tata Capital", min: "13.25%", max: "17.25%", fee: "2%", tenure: "12–48 mo" },
   { lender: "Axis Bank", min: "11.75%", max: "15.75%", fee: "2%", tenure: "12–48 mo" },
-  { lender: "MoneyView NBFC", min: "14.49%", max: "18.49%", fee: "3%", tenure: "6–36 mo" },
+  { lender: "Neo Finance NBFC", min: "14.49%", max: "18.49%", fee: "3%", tenure: "6–36 mo" },
 ];
 
 const charges = [
@@ -29,7 +29,7 @@ export default function RatesPage() {
       <InnerHero
         badge="TRANSPARENT PRICING"
         title="Interest Rates & Charges"
-        subtitle="Koi chhupa charge nahi — sab kuch clear table mein. Navi/MoneyView style transparency."
+        subtitle="Koi chhupa charge nahi — sab kuch clear table mein. Full pricing transparency."
       />
       <div className="mx-auto max-w-5xl px-4 py-16">
         <div className="overflow-hidden rounded-2xl bg-white shadow-lg">

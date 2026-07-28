@@ -23,7 +23,7 @@ export default function AboutPage() {
       <InnerHero
         badge="OUR STORY"
         title="About Neer Loan Solutions"
-        subtitle="Hum India ka smart loan marketplace hain — MoneyView aur Navi jaisa, par aapke liye personalized."
+        subtitle="Hum India ka premium loan marketplace hain — aapke liye personalized offers, transparent process."
         cta={{ label: "Apply for Loan →", href: "/apply" }}
       />
       <div className="mx-auto max-w-4xl px-4 py-16">

@@ -10,6 +10,10 @@
   --gold: #f59e0b;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
@@ -38,9 +42,44 @@ body {
   .animate-pulse-slow {
     animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
+  .premium-section-dark {
+    @apply bg-slate-950 text-white;
+  }
+  .image-parallax {
+    background-attachment: fixed;
+    background-position: center;
+    background-size: cover;
+  }
 }
 
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-12px); }
+}
+
+/* Scroll reveal animations */
+.reveal {
+  opacity: 0;
+  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-up { transform: translateY(48px); }
+.reveal-left { transform: translateX(-48px); }
+.reveal-right { transform: translateX(48px); }
+.reveal-scale { transform: scale(0.92); }
+.reveal-fade { transform: none; }
+
+.reveal-visible {
+  opacity: 1;
+  transform: translate(0) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }

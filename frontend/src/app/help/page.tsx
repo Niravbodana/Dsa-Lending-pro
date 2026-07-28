@@ -46,7 +46,7 @@ export default function HelpPage() {
       <InnerHero
         badge="HELP CENTER"
         title="Kaise Madad Kar Sakte Hain?"
-        subtitle="MoneyView Help Center jaisa — saare common sawalon ke jawab."
+        subtitle="Saare common sawalon ke jawab — loan apply, KYC, EMI, tracking sab yahan."
       />
       <div className="mx-auto max-w-4xl px-4 py-16">
         <div className="mb-8 flex flex-wrap gap-3">
