@@ -15,6 +15,7 @@ import {
   submitDetails,
   verifyOtp,
 } from "@/lib/api";
+import { CONSENT_VERSIONS } from "@/lib/consent";
 
 type Step = "mobile" | "otp" | "details" | "eligibility" | "offers";
 type SortBy = "rate" | "amount" | "emi";
@@ -35,7 +36,15 @@ export default function ApplyPage() {
   const [error, setError] = useState("");
   const [eligibility, setEligibility] = useState<EligibilityResult | null>(null);
   const [sortBy, setSortBy] = useState<SortBy>("rate");
-  const [consent, setConsent] = useState(false);
+  const [smsConsent, setSmsConsent] = useState(false);
+  const [privacyConsent, setPrivacyConsent] = useState(false);
+  const [termsConsent, setTermsConsent] = useState(false);
+  const [dpdpConsent, setDpdpConsent] = useState(false);
+  const [creditConsent, setCreditConsent] = useState(false);
+  const [marketingConsent, setMarketingConsent] = useState(false);
+  const [lenderConsent, setLenderConsent] = useState(false);
+
+  const allRequiredConsents = privacyConsent && termsConsent && dpdpConsent;
 
   const [form, setForm] = useState({
     full_name: "",
@@ -59,10 +68,14 @@ export default function ApplyPage() {
 
   async function handleSendOtp(e: React.FormEvent) {
     e.preventDefault();
+    if (!smsConsent) {
+      setError("Please consent to receive OTP via SMS for verification.");
+      return;
+    }
     setError("");
     setLoading(true);
     try {
-      const res = await sendOtp(mobile);
+      const res = await sendOtp(mobile, true);
       setDevOtp(res.dev_otp || null);
       setStep("otp");
     } catch (err) {
@@ -90,8 +103,8 @@ export default function ApplyPage() {
 
   async function handleSubmitDetails(e: React.FormEvent) {
     e.preventDefault();
-    if (!consent) {
-      setError("Please accept the data protection & compliance terms to continue.");
+    if (!allRequiredConsents) {
+      setError("Please accept Privacy Policy, Terms of Service, and DPDP data processing consent.");
       return;
     }
     setError("");
@@ -104,6 +117,17 @@ export default function ApplyPage() {
         monthly_income: Number(form.monthly_income),
         employment_type: form.employment_type,
         city: form.city,
+        page_url: "/apply",
+        consents: {
+          dpdp_data_processing: dpdpConsent,
+          privacy_policy: privacyConsent,
+          terms_of_service: termsConsent,
+          credit_bureau_check: creditConsent,
+          marketing_communications: marketingConsent,
+          privacy_version: CONSENT_VERSIONS.privacy_policy,
+          terms_version: CONSENT_VERSIONS.terms_of_service,
+          dpdp_version: CONSENT_VERSIONS.dpdp_data_processing,
+        },
       });
       setStep("eligibility");
     } catch (err) {
@@ -143,6 +167,10 @@ export default function ApplyPage() {
   }
 
   async function handleSelectOffer(offer: LoanOffer) {
+    if (!lenderConsent) {
+      setError("Please consent to share your data with the selected partner lender.");
+      return;
+    }
     setError("");
     setLoading(true);
     try {
@@ -154,6 +182,8 @@ export default function ApplyPage() {
         interest_rate: offer.interest_rate,
         tenure_months: offer.tenure_months,
         emi: offer.emi,
+        lender_data_sharing_consent: true,
+        page_url: "/apply",
       });
       localStorage.setItem(`app_ref_${res.application_id}`, res.application_ref);
       router.push(`/application/${res.application_id}/kyc`);
@@ -202,9 +232,21 @@ export default function ApplyPage() {
                 className="mt-6 w-full rounded-xl border border-slate-200 px-4 py-3 text-lg outline-none focus:border-teal-500"
                 required
               />
+              <label className="mt-4 flex items-start gap-3 text-sm text-slate-600">
+                <input
+                  type="checkbox"
+                  checked={smsConsent}
+                  onChange={(e) => setSmsConsent(e.target.checked)}
+                  className="mt-1 accent-teal-600"
+                />
+                <span>
+                  I consent to receive a one-time OTP via SMS on my mobile number for identity
+                  verification (DPDP Act 2023).
+                </span>
+              </label>
               <button
                 type="submit"
-                disabled={loading || mobile.length !== 10}
+                disabled={loading || mobile.length !== 10 || !smsConsent}
                 className="mt-6 w-full rounded-xl bg-teal-600 py-3 font-bold text-white disabled:opacity-50"
               >
                 {loading ? "Sending..." : "Send OTP →"}
@@ -294,24 +336,76 @@ export default function ApplyPage() {
                   required
                 />
               </div>
-              <label className="mt-4 flex items-start gap-3 text-sm text-slate-600">
-                <input
-                  type="checkbox"
-                  checked={consent}
-                  onChange={(e) => setConsent(e.target.checked)}
-                  className="mt-1 accent-teal-600"
-                />
-                <span>
-                  I agree to Neer Loan Solutions&apos;s{" "}
-                  <Link href="/compliance" className="font-semibold text-teal-600 underline">
-                    RBI compliance & DPDP data protection
-                  </Link>{" "}
-                  terms. My data will be shared with partner lenders only upon offer selection.
-                </span>
-              </label>
+              <div className="mt-6 space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+                <p className="font-semibold text-slate-800">Legal consent (required)</p>
+                <label className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    checked={privacyConsent}
+                    onChange={(e) => setPrivacyConsent(e.target.checked)}
+                    className="mt-1 accent-teal-600"
+                  />
+                  <span>
+                    I have read and accept the{" "}
+                    <Link href="/compliance" className="font-semibold text-teal-600 underline">
+                      Privacy Policy
+                    </Link>{" "}
+                    (v{CONSENT_VERSIONS.privacy_policy}).
+                  </span>
+                </label>
+                <label className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    checked={termsConsent}
+                    onChange={(e) => setTermsConsent(e.target.checked)}
+                    className="mt-1 accent-teal-600"
+                  />
+                  <span>
+                    I accept the{" "}
+                    <Link href="/compliance" className="font-semibold text-teal-600 underline">
+                      Terms of Service
+                    </Link>{" "}
+                    (v{CONSENT_VERSIONS.terms_of_service}).
+                  </span>
+                </label>
+                <label className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    checked={dpdpConsent}
+                    onChange={(e) => setDpdpConsent(e.target.checked)}
+                    className="mt-1 accent-teal-600"
+                  />
+                  <span>
+                    I consent to Neer Loan Solutions processing my personal data under the DPDP Act
+                    2023 (v{CONSENT_VERSIONS.dpdp_data_processing}). Data is shared with partner
+                    lenders only after I select an offer.
+                  </span>
+                </label>
+                <label className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    checked={creditConsent}
+                    onChange={(e) => setCreditConsent(e.target.checked)}
+                    className="mt-1 accent-teal-600"
+                  />
+                  <span>
+                    Optional: I consent to credit bureau checks (CIBIL/Experian) for eligibility
+                    assessment.
+                  </span>
+                </label>
+                <label className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    checked={marketingConsent}
+                    onChange={(e) => setMarketingConsent(e.target.checked)}
+                    className="mt-1 accent-teal-600"
+                  />
+                  <span>Optional: Send me loan offers and product updates via SMS/email.</span>
+                </label>
+              </div>
               <button
                 type="submit"
-                disabled={loading || !consent}
+                disabled={loading || !allRequiredConsents}
                 className="mt-6 w-full rounded-xl bg-teal-600 py-3 font-bold text-white disabled:opacity-50"
               >
                 {loading ? "Saving..." : "Check Eligibility →"}
@@ -408,6 +502,18 @@ export default function ApplyPage() {
                   <option value="emi">Lowest EMI</option>
                 </select>
               </div>
+              <label className="mt-6 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+                <input
+                  type="checkbox"
+                  checked={lenderConsent}
+                  onChange={(e) => setLenderConsent(e.target.checked)}
+                  className="mt-1 accent-teal-600"
+                />
+                <span>
+                  I consent to share my application data (name, PAN, income, KYC) with the partner
+                  lender I select, solely for loan processing (DPDP + RBI LSP guidelines).
+                </span>
+              </label>
               <div className="mt-6 space-y-4">
                 {sortedOffers.map((offer) => (
                   <OfferCard

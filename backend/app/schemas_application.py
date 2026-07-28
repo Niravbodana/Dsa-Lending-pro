@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 # --- KYC ---
@@ -42,6 +42,13 @@ class EsignRequest(BaseModel):
     session_token: str
     application_id: int
     agreed: bool
+    page_url: str | None = None
+
+    @model_validator(mode="after")
+    def agreement_required(self) -> "EsignRequest":
+        if not self.agreed:
+            raise ValueError("Loan agreement consent is required")
+        return self
 
 
 class SubmitApplicationRequest(BaseModel):

@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.database import get_db
-from app.models import BugReport, Lead, LoanApplication
+from app.models import BugReport, Lead, LoanApplication, UserConsent
 from app.schemas_admin import (
     AdminLoginRequest,
     AdminLoginResponse,
@@ -21,6 +21,7 @@ from app.schemas_admin import (
     LeadAdminResponse,
     LeadStatusUpdate,
 )
+from app.schemas_consent import ConsentRecordResponse
 
 from app.services.application import update_application_status
 
@@ -210,3 +211,19 @@ def update_application(
         raise HTTPException(status_code=404, detail="Application not found")
     update_application_status(db, app, payload.status, payload.message, source="admin")
     return app
+
+
+@router.get("/consents", response_model=list[ConsentRecordResponse])
+def list_consents(
+    lead_id: int | None = None,
+    mobile: str | None = None,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+    _: None = Depends(verify_admin),
+):
+    q = db.query(UserConsent).order_by(UserConsent.created_at.desc())
+    if lead_id is not None:
+        q = q.filter(UserConsent.lead_id == lead_id)
+    if mobile:
+        q = q.filter(UserConsent.mobile == mobile)
+    return q.limit(min(limit, 500)).all()

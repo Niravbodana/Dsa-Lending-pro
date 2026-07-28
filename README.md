@@ -31,7 +31,21 @@ Personal Loan Marketplace (LSP model) — premium digital lending platform. Conn
 | `/app` | Mobile app download |
 | `/partner-with-us` | Lender & DSA partnerships |
 | `/compliance` | RBI LSP + DPDP Act |
-| `/admin` | Admin panel (`admin123`) |
+| `/admin` | Admin panel (`admin123`) — includes **Legal Consents** audit log |
+
+## Legal Consent (DPDP Act 2023)
+
+User consents are **persisted in the database** (`user_consents` table) with version, timestamp, IP, and page URL:
+
+| Step | Consent types recorded |
+|------|------------------------|
+| Apply — mobile | `sms_otp` |
+| Apply — details | `privacy_policy`, `terms_of_service`, `dpdp_data_processing`, optional `credit_bureau_check`, `marketing_communications` |
+| Offer selection | `lender_data_sharing` |
+| KYC eSign | `loan_agreement_esign` |
+| Site-wide | `cookie_essential`, `cookie_analytics` (cookie banner) |
+
+View records in **Admin → Legal Consents**. Policy version: `2026.1` (see `backend/app/services/consent.py`).
 
 ## Quick Start (Mac / Linux)
 

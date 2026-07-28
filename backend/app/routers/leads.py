@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -14,6 +14,7 @@ from app.schemas import (
     SelectOfferResponse,
 )
 from app.services.application import add_status_history, generate_application_ref, send_notification
+from app.services.consent import record_consent, record_consent_bundle, log_consent_event
 from app.services.eligibility import EligibilityInput, check_eligibility
 from app.services.offer_engine import fetch_partner_offers_sync
 from app.services.otp import get_lead_by_mobile, get_mobile_from_token
@@ -29,7 +30,9 @@ def _auth(db: Session, token: str) -> str:
 
 
 @router.post("/details", response_model=LeadResponse)
-def save_lead_details(payload: LeadDetailsRequest, db: Session = Depends(get_db)):
+def save_lead_details(
+    payload: LeadDetailsRequest, request: Request, db: Session = Depends(get_db)
+):
     mobile = _auth(db, payload.session_token)
     lead = get_lead_by_mobile(db, mobile)
     if not lead:
@@ -41,6 +44,29 @@ def save_lead_details(payload: LeadDetailsRequest, db: Session = Depends(get_db)
     lead.employment_type = payload.employment_type
     lead.city = payload.city
     lead.status = "details_submitted"
+
+    c = payload.consents
+    record_consent_bundle(
+        db,
+        mobile=mobile,
+        lead_id=lead.id,
+        application_id=None,
+        consents={
+            "dpdp_data_processing": c.dpdp_data_processing,
+            "privacy_policy": c.privacy_policy,
+            "terms_of_service": c.terms_of_service,
+            "credit_bureau_check": c.credit_bureau_check,
+            "marketing_communications": c.marketing_communications,
+        },
+        page_url=payload.page_url or "/apply",
+        request=request,
+    )
+    log_consent_event(
+        db,
+        lead.id,
+        "legal_consent_recorded",
+        f"privacy={c.privacy_version}, terms={c.terms_version}, dpdp={c.dpdp_version}",
+    )
     db.add(ApplicationLog(lead_id=lead.id, event="details_submitted", details=payload.city))
     db.commit()
     db.refresh(lead)
@@ -136,7 +162,7 @@ def get_offers(session_token: str, db: Session = Depends(get_db)):
 
 
 @router.post("/select-offer", response_model=SelectOfferResponse)
-def select_offer(payload: SelectOfferRequest, db: Session = Depends(get_db)):
+def select_offer(payload: SelectOfferRequest, request: Request, db: Session = Depends(get_db)):
     mobile = _auth(db, payload.session_token)
     lead = get_lead_by_mobile(db, mobile)
     if not lead:
@@ -160,6 +186,27 @@ def select_offer(payload: SelectOfferRequest, db: Session = Depends(get_db)):
     )
     db.add(application)
     db.flush()
+
+    ip, ua = client_meta(request)
+    record_consent(
+        db,
+        consent_type="lender_data_sharing",
+        accepted=True,
+        lead_id=lead.id,
+        application_id=application.id,
+        mobile=mobile,
+        page_url=payload.page_url or "/apply",
+        metadata=f"lender={payload.lender_name}",
+        ip_address=ip,
+        user_agent=ua,
+    )
+    log_consent_event(
+        db,
+        lead.id,
+        "lender_data_sharing_consent",
+        f"{payload.lender_name} — app {app_ref}",
+    )
+
     add_status_history(db, application.id, "offer_selected", f"Offer from {payload.lender_name}")
     add_status_history(db, application.id, "kyc_pending", "Complete KYC to proceed")
     db.add(

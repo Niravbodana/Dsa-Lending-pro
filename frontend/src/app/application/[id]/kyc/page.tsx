@@ -99,7 +99,12 @@ export default function KycPage() {
     setLoading(true);
     setError("");
     try {
-      await esignComplete({ session_token: token, application_id: appId, agreed });
+      await esignComplete({
+        session_token: token,
+        application_id: appId,
+        agreed,
+        page_url: `/application/${appId}/kyc`,
+      });
       setStep("submit");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed");

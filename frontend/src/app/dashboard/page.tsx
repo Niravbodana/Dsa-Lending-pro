@@ -32,6 +32,7 @@ export default function DashboardPage() {
   } | null>(null);
   const [emi, setEmi] = useState<{ month: number; emi: number; balance: number }[]>([]);
   const [loading, setLoading] = useState(false);
+  const [smsConsent, setSmsConsent] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("session_token");
@@ -57,9 +58,10 @@ export default function DashboardPage() {
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
+    if (!smsConsent) return;
     setLoading(true);
     try {
-      await sendOtp(mobile);
+      await sendOtp(mobile, true);
       setDevOtp("sent");
     } finally {
       setLoading(false);
@@ -113,9 +115,19 @@ export default function DashboardPage() {
                   className="w-full rounded-xl border px-4 py-3"
                   required
                 />
+                <label className="flex items-start gap-2 text-xs text-slate-600">
+                  <input
+                    type="checkbox"
+                    checked={smsConsent}
+                    onChange={(e) => setSmsConsent(e.target.checked)}
+                    className="mt-0.5 accent-teal-600"
+                  />
+                  <span>I consent to receive OTP via SMS for login (DPDP Act 2023).</span>
+                </label>
                 <button
                   type="submit"
-                  className="w-full rounded-xl bg-teal-600 py-3 font-bold text-white"
+                  disabled={!smsConsent || mobile.length !== 10}
+                  className="w-full rounded-xl bg-teal-600 py-3 font-bold text-white disabled:opacity-50"
                 >
                   Send OTP
                 </button>

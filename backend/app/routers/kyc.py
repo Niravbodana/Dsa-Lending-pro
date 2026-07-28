@@ -1,7 +1,7 @@
 import hashlib
 import random
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from app.config import settings
@@ -21,6 +21,7 @@ from app.services.application import (
     send_notification,
     update_application_status,
 )
+from app.services.consent import client_meta, log_consent_event, record_consent
 from app.services.otp import get_lead_by_mobile, get_mobile_from_token
 
 router = APIRouter(prefix="/kyc", tags=["kyc"])
@@ -103,13 +104,33 @@ def bank_verify(payload: BankVerifyRequest, db: Session = Depends(get_db)):
 
 
 @router.post("/esign", response_model=KycStepResponse)
-def esign_complete(payload: EsignRequest, db: Session = Depends(get_db)):
+def esign_complete(payload: EsignRequest, request: Request, db: Session = Depends(get_db)):
     mobile, app = _get_app(db, payload.session_token, payload.application_id)
 
     if not app.bank_verified:
         raise HTTPException(status_code=400, detail="Complete bank verification first")
-    if not payload.agreed:
-        raise HTTPException(status_code=400, detail="You must agree to the loan agreement")
+
+    lead = get_lead_by_mobile(db, mobile)
+    ip, ua = client_meta(request)
+    record_consent(
+        db,
+        consent_type="loan_agreement_esign",
+        accepted=True,
+        lead_id=lead.id if lead else None,
+        application_id=app.id,
+        mobile=mobile,
+        page_url=payload.page_url or f"/application/{app.id}/kyc",
+        ip_address=ip,
+        user_agent=ua,
+        metadata=f"lender={app.lender_name}, ref={app.application_ref}",
+    )
+    if lead:
+        log_consent_event(
+            db,
+            lead.id,
+            "loan_agreement_esign",
+            f"{app.application_ref} — {app.lender_name}",
+        )
 
     app.esign_completed = True
     app.status = "kyc_completed"

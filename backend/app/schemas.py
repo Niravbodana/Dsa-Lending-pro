@@ -1,11 +1,23 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
+
+from app.schemas_consent import LeadConsentsInput
 
 
 class SendOtpRequest(BaseModel):
     mobile: str = Field(..., min_length=10, max_length=10, pattern=r"^[6-9]\d{9}$")
+    sms_consent: bool = Field(
+        ...,
+        description="User consent to receive OTP SMS for verification (DPDP)",
+    )
+
+    @model_validator(mode="after")
+    def sms_consent_required(self) -> "SendOtpRequest":
+        if not self.sms_consent:
+            raise ValueError("SMS OTP consent is required")
+        return self
 
 
 class SendOtpResponse(BaseModel):
@@ -32,6 +44,8 @@ class LeadDetailsRequest(BaseModel):
     monthly_income: float = Field(..., gt=0)
     employment_type: Literal["salaried", "self_employed", "business"]
     city: str = Field(..., min_length=2, max_length=80)
+    consents: LeadConsentsInput
+    page_url: str | None = None
 
     @field_validator("pan")
     @classmethod
@@ -116,6 +130,14 @@ class SelectOfferRequest(BaseModel):
     interest_rate: float
     tenure_months: int
     emi: int
+    lender_data_sharing_consent: bool
+    page_url: str | None = None
+
+    @model_validator(mode="after")
+    def lender_consent_required(self) -> "SelectOfferRequest":
+        if not self.lender_data_sharing_consent:
+            raise ValueError("Lender data sharing consent is required")
+        return self
 
 
 class SelectOfferResponse(BaseModel):

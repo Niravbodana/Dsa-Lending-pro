@@ -9,15 +9,17 @@ import {
   deleteBug,
   getAdminApplications,
   getAdminBugs,
+  getAdminConsents,
   getAdminLeads,
   getAdminStats,
   AdminApplication,
+  ConsentRecord,
   updateApplicationStatus,
   Lead,
   updateBug,
 } from "@/lib/api";
 
-type Tab = "dashboard" | "leads" | "applications" | "bugs";
+type Tab = "dashboard" | "leads" | "applications" | "consents" | "bugs";
 
 const statusColors: Record<string, string> = {
   open: "bg-red-100 text-red-700",
@@ -45,6 +47,7 @@ export default function AdminPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [bugs, setBugs] = useState<Bug[]>([]);
   const [applications, setApplications] = useState<AdminApplication[]>([]);
+  const [consents, setConsents] = useState<ConsentRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [fixNotes, setFixNotes] = useState<Record<number, string>>({});
@@ -62,6 +65,7 @@ export default function AdminPage() {
         if (tab === "dashboard") setStats(await getAdminStats(token));
         if (tab === "leads") setLeads(await getAdminLeads(token));
         if (tab === "applications") setApplications(await getAdminApplications(token));
+        if (tab === "consents") setConsents(await getAdminConsents(token));
         if (tab === "bugs") setBugs(await getAdminBugs(token));
       } catch {
         localStorage.removeItem("admin_token");
@@ -80,6 +84,7 @@ export default function AdminPage() {
       if (tab === "dashboard") setStats(await getAdminStats(token));
       if (tab === "leads") setLeads(await getAdminLeads(token));
       if (tab === "applications") setApplications(await getAdminApplications(token));
+      if (tab === "consents") setConsents(await getAdminConsents(token));
       if (tab === "bugs") setBugs(await getAdminBugs(token));
     } catch {
       localStorage.removeItem("admin_token");
@@ -172,8 +177,9 @@ export default function AdminPage() {
             [
               { id: "dashboard" as Tab, label: "📊 Dashboard" },
               { id: "leads" as Tab, label: "👥 Leads" },
-              { id: "applications" as Tab, label: "📋 Applications" },
-              { id: "bugs" as Tab, label: "🐛 Bug Fixer" },
+              { id: "applications" as Tab, label: "Applications" },
+              { id: "consents" as Tab, label: "Legal Consents" },
+              { id: "bugs" as Tab, label: "Bug Fixer" },
             ]
           ).map((item) => (
             <button
@@ -201,7 +207,7 @@ export default function AdminPage() {
       <div className="ml-64 p-8">
         <div className="mb-8 flex items-center justify-between">
           <h1 className="text-2xl font-black text-slate-900 capitalize">
-            {tab === "bugs" ? "Bug Fixer" : tab}
+            {tab === "bugs" ? "Bug Fixer" : tab === "consents" ? "Legal Consents" : tab}
           </h1>
           <button
             onClick={loadData}
@@ -377,6 +383,49 @@ export default function AdminPage() {
                           </div>
                         )}
                       </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Legal consents audit trail */}
+        {tab === "consents" && !loading && (
+          <div className="overflow-hidden rounded-2xl bg-white shadow">
+            <p className="border-b border-slate-100 px-6 py-4 text-sm text-slate-500">
+              DPDP / RBI consent records — timestamp, version, IP, and page URL for audit.
+            </p>
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
+                <tr>
+                  <th className="px-6 py-4">Time</th>
+                  <th className="px-6 py-4">Mobile</th>
+                  <th className="px-6 py-4">Type</th>
+                  <th className="px-6 py-4">Version</th>
+                  <th className="px-6 py-4">Lead</th>
+                  <th className="px-6 py-4">Page</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {consents.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-12 text-center text-slate-400">
+                      No consent records yet
+                    </td>
+                  </tr>
+                ) : (
+                  consents.map((row) => (
+                    <tr key={row.id} className="hover:bg-slate-50">
+                      <td className="px-6 py-4 text-xs text-slate-500">
+                        {new Date(row.created_at).toLocaleString("en-IN")}
+                      </td>
+                      <td className="px-6 py-4 font-mono">{row.mobile || "—"}</td>
+                      <td className="px-6 py-4 font-medium">{row.consent_type}</td>
+                      <td className="px-6 py-4">{row.consent_version}</td>
+                      <td className="px-6 py-4">{row.lead_id ?? "—"}</td>
+                      <td className="px-6 py-4 text-xs text-slate-500">{row.page_url || "—"}</td>
                     </tr>
                   ))
                 )}

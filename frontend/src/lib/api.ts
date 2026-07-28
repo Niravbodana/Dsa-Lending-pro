@@ -26,11 +26,11 @@ export type EligibilityResult = {
   factors: string[];
 };
 
-export async function sendOtp(mobile: string) {
+export async function sendOtp(mobile: string, smsConsent: boolean) {
   const res = await fetch(`${API_BASE}/api/auth/send-otp`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ mobile }),
+    body: JSON.stringify({ mobile, sms_consent: smsConsent }),
   });
   if (!res.ok) throw new Error((await res.json()).detail || "Failed to send OTP");
   return res.json() as Promise<{ message: string; expires_in: number; dev_otp?: string }>;
@@ -53,6 +53,17 @@ export async function submitDetails(data: {
   monthly_income: number;
   employment_type: "salaried" | "self_employed" | "business";
   city: string;
+  consents: {
+    dpdp_data_processing: boolean;
+    privacy_policy: boolean;
+    terms_of_service: boolean;
+    credit_bureau_check: boolean;
+    marketing_communications: boolean;
+    privacy_version: string;
+    terms_version: string;
+    dpdp_version: string;
+  };
+  page_url?: string;
 }) {
   const res = await fetch(`${API_BASE}/api/leads/details`, {
     method: "POST",
@@ -100,6 +111,8 @@ export async function selectOffer(data: {
   interest_rate: number;
   tenure_months: number;
   emi: number;
+  lender_data_sharing_consent: boolean;
+  page_url?: string;
 }) {
   const res = await fetch(`${API_BASE}/api/leads/select-offer`, {
     method: "POST",
@@ -164,6 +177,7 @@ export async function esignComplete(data: {
   session_token: string;
   application_id: number;
   agreed: boolean;
+  page_url?: string;
 }) {
   const res = await fetch(`${API_BASE}/api/kyc/esign`, {
     method: "POST",
@@ -414,4 +428,30 @@ export async function updateApplicationStatus(
   });
   if (!res.ok) throw new Error("Failed to update");
   return res.json();
+}
+
+export type ConsentRecord = {
+  id: number;
+  lead_id: number | null;
+  application_id: number | null;
+  mobile: string | null;
+  consent_type: string;
+  consent_version: string;
+  accepted: boolean;
+  page_url: string | null;
+  ip_address: string | null;
+  metadata_json: string | null;
+  created_at: string;
+};
+
+export async function getAdminConsents(token: string, params?: { lead_id?: number; mobile?: string }) {
+  const qs = new URLSearchParams();
+  if (params?.lead_id) qs.set("lead_id", String(params.lead_id));
+  if (params?.mobile) qs.set("mobile", params.mobile);
+  const suffix = qs.toString() ? `?${qs}` : "";
+  const res = await fetch(`${API_BASE}/api/admin/consents${suffix}`, {
+    headers: adminHeaders(token),
+  });
+  if (!res.ok) throw new Error("Failed to fetch consents");
+  return res.json() as Promise<ConsentRecord[]>;
 }
