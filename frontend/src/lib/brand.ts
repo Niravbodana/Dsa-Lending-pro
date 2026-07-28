@@ -10,7 +10,7 @@ export const BRAND = {
     teal: "#0F766E",
     cyan: "#0891B2",
     gold: "#D4A017",
-    logoBay: "#F3F0E8",
+    logoBay: "#FEFEFE",
   },
   email: "support@neerloansolutions.com",
   grievanceEmail: "grievance@neerloansolutions.com",

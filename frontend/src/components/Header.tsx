@@ -39,11 +39,11 @@ export function Header() {
           href="/"
           onClick={goHome}
           aria-label="NeerCred — Go to homepage"
-          className="group relative flex shrink-0 items-center transition-colors hover:bg-[#faf8f3]"
+          className="group relative flex shrink-0 items-center transition-colors hover:bg-white"
           style={{ backgroundColor: LOGO_BAY_BG }}
         >
           <span
-            className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-r from-transparent to-neercred-navy sm:w-14"
+            className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-r from-[#fefefe] via-[#e8edf2] to-neercred-navy sm:w-20"
             aria-hidden
           />
           <NeerCredLogo className="relative z-[1] h-[60px] w-auto px-4 py-2 sm:h-[74px] sm:px-6 sm:py-2.5 lg:h-[84px] lg:px-8" />
