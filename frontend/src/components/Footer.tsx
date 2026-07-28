@@ -8,7 +8,9 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-16">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-6">
           <div className="lg:col-span-2">
-            <NeerCredLogo size={44} dark />
+            <div className="inline-flex" style={{ backgroundColor: BRAND.colors.logoBay }}>
+              <NeerCredLogo className="h-14 w-auto px-3 py-2 sm:h-16" />
+            </div>
             <p className="mt-3 text-sm leading-relaxed">
               <span className="font-medium text-neercred-gold">{BRAND.logoTagline}</span>
               {" · "}
