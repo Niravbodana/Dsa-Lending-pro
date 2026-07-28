@@ -48,10 +48,17 @@ cd frontend && npm run build
 
 ### Hello-world flow
 
-1. Open http://localhost:3000
-2. Click "Check Eligibility"
-3. Enter mobile → OTP (use dev OTP shown) → fill details → view offers → select offer
+1. Open http://localhost:3000 — premium homepage with hero image & Hindi copy
+2. Click "Abhi Apply Karo" → complete OTP → details → offers → select
+3. Admin panel: http://localhost:3000/admin (password: `admin123`)
+
+### Admin panel
+
+- **Dashboard** — lead funnel stats, conversion rate, bug counts
+- **Leads** — all customer applications
+- **Bug Fixer** — view/fix/delete user-reported bugs (🐛 button on website)
 
 ### Secrets
 
-None required for local dev. Production will need partner API keys, SMS gateway, etc.
+- `ADMIN_PASSWORD` in `backend/.env` (default: `admin123` for dev)
+- Production will need partner API keys, SMS gateway, etc.

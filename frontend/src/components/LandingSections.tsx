@@ -1,88 +1,147 @@
+import Image from "next/image";
 import Link from "next/link";
 
 const stats = [
-  { value: "₹5L+", label: "Max Loan Amount" },
-  { value: "10.99%", label: "Starting ROI" },
-  { value: "5 Min", label: "Quick Approval" },
-  { value: "15+", label: "Partner Lenders" },
+  { value: "₹5L+", label: "Max Loan", icon: "💰" },
+  { value: "10.99%", label: "Lowest ROI", icon: "📉" },
+  { value: "5 Min", label: "Approval", icon: "⚡" },
+  { value: "50K+", label: "Happy Users", icon: "😊" },
 ];
 
-const steps = [
-  { num: "01", title: "Enter Mobile", desc: "Verify with OTP in seconds" },
-  { num: "02", title: "Share Details", desc: "PAN, income & employment" },
-  { num: "03", title: "Compare Offers", desc: "Best rates from partners" },
-  { num: "04", title: "Get Loan", desc: "Direct disbursal to bank" },
+const dialogues = [
+  "\"Sapne poore karo, EMI se daro mat!\"",
+  "\"Wedding, travel, medical — sab ke liye instant loan\"",
+  "\"Zero paperwork. 100% digital. Paisa seedha account mein.\"",
 ];
-
-const partners = ["HDFC Bank", "ICICI Bank", "Bajaj Finserv", "Tata Capital", "MoneyView"];
 
 export function Hero() {
   return (
-    <section className="gradient-hero relative overflow-hidden text-white">
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-40" />
-      <div className="relative mx-auto grid max-w-6xl gap-12 px-4 py-16 md:grid-cols-2 md:py-24">
-        <div>
-          <span className="inline-block rounded-full bg-white/20 px-4 py-1 text-sm font-medium backdrop-blur">
-            🚀 Phase 1 MVP — Loan Marketplace
-          </span>
-          <h1 className="mt-6 text-4xl font-extrabold leading-tight md:text-5xl">
-            Get Personal Loan up to{" "}
-            <span className="text-yellow-300">₹5,00,000</span> in Minutes
+    <section className="gradient-hero relative min-h-[90vh] overflow-hidden text-white">
+      {/* Decorative elements */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(251,191,36,0.15)_0%,_transparent_50%)]" />
+      <div className="absolute -left-32 top-20 h-96 w-96 rounded-full bg-teal-400/10 blur-3xl" />
+      <div className="absolute -right-32 bottom-20 h-96 w-96 rounded-full bg-cyan-400/10 blur-3xl" />
+
+      <div className="relative mx-auto grid max-w-7xl items-center gap-8 px-4 py-12 lg:grid-cols-2 lg:py-20">
+        {/* Left - Copy */}
+        <div className="order-2 lg:order-1">
+          <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-1.5 text-sm font-semibold text-amber-200">
+            <span className="animate-pulse-slow">🔥</span>
+            Limited Time — 10.99% Interest Rate
+          </div>
+
+          <h1 className="mt-6 text-4xl font-black leading-[1.1] tracking-tight md:text-5xl lg:text-6xl">
+            Apna Loan,{" "}
+            <span className="text-gradient-gold">Apni Choice</span>
+            <br />
+            <span className="text-3xl md:text-4xl lg:text-5xl">
+              ₹5,00,000 tak — <span className="text-teal-200">5 minute mein!</span>
+            </span>
           </h1>
-          <p className="mt-4 text-lg text-teal-50">
-            Compare offers from multiple partner banks & NBFCs. We don&apos;t lend — our partners
-            do. You choose the best offer, loan goes directly to your bank account.
+
+          <p className="mt-5 max-w-lg text-lg leading-relaxed text-teal-50/90">
+            <strong className="text-white">Kyun bank ke chakkar kaato?</strong> Ek jagah se compare karo
+            HDFC, ICICI, Bajaj aur 15+ partner lenders ke best offers. Loan seedha aapke bank account
+            mein — hum sirf connect karte hain, lend nahi karte.
           </p>
+
+          {/* Rotating dialogues */}
+          <div className="mt-6 space-y-2">
+            {dialogues.map((d) => (
+              <p key={d} className="flex items-center gap-2 text-sm font-medium text-amber-100/90">
+                <span className="text-amber-400">✦</span> {d}
+              </p>
+            ))}
+          </div>
+
           <div className="mt-8 flex flex-wrap gap-4">
             <Link
               href="/apply"
-              className="rounded-full bg-white px-8 py-4 text-lg font-bold text-teal-700 shadow-xl transition hover:scale-105"
+              className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 px-8 py-4 text-lg font-extrabold text-slate-900 shadow-2xl shadow-amber-500/30 transition hover:scale-105"
             >
-              Check Eligibility →
+              <span className="relative z-10">Abhi Apply Karo — FREE →</span>
+              <div className="absolute inset-0 -translate-x-full bg-white/30 transition group-hover:translate-x-full duration-500" />
             </Link>
             <a
-              href="#how-it-works"
-              className="rounded-full border-2 border-white/50 px-8 py-4 text-lg font-semibold transition hover:bg-white/10"
+              href="#emi-calculator"
+              className="rounded-2xl border-2 border-white/30 px-8 py-4 text-lg font-bold backdrop-blur transition hover:bg-white/10"
             >
-              How it Works
+              EMI Calculate Karo
             </a>
           </div>
-          <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-4">
+
+          <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {stats.map((s) => (
-              <div key={s.label} className="rounded-2xl bg-white/10 p-4 backdrop-blur">
-                <p className="text-2xl font-bold">{s.value}</p>
-                <p className="text-sm text-teal-100">{s.label}</p>
+              <div
+                key={s.label}
+                className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur transition hover:bg-white/10"
+              >
+                <span className="text-xl">{s.icon}</span>
+                <p className="mt-1 text-xl font-black">{s.value}</p>
+                <p className="text-xs text-teal-100/70">{s.label}</p>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="flex items-center justify-center">
-          <div className="glass-card w-full max-w-sm rounded-3xl p-6 text-slate-800">
-            <p className="text-sm font-medium text-teal-600">Instant Eligibility</p>
-            <p className="mt-2 text-2xl font-bold">You&apos;re pre-approved for</p>
-            <p className="mt-1 text-4xl font-extrabold text-teal-700">₹3,50,000</p>
-            <div className="mt-6 space-y-3">
-              <div className="flex justify-between rounded-xl bg-slate-50 px-4 py-3">
-                <span className="text-slate-500">Interest from</span>
-                <span className="font-bold text-teal-700">10.99% p.a.</span>
-              </div>
-              <div className="flex justify-between rounded-xl bg-slate-50 px-4 py-3">
-                <span className="text-slate-500">EMI starting</span>
-                <span className="font-bold">₹11,450/mo</span>
-              </div>
-              <div className="flex justify-between rounded-xl bg-slate-50 px-4 py-3">
-                <span className="text-slate-500">Tenure</span>
-                <span className="font-bold">Up to 60 months</span>
+        {/* Right - Hero Image + Card */}
+        <div className="relative order-1 flex justify-center lg:order-2">
+          <div className="relative w-full max-w-md">
+            {/* Glow behind image */}
+            <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-amber-400/20 to-teal-400/20 blur-2xl" />
+
+            {/* Main hero image */}
+            <div className="relative overflow-hidden rounded-[2rem] border-4 border-white/20 shadow-2xl">
+              <Image
+                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&h=750&fit=crop&crop=faces"
+                alt="Priya - DSA Lending Pro customer success story"
+                width={600}
+                height={750}
+                className="h-[420px] w-full object-cover object-top md:h-[500px]"
+                priority
+              />
+              {/* Overlay quote */}
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-900/95 via-slate-900/70 to-transparent p-6">
+                <p className="text-lg font-bold text-white">
+                  &ldquo;Maine 3 minute mein ₹4.2 lakh ka loan liya!&rdquo;
+                </p>
+                <p className="mt-1 text-sm text-teal-200">
+                  — Priya Sharma, Mumbai <span className="text-amber-400">★★★★★</span>
+                </p>
               </div>
             </div>
-            <Link
-              href="/apply"
-              className="mt-6 block w-full rounded-xl bg-teal-600 py-3 text-center font-bold text-white transition hover:bg-teal-700"
-            >
-              Apply Now — It&apos;s Free
-            </Link>
+
+            {/* Floating approval card */}
+            <div className="glass-card animate-float absolute -bottom-6 -left-6 max-w-[220px] rounded-2xl p-4 text-slate-800 lg:-left-10">
+              <div className="flex items-center gap-2">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-lg">
+                  ✅
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-slate-500">Just Approved!</p>
+                  <p className="text-lg font-black text-green-600">₹3,50,000</p>
+                </div>
+              </div>
+              <p className="mt-2 text-xs text-slate-500">@ 10.99% • 36 months</p>
+            </div>
+
+            {/* Floating rate badge */}
+            <div className="absolute -right-4 top-8 rounded-2xl bg-amber-400 px-4 py-3 text-center font-black text-slate-900 shadow-xl lg:-right-8">
+              <p className="text-2xl leading-none">10.99%</p>
+              <p className="text-[10px] uppercase tracking-wider">Starting ROI</p>
+            </div>
           </div>
+        </div>
+      </div>
+
+      {/* Trust strip */}
+      <div className="relative border-t border-white/10 bg-black/20 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-8 px-4 py-4 text-sm text-teal-100/80">
+          <span>🔒 256-bit SSL Secured</span>
+          <span>✓ RBI LSP Compliant</span>
+          <span>🏦 15+ Partner Banks</span>
+          <span>⭐ 4.8/5 Customer Rating</span>
+          <span>📱 100% Digital Process</span>
         </div>
       </div>
     </section>
@@ -90,22 +149,60 @@ export function Hero() {
 }
 
 export function HowItWorks() {
+  const steps = [
+    {
+      num: "01",
+      title: "Mobile Number Daalo",
+      desc: "OTP se verify — 30 second mein ho jayega",
+      icon: "📱",
+    },
+    {
+      num: "02",
+      title: "Details Bharo",
+      desc: "PAN, income, city — bas itna hi chahiye",
+      icon: "📝",
+    },
+    {
+      num: "03",
+      title: "Offers Compare Karo",
+      desc: "Sabse sasta ROI choose karo",
+      icon: "⚖️",
+    },
+    {
+      num: "04",
+      title: "Loan Apne Account Mein",
+      desc: "Partner bank seedha transfer karegi",
+      icon: "🏦",
+    },
+  ];
+
   return (
-    <section id="how-it-works" className="bg-white py-20">
-      <div className="mx-auto max-w-6xl px-4">
-        <h2 className="text-center text-3xl font-bold text-slate-900">How It Works</h2>
-        <p className="mx-auto mt-3 max-w-2xl text-center text-slate-500">
-          Simple 4-step process — just like MoneyView & Navi
-        </p>
-        <div className="mt-12 grid gap-6 md:grid-cols-4">
-          {steps.map((step) => (
+    <section id="how-it-works" className="bg-white py-24">
+      <div className="mx-auto max-w-7xl px-4">
+        <div className="text-center">
+          <span className="rounded-full bg-teal-50 px-4 py-1 text-sm font-bold text-teal-600">
+            SIMPLE PROCESS
+          </span>
+          <h2 className="mt-4 text-4xl font-black text-slate-900">
+            Loan Lena Ab <span className="text-teal-600">Mazaak</span> Hai!
+          </h2>
+          <p className="mx-auto mt-3 max-w-2xl text-lg text-slate-500">
+            4 easy steps — MoneyView & Navi se bhi fast
+          </p>
+        </div>
+        <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {steps.map((step, i) => (
             <div
               key={step.num}
-              className="rounded-2xl border border-slate-100 bg-slate-50 p-6 transition hover:shadow-lg"
+              className="group relative rounded-3xl border border-slate-100 bg-gradient-to-b from-slate-50 to-white p-8 transition hover:-translate-y-2 hover:border-teal-200 hover:shadow-xl"
             >
-              <span className="text-3xl font-black text-teal-200">{step.num}</span>
-              <h3 className="mt-2 text-lg font-bold text-slate-900">{step.title}</h3>
-              <p className="mt-1 text-sm text-slate-500">{step.desc}</p>
+              {i < steps.length - 1 && (
+                <div className="absolute -right-3 top-1/2 hidden h-0.5 w-6 bg-teal-200 lg:block" />
+              )}
+              <span className="text-4xl">{step.icon}</span>
+              <span className="mt-4 block text-4xl font-black text-teal-100">{step.num}</span>
+              <h3 className="mt-2 text-xl font-bold text-slate-900">{step.title}</h3>
+              <p className="mt-2 text-slate-500">{step.desc}</p>
             </div>
           ))}
         </div>
@@ -115,18 +212,31 @@ export function HowItWorks() {
 }
 
 export function Partners() {
+  const partners = [
+    { name: "HDFC Bank", color: "from-blue-600 to-blue-700" },
+    { name: "ICICI Bank", color: "from-orange-500 to-red-600" },
+    { name: "Bajaj Finserv", color: "from-blue-500 to-indigo-600" },
+    { name: "Tata Capital", color: "from-sky-600 to-blue-700" },
+    { name: "MoneyView", color: "from-purple-500 to-violet-600" },
+    { name: "Axis Bank", color: "from-rose-600 to-red-700" },
+  ];
+
   return (
-    <section className="bg-slate-50 py-16">
-      <div className="mx-auto max-w-6xl px-4 text-center">
-        <h2 className="text-2xl font-bold text-slate-900">Our Partner Lenders</h2>
-        <p className="mt-2 text-slate-500">Real partner APIs will be integrated in Phase 2</p>
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+    <section className="bg-slate-900 py-20 text-white">
+      <div className="mx-auto max-w-7xl px-4 text-center">
+        <h2 className="text-3xl font-black">
+          India&apos;s Top <span className="text-amber-400">Partner Lenders</span>
+        </h2>
+        <p className="mt-3 text-slate-400">
+          Ek application, multiple offers — aap choose karo, hum connect karte hain
+        </p>
+        <div className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
           {partners.map((p) => (
             <div
-              key={p}
-              className="rounded-xl border border-slate-200 bg-white px-6 py-4 font-semibold text-slate-700 shadow-sm"
+              key={p.name}
+              className={`rounded-2xl bg-gradient-to-br ${p.color} p-5 font-bold shadow-lg transition hover:scale-105`}
             >
-              {p}
+              {p.name}
             </div>
           ))}
         </div>
@@ -137,10 +247,44 @@ export function Partners() {
 
 export function Footer() {
   return (
-    <footer className="border-t border-slate-200 bg-white py-8">
-      <div className="mx-auto max-w-6xl px-4 text-center text-sm text-slate-500">
-        <p>© 2026 DSA Lending Pro. RBI LSP Guidelines compliant platform.</p>
-        <p className="mt-1">We are a Loan Service Provider — not a lender.</p>
+    <footer className="border-t border-slate-200 bg-white py-12">
+      <div className="mx-auto max-w-7xl px-4">
+        <div className="grid gap-8 md:grid-cols-4">
+          <div>
+            <p className="text-xl font-black text-slate-900">
+              DSA Lending <span className="text-teal-600">Pro</span>
+            </p>
+            <p className="mt-2 text-sm text-slate-500">
+              India&apos;s smartest personal loan marketplace. Compare, choose, get funded.
+            </p>
+          </div>
+          <div>
+            <p className="font-bold text-slate-900">Quick Links</p>
+            <ul className="mt-3 space-y-2 text-sm text-slate-500">
+              <li><a href="/apply" className="hover:text-teal-600">Apply Now</a></li>
+              <li><a href="#emi-calculator" className="hover:text-teal-600">EMI Calculator</a></li>
+              <li><a href="#faq" className="hover:text-teal-600">FAQ</a></li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-bold text-slate-900">Legal</p>
+            <ul className="mt-3 space-y-2 text-sm text-slate-500">
+              <li>RBI LSP Guidelines</li>
+              <li>DPDP Act Compliant</li>
+              <li>Privacy Policy</li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-bold text-slate-900">Contact</p>
+            <p className="mt-3 text-sm text-slate-500">
+              support@dsalendingpro.com<br />
+              +91 98765 43210
+            </p>
+          </div>
+        </div>
+        <div className="mt-10 border-t border-slate-100 pt-6 text-center text-sm text-slate-400">
+          <p>© 2026 DSA Lending Pro. We are a Loan Service Provider — not a lender.</p>
+        </div>
       </div>
     </footer>
   );

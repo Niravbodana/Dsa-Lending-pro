@@ -28,6 +28,7 @@ Thumbs.db
 # Python
 *.egg-info/
 .pytest_cache/
+*.db
 
 # Docker
 postgres_data/

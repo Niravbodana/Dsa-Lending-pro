@@ -71,3 +71,115 @@ export async function selectOffer(data: {
   if (!res.ok) throw new Error((await res.json()).detail || "Failed to select offer");
   return res.json();
 }
+
+// --- Bug Reports ---
+export async function reportBug(data: {
+  title: string;
+  description: string;
+  severity?: string;
+  page_url?: string;
+  reported_by?: string;
+}) {
+  const res = await fetch(`${API_BASE}/api/admin/bugs`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error((await res.json()).detail || "Failed to report bug");
+  return res.json();
+}
+
+// --- Admin ---
+export type AdminStats = {
+  total_leads: number;
+  otp_verified: number;
+  details_submitted: number;
+  offers_fetched: number;
+  offer_selected: number;
+  open_bugs: number;
+  fixed_bugs: number;
+  total_bugs: number;
+  conversion_rate: number;
+};
+
+export type Lead = {
+  id: number;
+  mobile: string;
+  full_name: string | null;
+  pan: string | null;
+  monthly_income: number | null;
+  employment_type: string | null;
+  city: string | null;
+  status: string;
+  selected_lender: string | null;
+  selected_offer_id: string | null;
+  created_at: string;
+};
+
+export type Bug = {
+  id: number;
+  title: string;
+  description: string;
+  severity: string;
+  status: string;
+  page_url: string | null;
+  reported_by: string | null;
+  fix_notes: string | null;
+  created_at: string;
+  fixed_at: string | null;
+};
+
+function adminHeaders(token: string) {
+  return { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
+}
+
+export async function adminLogin(password: string) {
+  const res = await fetch(`${API_BASE}/api/admin/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password }),
+  });
+  if (!res.ok) throw new Error("Invalid password");
+  return res.json() as Promise<{ token: string }>;
+}
+
+export async function getAdminStats(token: string) {
+  const res = await fetch(`${API_BASE}/api/admin/stats`, { headers: adminHeaders(token) });
+  if (!res.ok) throw new Error("Failed to fetch stats");
+  return res.json() as Promise<AdminStats>;
+}
+
+export async function getAdminLeads(token: string) {
+  const res = await fetch(`${API_BASE}/api/admin/leads`, { headers: adminHeaders(token) });
+  if (!res.ok) throw new Error("Failed to fetch leads");
+  return res.json() as Promise<Lead[]>;
+}
+
+export async function getAdminBugs(token: string) {
+  const res = await fetch(`${API_BASE}/api/admin/bugs`, { headers: adminHeaders(token) });
+  if (!res.ok) throw new Error("Failed to fetch bugs");
+  return res.json() as Promise<Bug[]>;
+}
+
+export async function updateBug(
+  token: string,
+  bugId: number,
+  data: { status?: string; severity?: string; fix_notes?: string }
+) {
+  const res = await fetch(`${API_BASE}/api/admin/bugs/${bugId}`, {
+    method: "PATCH",
+    headers: adminHeaders(token),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to update bug");
+  return res.json() as Promise<Bug>;
+}
+
+export async function deleteBug(token: string, bugId: number) {
+  const res = await fetch(`${API_BASE}/api/admin/bugs/${bugId}`, {
+    method: "DELETE",
+    headers: adminHeaders(token),
+  });
+  if (!res.ok) throw new Error("Failed to delete bug");
+  return res.json();
+}
