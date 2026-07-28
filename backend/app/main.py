@@ -8,8 +8,8 @@ from app.routers import admin, auth, dashboard, kyc, leads, webhooks
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="DSA Lending Pro API",
-    description="Personal Loan Marketplace - Phase 1 MVP",
+    title="Neer Loan Solutions API",
+    description="Personal Loan Marketplace - Complete Platform",
     version="1.0.0",
 )
 

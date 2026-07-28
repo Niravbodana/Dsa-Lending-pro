@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Header } from "@/components/Header";
-import { Footer } from "@/components/LandingSections";
+import { Footer } from "@/components/Footer";
 
 type Tab = "rbi" | "dpdp" | "privacy" | "terms" | "grievance";
 
@@ -21,11 +21,11 @@ const content: Record<Tab, { title: string; sections: { heading: string; body: s
     sections: [
       {
         heading: "Our Role as LSP",
-        body: "DSA Lending Pro is registered as a Loan Service Provider (LSP) under RBI's digital lending guidelines. We act as a technology platform that connects borrowers with Regulated Entities (REs) — banks and NBFCs. We do NOT lend money directly.",
+        body: "Neer Loan Solutions is registered as a Loan Service Provider (LSP) under RBI's digital lending guidelines. We act as a technology platform that connects borrowers with Regulated Entities (REs) — banks and NBFCs. We do NOT lend money directly.",
       },
       {
         heading: "Key RBI Compliance Points",
-        body: "• All loan disbursals happen directly from the partner lender to the borrower's bank account — DSA Lending Pro never holds customer funds.\n• We display the name of the lending partner before loan execution.\n• Key Fact Statements (KFS) are provided by the partner lender before loan agreement.\n• Cooling-off period and grievance redressal as per RBI norms.\n• No automatic increase in credit limit without explicit customer consent.",
+        body: "• All loan disbursals happen directly from the partner lender to the borrower's bank account — Neer Loan Solutions never holds customer funds.\n• We display the name of the lending partner before loan execution.\n• Key Fact Statements (KFS) are provided by the partner lender before loan agreement.\n• Cooling-off period and grievance redressal as per RBI norms.\n• No automatic increase in credit limit without explicit customer consent.",
       },
       {
         heading: "Fair Practices Code",
@@ -62,7 +62,7 @@ const content: Record<Tab, { title: string; sections: { heading: string; body: s
       },
       {
         heading: "Your Rights Under DPDP Act",
-        body: "• Right to access your personal data\n• Right to correction of inaccurate data\n• Right to erasure (deletion) of your data\n• Right to grievance redressal\n• Right to nominate someone to exercise rights in case of death/incapacity\n\nContact our Data Protection Officer: dpo@dsalendingpro.com",
+        body: "• Right to access your personal data\n• Right to correction of inaccurate data\n• Right to erasure (deletion) of your data\n• Right to grievance redressal\n• Right to nominate someone to exercise rights in case of death/incapacity\n\nContact our Data Protection Officer: dpo@neerloansolutions.com",
       },
     ],
   },
@@ -96,11 +96,11 @@ const content: Record<Tab, { title: string; sections: { heading: string; body: s
     sections: [
       {
         heading: "Acceptance of Terms",
-        body: "By using DSA Lending Pro, you agree to these terms. If you disagree, please do not use our platform.",
+        body: "By using Neer Loan Solutions, you agree to these terms. If you disagree, please do not use our platform.",
       },
       {
         heading: "Service Description",
-        body: "DSA Lending Pro is a loan marketplace platform. We facilitate connections between borrowers and partner lenders. We are NOT a lender and do not guarantee loan approval.",
+        body: "Neer Loan Solutions is a loan marketplace platform. We facilitate connections between borrowers and partner lenders. We are NOT a lender and do not guarantee loan approval.",
       },
       {
         heading: "User Responsibilities",
@@ -108,7 +108,7 @@ const content: Record<Tab, { title: string; sections: { heading: string; body: s
       },
       {
         heading: "Limitation of Liability",
-        body: "DSA Lending Pro is not liable for loan rejection by partner lenders, delays in disbursal, or disputes between you and the lending partner. Our liability is limited to the extent permitted by law.",
+        body: "Neer Loan Solutions is not liable for loan rejection by partner lenders, delays in disbursal, or disputes between you and the lending partner. Our liability is limited to the extent permitted by law.",
       },
       {
         heading: "Governing Law",
@@ -125,7 +125,7 @@ const content: Record<Tab, { title: string; sections: { heading: string; body: s
       },
       {
         heading: "Contact Details",
-        body: "📧 Email: grievance@dsalendingpro.com\n📞 Phone: +91 98765 43210 (Mon-Sat, 9 AM - 6 PM)\n📍 Address: DSA Lending Pro, Mumbai, Maharashtra 400001\n\nGrievance Officer: Mr. Rajesh Kumar\nEmail: rajesh.kumar@dsalendingpro.com",
+        body: "📧 Email: grievance@neerloansolutions.com\n📞 Phone: +91 98765 43210 (Mon-Sat, 9 AM - 6 PM)\n📍 Address: Neer Loan Solutions, Mumbai, Maharashtra 400001\n\nGrievance Officer: Mr. Rajesh Kumar\nEmail: rajesh.kumar@neerloansolutions.com",
       },
       {
         heading: "Resolution Timeline",
@@ -201,8 +201,8 @@ export default function CompliancePage() {
           </p>
           <p className="mt-2 text-sm text-teal-600">
             Contact our Data Protection Officer:{" "}
-            <a href="mailto:dpo@dsalendingpro.com" className="font-semibold underline">
-              dpo@dsalendingpro.com
+            <a href="mailto:dpo@neerloansolutions.com" className="font-semibold underline">
+              dpo@neerloansolutions.com
             </a>
           </p>
           <Link

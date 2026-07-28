@@ -1,4 +1,4 @@
-# DSA Lending Pro — Complete A to Z Loan Marketplace
+# Neer Loan Solutions — Complete A to Z Loan Marketplace
 
 Personal Loan Marketplace (LSP model) — MoneyView/Navi style. Connect customers with partner banks, earn commission on disbursal.
 
@@ -22,6 +22,14 @@ Personal Loan Marketplace (LSP model) — MoneyView/Navi style. Connect customer
 | `/application/[id]/kyc` | KYC + eSign flow |
 | `/dashboard` | User dashboard (OTP login) |
 | `/track` | Track loan by ref + mobile |
+| `/loans` | All loan products |
+| `/rates` | Interest rates comparison |
+| `/about` | About Neer Loan Solutions |
+| `/contact` | Contact & support |
+| `/help` | Help center / FAQs |
+| `/refer` | Refer & earn program |
+| `/app` | Mobile app download |
+| `/partner-with-us` | Lender & DSA partnerships |
 | `/compliance` | RBI LSP + DPDP Act |
 | `/admin` | Admin panel (`admin123`) |
 
@@ -49,7 +57,7 @@ PARTNER_HDFC_API_KEY=your-key
 ```bash
 POST /api/webhooks/partner/status
 {
-  "application_ref": "DSA123456",
+  "application_ref": "NLR123456",
   "status": "disbursed",
   "message": "Loan disbursed",
   "disbursal_amount": 500000

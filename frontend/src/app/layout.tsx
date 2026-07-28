@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
+import { BRAND } from "@/lib/brand";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -8,9 +9,9 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "DSA Lending Pro | Personal Loan in Minutes",
+  title: `${BRAND.name} | Personal Loan in Minutes`,
   description:
-    "Compare personal loan offers from top partner banks & NBFCs. Get up to ₹5,00,000 with instant eligibility check.",
+    "Compare personal loan offers from top partner banks & NBFCs. Get up to ₹5,00,000 with instant eligibility check. Like MoneyView & Navi.",
 };
 
 export default function RootLayout({

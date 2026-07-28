@@ -4,7 +4,7 @@ import { useState } from "react";
 
 const faqs = [
   {
-    q: "Kya DSA Lending Pro khud loan deta hai?",
+    q: "Kya Neer Loan Solutions khud loan deta hai?",
     a: "Nahi! Hum ek Loan Service Provider (LSP) hain. Hum aapko partner banks aur NBFCs se connect karte hain. Loan partner lender deta hai, seedha aapke bank account mein.",
   },
   {

@@ -302,7 +302,7 @@ export default function ApplyPage() {
                   className="mt-1 accent-teal-600"
                 />
                 <span>
-                  I agree to DSA Lending Pro&apos;s{" "}
+                  I agree to Neer Loan Solutions&apos;s{" "}
                   <Link href="/compliance" className="font-semibold text-teal-600 underline">
                     RBI compliance & DPDP data protection
                   </Link>{" "}

@@ -30,7 +30,7 @@ STATUS_FLOW = [
 
 def generate_application_ref() -> str:
     suffix = "".join(random.choices(string.digits, k=6))
-    return f"DSA{suffix}"
+    return f"NLR{suffix}"
 
 
 def calculate_commission(loan_amount: int) -> float:

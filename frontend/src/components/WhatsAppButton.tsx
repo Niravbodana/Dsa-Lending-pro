@@ -1,8 +1,11 @@
+import { BRAND } from "@/lib/brand";
+
+const phone = BRAND.whatsapp;
+const message = encodeURIComponent(
+  `Hi ${BRAND.name}! I want to apply for a personal loan. Please help me.`
+);
+
 export function WhatsAppButton() {
-  const phone = "919876543210";
-  const message = encodeURIComponent(
-    "Hi DSA Lending Pro! I want to apply for a personal loan. Please help me."
-  );
   return (
     <a
       href={`https://wa.me/${phone}?text=${message}`}

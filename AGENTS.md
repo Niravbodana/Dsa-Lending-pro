@@ -4,7 +4,7 @@ Guidance for AI agents working in this repository.
 
 ## Project overview
 
-**DSA Lending Pro** is a Personal Loan Marketplace (LSP model) — customers apply for loans, we show offers from partner banks/NBFCs, and earn commission on disbursal. Similar to MoneyView / Navi.
+**Neer Loan Solutions** is a Personal Loan Marketplace (LSP model) — customers apply for loans, we show offers from partner banks/NBFCs, and earn commission on disbursal. Similar to MoneyView / Navi.
 
 ## Cursor Cloud specific instructions
 

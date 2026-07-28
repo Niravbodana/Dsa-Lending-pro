@@ -1,5 +1,13 @@
 import { Header } from "@/components/Header";
-import { Footer, Hero, HowItWorks, Partners } from "@/components/LandingSections";
+import {
+  Hero,
+  HowItWorks,
+  Partners,
+  LoanProductsStrip,
+  AppDownloadBanner,
+  ReferBanner,
+} from "@/components/LandingSections";
+import { Footer } from "@/components/Footer";
 import { EmiCalculator } from "@/components/EmiCalculator";
 import { Testimonials } from "@/components/Testimonials";
 import { FAQ } from "@/components/FAQ";
@@ -12,10 +20,13 @@ export default function Home() {
     <main className="min-h-screen">
       <Header />
       <Hero />
+      <LoanProductsStrip />
       <HowItWorks />
       <EmiCalculator />
       <Testimonials />
       <Partners />
+      <ReferBanner />
+      <AppDownloadBanner />
       <FAQ />
       <Footer />
       <BugReportWidget />

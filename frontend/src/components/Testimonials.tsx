@@ -6,7 +6,7 @@ const testimonials = [
     city: "Delhi",
     amount: "₹4,50,000",
     quote:
-      "Wedding ke liye loan chahiye tha. DSA Lending Pro pe 4 minute mein 3 offers mile — HDFC se 11.2% pe liya. Bohot easy!",
+      "Wedding ke liye loan chahiye tha. Neer Loan Solutions pe 4 minute mein 3 offers mile — HDFC se 11.2% pe liya. Bohot easy!",
     rating: 5,
     image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&h=100&fit=crop&crop=faces",
   },

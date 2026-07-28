@@ -130,7 +130,7 @@ export default function AdminPage() {
           <div className="text-center">
             <p className="text-4xl">🔐</p>
             <h1 className="mt-4 text-2xl font-black text-slate-900">Admin Panel</h1>
-            <p className="mt-2 text-sm text-slate-500">DSA Lending Pro — Internal Access</p>
+            <p className="mt-2 text-sm text-slate-500">Neer Loan Solutions — Internal Access</p>
           </div>
           {error && (
             <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
@@ -163,7 +163,7 @@ export default function AdminPage() {
       <div className="fixed inset-y-0 left-0 w-64 bg-slate-900 text-white">
         <div className="border-b border-slate-700 p-6">
           <p className="text-lg font-black">
-            DSA <span className="text-teal-400">Admin</span>
+            Neer <span className="text-teal-400">Admin</span>
           </p>
           <p className="text-xs text-slate-400">Bug Fixer & Lead Manager</p>
         </div>

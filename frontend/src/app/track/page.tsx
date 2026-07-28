@@ -48,7 +48,7 @@ function TrackContent() {
         </p>
         <form onSubmit={handleTrack} className="mt-6 space-y-4">
           <input
-            placeholder="Application Ref (e.g. DSA123456)"
+            placeholder="Application Ref (e.g. NLR123456)"
             value={ref}
             onChange={(e) => setRef(e.target.value.toUpperCase())}
             className="w-full rounded-xl border px-4 py-3 font-mono outline-none focus:border-teal-500"
