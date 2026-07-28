@@ -6,16 +6,16 @@ export const metadata = { title: `About Us | ${BRAND.name}` };
 
 export default function AboutPage() {
   const milestones = [
-    { year: "2024", title: "Founded", desc: "Neer Loan Solutions started with one mission — loans simple banana." },
-    { year: "2025", title: "15+ Partners", desc: "HDFC, ICICI, Bajaj aur top NBFCs ke saath partnership." },
-    { year: "2026", title: "50K+ Users", desc: "50,000+ Indians ne apna loan Neer se liya." },
+    { year: "2024", title: "Founded", desc: "Neer Loan Solutions started with one mission — making loans simple." },
+    { year: "2025", title: "15+ Partners", desc: "Partnerships with HDFC, ICICI, Bajaj and top NBFCs." },
+    { year: "2026", title: "50K+ Users", desc: "50,000+ Indians have taken loans through Neer." },
   ];
 
   const values = [
-    { icon: "🎯", title: "Transparency", desc: "Koi hidden charge nahi. Sab kuch clear." },
-    { icon: "⚡", title: "Speed", desc: "5 minute mein eligibility, same-day approval possible." },
-    { icon: "🔒", title: "Security", desc: "Bank-grade encryption, DPDP Act compliant." },
-    { icon: "🤝", title: "Trust", desc: "RBI LSP guidelines ke poora palan." },
+    { icon: "🎯", title: "Transparency", desc: "No hidden charges. Everything is clear upfront." },
+    { icon: "⚡", title: "Speed", desc: "Eligibility in 5 minutes. Same-day approval possible." },
+    { icon: "🔒", title: "Security", desc: "Bank-grade encryption. DPDP Act compliant." },
+    { icon: "🤝", title: "Trust", desc: "Full compliance with RBI LSP guidelines." },
   ];
 
   return (
@@ -23,20 +23,21 @@ export default function AboutPage() {
       <InnerHero
         badge="OUR STORY"
         title="About Neer Loan Solutions"
-        subtitle="Hum India ka premium loan marketplace hain — aapke liye personalized offers, transparent process."
+        subtitle="India's premium loan marketplace — personalized offers and a transparent process built for you."
         cta={{ label: "Apply for Loan →", href: "/apply" }}
+        image="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1920&h=600&fit=crop"
       />
       <div className="mx-auto max-w-4xl px-4 py-16">
         <div className="rounded-3xl bg-white p-8 shadow-lg md:p-12">
-          <h2 className="text-2xl font-black text-slate-900">Hum Kaun Hain?</h2>
+          <h2 className="text-2xl font-black text-slate-900">Who We Are</h2>
           <p className="mt-4 leading-relaxed text-slate-600">
-            <strong>{BRAND.name}</strong> ek Loan Service Provider (LSP) hai jo borrowers ko India ke
-            best banks aur NBFCs se connect karta hai. Hum khud loan nahi dete — hum aapko sahi lender
-            tak le jaate hain, best rate pe, minimum paperwork ke saath.
+            <strong>{BRAND.name}</strong> is a Loan Service Provider (LSP) that connects borrowers with
+            India&apos;s best banks and NBFCs. We do not lend directly — we guide you to the right lender
+            at the best rate with minimum paperwork.
           </p>
           <p className="mt-4 leading-relaxed text-slate-600">
-            Mumbai se shuru hoke, aaj hum poore India mein personal loans facilitate karte hain —
-            wedding, medical, travel, business, education — har need ke liye.
+            Founded in Mumbai, we now facilitate personal loans across India — for weddings, medical
+            needs, travel, business, education, and more.
           </p>
         </div>
 

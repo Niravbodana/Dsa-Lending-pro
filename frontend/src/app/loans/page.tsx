@@ -12,7 +12,7 @@ const products = [
     title: "Personal Loan",
     amount: "₹50K – ₹5L",
     rate: "10.99% onwards",
-    desc: "Kisi bhi personal need ke liye — no questions asked.",
+    desc: "For any personal need — no questions asked.",
     features: ["Instant eligibility", "No collateral", "Flexible tenure"],
     image: "https://images.unsplash.com/photo-1554224311-0fb870a1d0ef?w=600&h=360&fit=crop",
   },
@@ -30,7 +30,7 @@ const products = [
     title: "Wedding Loan",
     amount: "₹2L – ₹5L",
     rate: "11.99% onwards",
-    desc: "Sapno ki shaadi — budget tension free.",
+    desc: "Make your dream wedding stress-free on budget.",
     features: ["High loan amount", "Long tenure", "Special rates"],
     image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=600&h=360&fit=crop",
   },
@@ -39,7 +39,7 @@ const products = [
     title: "Business Loan",
     amount: "₹1L – ₹5L",
     rate: "12.49% onwards",
-    desc: "Business grow karo — working capital ke liye.",
+    desc: "Grow your business with working capital financing.",
     features: ["Self-employed friendly", "Quick approval", "No property needed"],
     image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=360&fit=crop",
   },
@@ -48,7 +48,7 @@ const products = [
     title: "Education Loan",
     amount: "₹50K – ₹3L",
     rate: "11.25% onwards",
-    desc: "Padhai ke sapne poore karo.",
+    desc: "Fund your education goals with flexible repayment.",
     features: ["Student friendly", "Moratorium option", "Low EMI"],
     image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&h=360&fit=crop",
   },
@@ -57,7 +57,7 @@ const products = [
     title: "Travel Loan",
     amount: "₹50K – ₹2L",
     rate: "12.99% onwards",
-    desc: "Dream vacation — ab EMI mein possible.",
+    desc: "Your dream vacation — now possible with easy EMIs.",
     features: ["Quick process", "No advance", "Digital only"],
     image: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&h=360&fit=crop",
   },
@@ -68,8 +68,8 @@ export default function LoansPage() {
     <PageShell>
       <InnerHero
         badge="LOAN PRODUCTS"
-        title="Saari Loan Types, Ek Platform"
-        subtitle="Ek platform pe saari loan types — compare karo, best offer choose karo."
+        title="All Loan Types, One Platform"
+        subtitle="Every loan type on one platform — compare offers and choose the best."
         cta={{ label: "Check Eligibility →", href: "/apply" }}
         image="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920&h=600&fit=crop"
       />

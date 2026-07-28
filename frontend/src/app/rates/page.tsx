@@ -29,7 +29,7 @@ export default function RatesPage() {
       <InnerHero
         badge="TRANSPARENT PRICING"
         title="Interest Rates & Charges"
-        subtitle="Koi chhupa charge nahi — sab kuch clear table mein. Full pricing transparency."
+        subtitle="No hidden charges — everything in a clear, transparent table."
       />
       <div className="mx-auto max-w-5xl px-4 py-16">
         <div className="overflow-hidden rounded-2xl bg-white shadow-lg">
@@ -75,9 +75,9 @@ export default function RatesPage() {
         </div>
 
         <div className="mt-12 rounded-2xl bg-amber-50 p-6 text-center">
-          <p className="font-bold text-amber-900">Exact rate aapke profile pe depend karta hai</p>
+          <p className="font-bold text-amber-900">Your exact rate depends on your profile</p>
           <p className="mt-2 text-sm text-amber-800">
-            Apply karo — 2 minute mein personalized offers milenge
+            Apply now — get personalized offers in 2 minutes
           </p>
           <Link href="/apply" className="mt-4 inline-block rounded-xl bg-amber-500 px-8 py-3 font-bold text-slate-900">
             Get My Rate →

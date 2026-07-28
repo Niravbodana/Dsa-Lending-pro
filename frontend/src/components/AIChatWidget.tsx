@@ -8,14 +8,14 @@ import { BRAND } from "@/lib/brand";
 const WELCOME: ChatMessage = {
   role: "assistant",
   content:
-    "Namaste! Main **Neer AI** hoon — aapka personal loan assistant. Loan apply, EMI, KYC, tracking — sab mein madad karunga!",
+    "Hello! I'm **Neer AI** — your personal loan assistant. I can help with loan applications, EMI, KYC, and tracking.",
 };
 
 const QUICK_START = [
-  "Loan kaise apply karun?",
-  "Kitna loan mil sakta hai?",
-  "EMI calculate karo",
-  "Documents kya chahiye?",
+  "How do I apply for a loan?",
+  "How much loan can I get?",
+  "Calculate my EMI",
+  "What documents are needed?",
 ];
 
 function renderMarkdownLite(text: string) {
@@ -74,13 +74,13 @@ export function AIChatWidget() {
       setSessionId(res.session_id);
       setMessages((prev) => [...prev, { role: "assistant", content: res.reply }]);
       setSuggestions(res.suggestions?.length ? res.suggestions : QUICK_START);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Chat failed");
+    } catch {
+      setError("Connection failed");
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: `Sorry, abhi connect nahi ho paaya. ${BRAND.phone} pe call karo ya /apply se direct apply karo!`,
+          content: `Sorry, we couldn't connect right now. Call ${BRAND.phone} or apply directly at /apply.`,
         },
       ]);
     } finally {
@@ -109,7 +109,6 @@ export function AIChatWidget() {
             onClick={() => setOpen(false)}
           />
           <div className="relative flex h-[min(640px,90vh)] w-full max-w-md flex-col overflow-hidden rounded-3xl bg-white shadow-2xl">
-            {/* Header */}
             <div className="flex items-center gap-3 bg-gradient-to-r from-violet-600 to-indigo-600 px-5 py-4 text-white">
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/20 text-xl">
                 ✨
@@ -127,7 +126,6 @@ export function AIChatWidget() {
               </button>
             </div>
 
-            {/* Messages */}
             <div className="flex-1 space-y-3 overflow-y-auto bg-slate-50 p-4">
               {messages.map((msg, i) => (
                 <div
@@ -152,15 +150,14 @@ export function AIChatWidget() {
                       <span className="animate-bounce">●</span>
                       <span className="animate-bounce [animation-delay:0.1s]">●</span>
                       <span className="animate-bounce [animation-delay:0.2s]">●</span>
-                    </span>
-                    {" "}Neer AI soch raha hai...
+                    </span>{" "}
+                    Neer AI is thinking...
                   </div>
                 </div>
               )}
               <div ref={bottomRef} />
             </div>
 
-            {/* Quick suggestions */}
             {suggestions.length > 0 && !loading && (
               <div className="flex gap-2 overflow-x-auto border-t border-slate-100 bg-white px-3 py-2">
                 {suggestions.slice(0, 4).map((s) => (
@@ -180,7 +177,6 @@ export function AIChatWidget() {
               <p className="bg-red-50 px-4 py-2 text-center text-xs text-red-600">{error}</p>
             )}
 
-            {/* Input */}
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -191,7 +187,7 @@ export function AIChatWidget() {
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Apna sawal likho..."
+                placeholder="Type your question..."
                 className="flex-1 rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-violet-500"
                 disabled={loading}
               />

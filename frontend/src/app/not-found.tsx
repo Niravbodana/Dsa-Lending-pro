@@ -11,7 +11,7 @@ export default function NotFound() {
         <p className="text-8xl font-black text-teal-600">404</p>
         <h1 className="mt-4 text-2xl font-black text-slate-900">Page Not Found</h1>
         <p className="mt-3 text-slate-500">
-          Yeh page {BRAND.name} pe exist nahi karta. Homepage ya apply flow try karo.
+          This page does not exist on {BRAND.name}. Try the homepage or apply flow.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link

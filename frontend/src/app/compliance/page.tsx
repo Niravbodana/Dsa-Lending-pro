@@ -156,7 +156,7 @@ export default function CompliancePage() {
             RBI Compliance & Data Protection
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-teal-100">
-            Aapka data surakshit hai. Hum RBI guidelines aur DPDP Act 2023 ke poora palan karte hain.
+            Your data is secure. We fully comply with RBI guidelines and the DPDP Act 2023.
           </p>
         </div>
       </div>

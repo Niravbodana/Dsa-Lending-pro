@@ -53,7 +53,7 @@ export function BugReportWidget() {
                 <p className="text-4xl">✅</p>
                 <p className="mt-4 text-lg font-bold text-slate-900">Report Submitted!</p>
                 <p className="mt-2 text-sm text-slate-500">
-                  Hamari team jaldi fix karegi. Dhanyavaad!
+                  Our team will fix it soon. Thank you!
                 </p>
                 <button
                   onClick={() => { setOpen(false); setDone(false); }}
@@ -64,8 +64,8 @@ export function BugReportWidget() {
               </div>
             ) : (
               <>
-                <h3 className="text-xl font-bold text-slate-900">🐛 Bug Report Karo</h3>
-                <p className="mt-1 text-sm text-slate-500">Koi problem hai? Hum fix karenge!</p>
+                <h3 className="text-xl font-bold text-slate-900">🐛 Report a Bug</h3>
+                <p className="mt-1 text-sm text-slate-500">Found a problem? We&apos;ll fix it!</p>
                 {error && (
                   <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
                 )}

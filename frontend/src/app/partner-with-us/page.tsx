@@ -17,7 +17,7 @@ export default function PartnerPage() {
       <InnerHero
         badge="FOR LENDERS & DSA"
         title="Partner With Neer Loan Solutions"
-        subtitle="Banks, NBFCs, aur DSA agents — saath milkar grow karo."
+        subtitle="Banks, NBFCs, and DSA agents — grow together with Neer Loan Solutions."
         cta={{ label: "Contact Partnership Team →", href: "/contact" }}
       />
       <div className="mx-auto max-w-5xl px-4 py-16">

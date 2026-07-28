@@ -151,9 +151,9 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-black">
-              Namaste, {profile?.full_name || "User"} 👋
+              Hello, {profile?.full_name || "User"} 👋
             </h1>
-            <p className="text-slate-500">Aapke loan applications</p>
+            <p className="text-slate-500">Your loan applications</p>
           </div>
           <Link href="/apply" className="rounded-xl bg-teal-600 px-5 py-2 font-bold text-white">
             New Application +

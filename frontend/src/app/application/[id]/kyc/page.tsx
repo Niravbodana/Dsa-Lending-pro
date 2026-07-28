@@ -161,7 +161,7 @@ export default function KycPage() {
               {step === "aadhaar" ? (
                 <form onSubmit={handleAadhaar}>
                   <h2 className="text-2xl font-bold">Aadhaar eKYC</h2>
-                  <p className="mt-2 text-slate-500">UIDAI se OTP aayega registered mobile pe</p>
+                  <p className="mt-2 text-slate-500">OTP will be sent to your Aadhaar-linked mobile via UIDAI</p>
                   <input
                     placeholder="12-digit Aadhaar number"
                     value={aadhaar}
@@ -284,7 +284,7 @@ export default function KycPage() {
               <p className="text-4xl">📤</p>
               <h2 className="mt-4 text-2xl font-bold">Ready to Submit</h2>
               <p className="mt-2 text-slate-500">
-                Application partner lender ko bhej di jayegi for final approval
+                Your application will be sent to the partner lender for final approval
               </p>
               <button
                 onClick={handleSubmit}
@@ -301,7 +301,7 @@ export default function KycPage() {
               <p className="text-5xl">🎉</p>
               <h2 className="mt-4 text-2xl font-bold text-green-700">Application Submitted!</h2>
               <p className="mt-2 text-slate-500">
-                Partner lender review karega. Status dashboard pe track karo.
+                The partner lender will review your application. Track status on your dashboard.
               </p>
               <div className="mt-6 flex flex-col gap-3">
                 <Link

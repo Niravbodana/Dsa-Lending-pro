@@ -7,7 +7,7 @@ const testimonials = [
     city: "Delhi",
     amount: "₹4,50,000",
     quote:
-      "Wedding ke liye loan chahiye tha. Neer Loan Solutions pe 4 minute mein 3 offers mile — HDFC se 11.2% pe liya. Bohot easy!",
+      "I needed a loan for my wedding. Got 3 offers in 4 minutes on Neer Loan Solutions — chose HDFC at 11.2%. Incredibly easy!",
     rating: 5,
     image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop&crop=faces",
   },
@@ -16,7 +16,7 @@ const testimonials = [
     city: "Bangalore",
     amount: "₹2,80,000",
     quote:
-      "Medical emergency thi. Same day approval mila Bajaj se. Koi agent nahi, koi hidden charge nahi. Sach mein game changer.",
+      "Medical emergency — got same-day approval from Bajaj. No agents, no hidden charges. Truly a game changer.",
     rating: 5,
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=faces",
   },
@@ -25,7 +25,7 @@ const testimonials = [
     city: "Hyderabad",
     amount: "₹5,00,000",
     quote:
-      "Home renovation ke liye compare kiya sab offers. ICICI se liya — sabse kam EMI thi. Highly recommend!",
+      "Compared all offers for home renovation. Chose ICICI — lowest EMI. Highly recommend Neer Loan Solutions!",
     rating: 5,
     image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=faces",
   },
@@ -40,7 +40,7 @@ export function Testimonials() {
             REAL STORIES
           </span>
           <h2 className="mt-4 text-4xl font-black text-slate-900">
-            50,000+ Indians Ne <span className="text-teal-600">Bharosa Kiya</span>
+            Trusted by <span className="text-teal-600">50,000+ Indians</span>
           </h2>
         </ScrollReveal>
         <div className="mt-16 grid gap-8 md:grid-cols-3">

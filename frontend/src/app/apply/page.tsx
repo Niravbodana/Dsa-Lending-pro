@@ -191,8 +191,8 @@ export default function ApplyPage() {
 
           {step === "mobile" && (
             <form onSubmit={handleSendOtp}>
-              <h2 className="text-2xl font-bold text-slate-900">Mobile Number Daalo</h2>
-              <p className="mt-2 text-slate-500">OTP se verify karenge — 30 second mein</p>
+              <h2 className="text-2xl font-bold text-slate-900">Enter Mobile Number</h2>
+              <p className="mt-2 text-slate-500">We&apos;ll verify with OTP — takes 30 seconds</p>
               <input
                 type="tel"
                 maxLength={10}
@@ -214,7 +214,7 @@ export default function ApplyPage() {
 
           {step === "otp" && (
             <form onSubmit={handleVerifyOtp}>
-              <h2 className="text-2xl font-bold text-slate-900">OTP Verify Karo</h2>
+              <h2 className="text-2xl font-bold text-slate-900">Verify OTP</h2>
               <p className="mt-2 text-slate-500">+91 {mobile}</p>
               {devOtp && (
                 <p className="mt-2 rounded-lg bg-yellow-50 px-3 py-2 text-sm font-mono text-yellow-800">
@@ -242,12 +242,12 @@ export default function ApplyPage() {
 
           {step === "details" && (
             <form onSubmit={handleSubmitDetails}>
-              <h2 className="text-2xl font-bold text-slate-900">Aapki Details</h2>
-              <p className="mt-2 text-slate-500">Best offers ke liye basic info chahiye</p>
+              <h2 className="text-2xl font-bold text-slate-900">Your Details</h2>
+              <p className="mt-2 text-slate-500">Basic info needed for the best offers</p>
               <div className="mt-6 space-y-4">
                 <input
                   type="text"
-                  placeholder="Full Name (PAN ke hisaab se)"
+                  placeholder="Full Name (as per PAN)"
                   value={form.full_name}
                   onChange={(e) => setForm({ ...form, full_name: e.target.value })}
                   className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-teal-500"

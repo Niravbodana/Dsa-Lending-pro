@@ -44,7 +44,7 @@ function TrackContent() {
       <div className="rounded-2xl bg-white p-8 shadow-lg">
         <h1 className="text-2xl font-black text-center">Track Loan Status</h1>
         <p className="mt-2 text-center text-sm text-slate-500">
-          Application ref + mobile se track karo
+          Track using your application reference and registered mobile number
         </p>
         <form onSubmit={handleTrack} className="mt-6 space-y-4">
           <input

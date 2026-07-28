@@ -10,9 +10,9 @@ const stats = [
 ];
 
 const dialogues = [
-  "Sapne poore karo, EMI se daro mat!",
-  "Wedding, travel, medical — sab ke liye instant loan",
-  "Zero paperwork. 100% digital. Paisa seedha account mein.",
+  "Fulfill your dreams — don't fear EMI.",
+  "Wedding, travel, medical — instant loans for every need.",
+  "Zero paperwork. 100% digital. Money straight to your account.",
 ];
 
 const loanCards = [
@@ -44,15 +44,15 @@ const loanCards = [
 
 const lifestyleBlocks = [
   {
-    title: "Ghar, Shaadi, Sapne — Sab Possible",
-    desc: "Neer Loan Solutions aapko India ke trusted banks aur NBFCs se connect karta hai. Compare karo, choose karo, paise seedha account mein.",
+    title: "Home, Wedding, Dreams — All Possible",
+    desc: "Neer Loan Solutions connects you with India's trusted banks and NBFCs. Compare offers, choose the best rate, and receive funds directly in your account.",
     image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=900&h=600&fit=crop",
     cta: "Explore Loans",
     href: "/loans",
   },
   {
-    title: "100% Digital. Zero Branch Visit.",
-    desc: "OTP se login, Aadhaar eKYC, bank verify, digital eSign — poora process phone se. Ghar baithe loan approve.",
+    title: "100% Digital. Zero Branch Visits.",
+    desc: "OTP login, Aadhaar eKYC, bank verification, digital eSign — the entire process from your phone. Get approved from home.",
     image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=900&h=600&fit=crop",
     cta: "Start Application",
     href: "/apply",
@@ -86,13 +86,13 @@ export function Hero() {
             <span className="text-gradient-gold">Simple Process.</span>
             <br />
             <span className="text-3xl text-teal-100 md:text-4xl lg:text-5xl">
-              ₹5,00,000 tak — minutes mein.
+              Up to ₹5,00,000 — in minutes.
             </span>
           </h1>
 
           <p className="mt-5 max-w-lg text-lg leading-relaxed text-teal-50/90">
             <strong className="text-white">Neer Loan Solutions</strong> — compare offers from HDFC,
-            ICICI, Bajaj aur 15+ partner lenders. Transparent rates, RBI-compliant, fully digital.
+            ICICI, Bajaj and 15+ partner lenders. Transparent rates, RBI-compliant, fully digital.
           </p>
 
           <ul className="mt-6 space-y-2">
@@ -145,7 +145,7 @@ export function Hero() {
               />
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-900/95 via-slate-900/70 to-transparent p-6">
                 <p className="text-lg font-bold text-white">
-                  &ldquo;3 minute mein ₹4.2 lakh approve!&rdquo;
+                  &ldquo;₹4.2 lakh approved in 3 minutes!&rdquo;
                 </p>
                 <p className="mt-1 text-sm text-teal-200">
                   — Priya Sharma, Mumbai <span className="text-amber-400">★★★★★</span>
@@ -194,12 +194,7 @@ export function LifestyleShowcase() {
             variant={block.reverse ? "right" : "left"}
             className={`relative min-h-[360px] lg:min-h-[480px] ${block.reverse ? "lg:order-2" : ""}`}
           >
-            <Image
-              src={block.image}
-              alt={block.title}
-              fill
-              className="object-cover"
-            />
+            <Image src={block.image} alt={block.title} fill className="object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent lg:hidden" />
           </ScrollReveal>
           <ScrollReveal
@@ -233,7 +228,7 @@ export function LoanProductsStrip() {
             LOAN PRODUCTS
           </span>
           <h2 className="mt-4 text-4xl font-black text-slate-900">
-            Har Need Ke Liye <span className="text-teal-600">Right Loan</span>
+            The <span className="text-teal-600">Right Loan</span> for Every Need
           </h2>
         </ScrollReveal>
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -291,10 +286,10 @@ export function TrustGallery() {
       <div className="relative mx-auto max-w-7xl px-4">
         <ScrollReveal variant="up" className="text-center">
           <h2 className="text-4xl font-black">
-            Trusted By <span className="text-amber-400">Thousands</span> Across India
+            Trusted by <span className="text-amber-400">Thousands</span> Across India
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-slate-400">
-            Mumbai se Delhi tak — professionals, families, entrepreneurs sab Neer pe bharosa karte hain.
+            From Mumbai to Delhi — professionals, families, and entrepreneurs trust Neer Loan Solutions.
           </p>
         </ScrollReveal>
         <div className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-4">
@@ -323,9 +318,9 @@ export function AppDownloadBanner() {
       <div className="relative mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-8 px-4">
         <ScrollReveal variant="left">
           <p className="text-sm font-semibold text-teal-300">📱 MOBILE APP — COMING SOON</p>
-          <h2 className="mt-2 text-3xl font-black">Neer Loan App — Pocket Mein Loan</h2>
+          <h2 className="mt-2 text-3xl font-black">Neer Loan App — Loans in Your Pocket</h2>
           <p className="mt-2 max-w-md text-slate-300">
-            Track applications, compare offers, EMI calculator — sab ek premium app mein. Launching Q3 2026.
+            Track applications, compare offers, EMI calculator — all in one premium app. Launching Q3 2026.
           </p>
         </ScrollReveal>
         <ScrollReveal variant="right">
@@ -356,7 +351,7 @@ export function ReferBanner() {
           </div>
           <div>
             <p className="text-2xl font-black text-amber-900">🎁 Refer &amp; Earn ₹2,000</p>
-            <p className="text-amber-700">Dosto ko refer karo, har disbursal pe paise kamao</p>
+            <p className="text-amber-700">Refer friends and earn on every successful disbursal</p>
           </div>
         </ScrollReveal>
         <ScrollReveal variant="right">
@@ -371,10 +366,10 @@ export function ReferBanner() {
 
 export function HowItWorks() {
   const steps = [
-    { num: "01", title: "Mobile Verify", desc: "OTP se secure login — 30 seconds", icon: "📱", image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400&h=260&fit=crop" },
-    { num: "02", title: "Details Bharo", desc: "PAN, income, city — simple form", icon: "📝", image: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=400&h=260&fit=crop" },
-    { num: "03", title: "Compare Offers", desc: "15+ lenders se best rate choose karo", icon: "⚖️", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=260&fit=crop" },
-    { num: "04", title: "Money In Account", desc: "Partner bank seedha disbursal", icon: "🏦", image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400&h=260&fit=crop" },
+    { num: "01", title: "Verify Mobile", desc: "Secure OTP login — 30 seconds", icon: "📱", image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400&h=260&fit=crop" },
+    { num: "02", title: "Enter Details", desc: "PAN, income, city — simple form", icon: "📝", image: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=400&h=260&fit=crop" },
+    { num: "03", title: "Compare Offers", desc: "Choose the best rate from 15+ lenders", icon: "⚖️", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=260&fit=crop" },
+    { num: "04", title: "Money in Account", desc: "Direct disbursal from partner bank", icon: "🏦", image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400&h=260&fit=crop" },
   ];
 
   return (
@@ -383,7 +378,7 @@ export function HowItWorks() {
         <ScrollReveal variant="up" className="text-center">
           <span className="rounded-full bg-teal-50 px-4 py-1 text-sm font-bold text-teal-600">SIMPLE PROCESS</span>
           <h2 className="mt-4 text-4xl font-black text-slate-900">
-            Loan Lena Ab <span className="text-teal-600">Effortless</span> Hai
+            Getting a Loan Is Now <span className="text-teal-600">Effortless</span>
           </h2>
         </ScrollReveal>
         <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-4">

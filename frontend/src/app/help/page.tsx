@@ -7,35 +7,35 @@ export const metadata = { title: `Help Center | ${BRAND.name}` };
 
 const categories = [
   {
-    title: "Applying for Loan",
+    title: "Applying for a Loan",
     articles: [
-      { q: "Kaun apply kar sakta hai?", a: "18+ Indian resident with min ₹15,000 monthly income." },
-      { q: "Kitna time lagta hai?", a: "Eligibility 2-5 min. Approval same day possible." },
-      { q: "Kya documents chahiye?", a: "PAN, Aadhaar, bank details — sab digital." },
+      { q: "Who can apply?", a: "Indian residents aged 18+ with a minimum monthly income of ₹15,000." },
+      { q: "How long does it take?", a: "Eligibility: 2–5 minutes. Approval: same day possible." },
+      { q: "What documents are needed?", a: "PAN, Aadhaar, and bank details — all digital." },
     ],
   },
   {
     title: "KYC & Verification",
     articles: [
-      { q: "Aadhaar OTP safe hai?", a: "Haan, UIDAI authorized flow. Data encrypted." },
-      { q: "Penny drop kya hai?", a: "₹1 aapke account mein bhej ke verify karte hain, phir reverse." },
-      { q: "eSign valid hai?", a: "Haan, IT Act 2000 ke under legally valid." },
+      { q: "Is Aadhaar OTP safe?", a: "Yes. UIDAI-authorized flow with encrypted data." },
+      { q: "What is penny drop?", a: "We send ₹1 to your account to verify it, then reverse the transaction." },
+      { q: "Is eSign legally valid?", a: "Yes. Valid under the IT Act, 2000." },
     ],
   },
   {
     title: "EMI & Repayment",
     articles: [
-      { q: "EMI kab start hoti hai?", a: "Disbursal ke next month se, lender ke rules ke hisaab se." },
-      { q: "Prepayment possible?", a: "Haan, kai lenders zero foreclosure charge dete hain." },
-      { q: "EMI miss ho jaye to?", a: "Lender late fee charge karega. Contact lender directly." },
+      { q: "When does EMI start?", a: "From the month after disbursal, per lender rules." },
+      { q: "Is prepayment possible?", a: "Yes. Many lenders offer zero foreclosure charges." },
+      { q: "What if I miss an EMI?", a: "The lender may charge a late fee. Contact them directly." },
     ],
   },
   {
     title: "Account & Tracking",
     articles: [
-      { q: "Application kaise track karun?", a: "/track page pe ref + mobile daalo." },
-      { q: "Dashboard kaise login karun?", a: "/dashboard pe mobile OTP se login." },
-      { q: "Data delete kaise karun?", a: "dpo@neerloansolutions.com pe email karo." },
+      { q: "How do I track my application?", a: "Use /track with your ref number and mobile." },
+      { q: "How do I log in to the dashboard?", a: "Visit /dashboard and log in with mobile OTP." },
+      { q: "How do I delete my data?", a: "Email dpo@neerloansolutions.com with your request." },
     ],
   },
 ];
@@ -45,8 +45,9 @@ export default function HelpPage() {
     <PageShell>
       <InnerHero
         badge="HELP CENTER"
-        title="Kaise Madad Kar Sakte Hain?"
-        subtitle="Saare common sawalon ke jawab — loan apply, KYC, EMI, tracking sab yahan."
+        title="How Can We Help?"
+        subtitle="Answers to common questions about loans, KYC, EMI, and tracking."
+        image="https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=1920&h=600&fit=crop"
       />
       <div className="mx-auto max-w-4xl px-4 py-16">
         <div className="mb-8 flex flex-wrap gap-3">

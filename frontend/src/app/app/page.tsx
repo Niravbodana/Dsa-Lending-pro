@@ -20,7 +20,7 @@ export default function AppPage() {
       <InnerHero
         badge="MOBILE APP"
         title="Neer Loan App — Coming Soon"
-        subtitle="Premium mobile app — loan pocket mein. Track, apply, compare. Launching Q3 2026."
+        subtitle="Premium mobile app — loans in your pocket. Track, apply, compare. Launching Q3 2026."
       />
       <div className="mx-auto max-w-5xl px-4 py-16">
         <div className="grid items-center gap-12 lg:grid-cols-2">
@@ -85,7 +85,7 @@ export default function AppPage() {
 
         <div className="mt-12 text-center">
           <p className="text-slate-500">
-            Abhi ke liye website use karo —{" "}
+            For now, use our website —{" "}
             <Link href="/apply" className="font-bold text-teal-600 underline">
               Apply on Web →
             </Link>

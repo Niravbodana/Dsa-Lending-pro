@@ -29,10 +29,10 @@ export function EmiCalculator() {
             FREE TOOL
           </span>
           <h2 className="mt-4 text-4xl font-black text-slate-900">
-            EMI Calculator — <span className="text-teal-600">Pehle Jaano, Phir Lo</span>
+            EMI Calculator — <span className="text-teal-600">Know Before You Borrow</span>
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-slate-500">
-            Apni EMI calculate karo before applying. No hidden surprises!
+            Calculate your monthly EMI before applying. No hidden surprises.
           </p>
         </div>
 
@@ -42,9 +42,7 @@ export function EmiCalculator() {
               <div>
                 <div className="flex justify-between">
                   <label className="font-semibold text-slate-700">Loan Amount</label>
-                  <span className="font-bold text-teal-600">
-                    ₹{amount.toLocaleString("en-IN")}
-                  </span>
+                  <span className="font-bold text-teal-600">₹{amount.toLocaleString("en-IN")}</span>
                 </div>
                 <input
                   type="range"
@@ -113,7 +111,7 @@ export function EmiCalculator() {
               href="/apply"
               className="mt-8 block rounded-2xl bg-amber-400 py-4 text-center font-extrabold text-slate-900 transition hover:bg-amber-300"
             >
-              Itni EMI Mein Loan Lo →
+              Apply at This EMI →
             </Link>
           </div>
         </div>
