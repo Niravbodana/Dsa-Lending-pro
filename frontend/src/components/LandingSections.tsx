@@ -138,7 +138,8 @@ export function Hero() {
       <div className="relative border-t border-white/10 bg-black/20 backdrop-blur">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-8 px-4 py-4 text-sm text-teal-100/80">
           <span>🔒 256-bit SSL Secured</span>
-          <span>✓ RBI LSP Compliant</span>
+          <Link href="/compliance" className="hover:text-white transition">✓ RBI LSP Compliant</Link>
+          <Link href="/compliance" className="hover:text-white transition">🛡️ DPDP Act 2023</Link>
           <span>🏦 15+ Partner Banks</span>
           <span>⭐ 4.8/5 Customer Rating</span>
           <span>📱 100% Digital Process</span>
@@ -267,11 +268,12 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <p className="font-bold text-slate-900">Legal</p>
+            <p className="font-bold text-slate-900">Legal & Compliance</p>
             <ul className="mt-3 space-y-2 text-sm text-slate-500">
-              <li>RBI LSP Guidelines</li>
-              <li>DPDP Act Compliant</li>
-              <li>Privacy Policy</li>
+              <li><Link href="/compliance" className="hover:text-teal-600">RBI LSP Guidelines</Link></li>
+              <li><Link href="/compliance" className="hover:text-teal-600">DPDP Act / Data Protection</Link></li>
+              <li><Link href="/compliance" className="hover:text-teal-600">Privacy Policy</Link></li>
+              <li><Link href="/compliance" className="hover:text-teal-600">Grievance Redressal</Link></li>
             </ul>
           </div>
           <div>

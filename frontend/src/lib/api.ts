@@ -11,6 +11,19 @@ export type LoanOffer = {
   processing_fee: string;
   approval_chance: "high" | "medium" | "low";
   features: string[];
+  is_best_deal?: boolean;
+  lender_api_source?: string;
+  response_time_ms?: number | null;
+};
+
+export type EligibilityResult = {
+  eligible: boolean;
+  score: number;
+  max_loan_amount: number;
+  recommended_tenure: number;
+  debt_to_income_ratio: number;
+  message: string;
+  factors: string[];
 };
 
 export async function sendOtp(mobile: string) {
@@ -50,12 +63,33 @@ export async function submitDetails(data: {
   return res.json();
 }
 
+export async function checkEligibility(data: {
+  session_token: string;
+  loan_purpose: string;
+  existing_emi: number;
+}) {
+  const res = await fetch(`${API_BASE}/api/leads/check-eligibility`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error((await res.json()).detail || "Eligibility check failed");
+  return res.json() as Promise<{ lead_id: number; eligibility: EligibilityResult }>;
+}
+
 export async function fetchOffers(sessionToken: string) {
   const res = await fetch(
     `${API_BASE}/api/leads/offers?session_token=${encodeURIComponent(sessionToken)}`
   );
   if (!res.ok) throw new Error((await res.json()).detail || "Failed to fetch offers");
-  return res.json() as Promise<{ lead_id: number; offers: LoanOffer[]; message: string }>;
+  return res.json() as Promise<{
+    lead_id: number;
+    offers: LoanOffer[];
+    message: string;
+    eligibility_score?: number;
+    partners_queried: number;
+    partners_responded: number;
+  }>;
 }
 
 export async function selectOffer(data: {

@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { OfferCard } from "@/components/OfferCard";
 import {
+  checkEligibility,
+  EligibilityResult,
   fetchOffers,
   LoanOffer,
   selectOffer,
@@ -13,9 +15,11 @@ import {
   verifyOtp,
 } from "@/lib/api";
 
-type Step = "mobile" | "otp" | "details" | "offers" | "success";
+type Step = "mobile" | "otp" | "details" | "eligibility" | "offers" | "success";
+type SortBy = "rate" | "amount" | "emi";
 
-const STEPS: Step[] = ["mobile", "otp", "details", "offers", "success"];
+const STEPS: Step[] = ["mobile", "otp", "details", "eligibility", "offers", "success"];
+const STEP_LABELS = ["Mobile", "OTP", "Details", "Eligibility", "Offers", "Done"];
 
 export default function ApplyPage() {
   const [step, setStep] = useState<Step>("mobile");
@@ -24,9 +28,13 @@ export default function ApplyPage() {
   const [devOtp, setDevOtp] = useState<string | null>(null);
   const [sessionToken, setSessionToken] = useState("");
   const [offers, setOffers] = useState<LoanOffer[]>([]);
+  const [partnersInfo, setPartnersInfo] = useState({ queried: 0, responded: 0 });
+  const [eligibility, setEligibility] = useState<EligibilityResult | null>(null);
   const [selectedOffer, setSelectedOffer] = useState<LoanOffer | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [sortBy, setSortBy] = useState<SortBy>("rate");
+  const [consent, setConsent] = useState(false);
 
   const [form, setForm] = useState({
     full_name: "",
@@ -34,9 +42,19 @@ export default function ApplyPage() {
     monthly_income: "",
     employment_type: "salaried" as "salaried" | "self_employed" | "business",
     city: "",
+    loan_purpose: "personal" as "personal" | "medical" | "wedding" | "travel" | "business" | "education",
+    existing_emi: "",
   });
 
   const stepIndex = STEPS.indexOf(step);
+
+  const sortedOffers = useMemo(() => {
+    const copy = [...offers];
+    if (sortBy === "rate") copy.sort((a, b) => a.interest_rate - b.interest_rate);
+    if (sortBy === "amount") copy.sort((a, b) => b.loan_amount - a.loan_amount);
+    if (sortBy === "emi") copy.sort((a, b) => a.emi - b.emi);
+    return copy;
+  }, [offers, sortBy]);
 
   async function handleSendOtp(e: React.FormEvent) {
     e.preventDefault();
@@ -70,6 +88,10 @@ export default function ApplyPage() {
 
   async function handleSubmitDetails(e: React.FormEvent) {
     e.preventDefault();
+    if (!consent) {
+      setError("Please accept the data protection & compliance terms to continue.");
+      return;
+    }
     setError("");
     setLoading(true);
     try {
@@ -81,11 +103,38 @@ export default function ApplyPage() {
         employment_type: form.employment_type,
         city: form.city,
       });
-      const offersRes = await fetchOffers(sessionToken);
-      setOffers(offersRes.offers);
-      setStep("offers");
+      setStep("eligibility");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to submit details");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleCheckEligibility(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      const res = await checkEligibility({
+        session_token: sessionToken,
+        loan_purpose: form.loan_purpose,
+        existing_emi: Number(form.existing_emi) || 0,
+      });
+      setEligibility(res.eligibility);
+      if (!res.eligibility.eligible) {
+        setLoading(false);
+        return;
+      }
+      const offersRes = await fetchOffers(sessionToken);
+      setOffers(offersRes.offers);
+      setPartnersInfo({
+        queried: offersRes.partners_queried,
+        responded: offersRes.partners_responded,
+      });
+      setStep("offers");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Eligibility check failed");
     } finally {
       setLoading(false);
     }
@@ -114,50 +163,43 @@ export default function ApplyPage() {
       <Header />
 
       <div className="mx-auto max-w-2xl px-4 py-10">
-        {/* Progress bar */}
-        <div className="mb-8 flex items-center gap-2">
-          {["Mobile", "OTP", "Details", "Offers", "Done"].map((label, i) => (
-            <div key={label} className="flex flex-1 flex-col items-center">
+        <div className="mb-8 flex items-center gap-1 overflow-x-auto">
+          {STEP_LABELS.map((label, i) => (
+            <div key={label} className="flex min-w-[52px] flex-1 flex-col items-center">
               <div
-                className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
-                  i <= stepIndex
-                    ? "bg-teal-600 text-white"
-                    : "bg-slate-200 text-slate-400"
+                className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${
+                  i <= stepIndex ? "bg-teal-600 text-white" : "bg-slate-200 text-slate-400"
                 }`}
               >
                 {i + 1}
               </div>
-              <span className="mt-1 text-xs text-slate-500">{label}</span>
+              <span className="mt-1 text-[10px] text-slate-500">{label}</span>
             </div>
           ))}
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
           {error && (
-            <div className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">
-              {error}
-            </div>
+            <div className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</div>
           )}
 
           {step === "mobile" && (
             <form onSubmit={handleSendOtp}>
-              <h2 className="text-2xl font-bold text-slate-900">Enter Mobile Number</h2>
-              <p className="mt-2 text-slate-500">
-                We&apos;ll send an OTP to verify your number
-              </p>
+              <h2 className="text-2xl font-bold text-slate-900">Mobile Number Daalo</h2>
+              <p className="mt-2 text-slate-500">OTP se verify karenge — 30 second mein</p>
               <input
                 type="tel"
                 maxLength={10}
                 placeholder="10-digit mobile number"
                 value={mobile}
                 onChange={(e) => setMobile(e.target.value.replace(/\D/g, ""))}
-                className="mt-6 w-full rounded-xl border border-slate-200 px-4 py-3 text-lg outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                className="mt-6 w-full rounded-xl border border-slate-200 px-4 py-3 text-lg outline-none focus:border-teal-500"
                 required
               />
               <button
                 type="submit"
                 disabled={loading || mobile.length !== 10}
-                className="mt-6 w-full rounded-xl bg-teal-600 py-3 font-bold text-white transition hover:bg-teal-700 disabled:opacity-50"
+                className="mt-6 w-full rounded-xl bg-teal-600 py-3 font-bold text-white disabled:opacity-50"
               >
                 {loading ? "Sending..." : "Send OTP →"}
               </button>
@@ -166,51 +208,40 @@ export default function ApplyPage() {
 
           {step === "otp" && (
             <form onSubmit={handleVerifyOtp}>
-              <h2 className="text-2xl font-bold text-slate-900">Verify OTP</h2>
-              <p className="mt-2 text-slate-500">
-                OTP sent to +91 {mobile}
-                {devOtp && (
-                  <span className="mt-2 block rounded-lg bg-yellow-50 px-3 py-2 text-sm font-mono text-yellow-800">
-                    Dev OTP: <strong>{devOtp}</strong> (any 6 digits also work in dev mode)
-                  </span>
-                )}
-              </p>
+              <h2 className="text-2xl font-bold text-slate-900">OTP Verify Karo</h2>
+              <p className="mt-2 text-slate-500">+91 {mobile}</p>
+              {devOtp && (
+                <p className="mt-2 rounded-lg bg-yellow-50 px-3 py-2 text-sm font-mono text-yellow-800">
+                  Dev OTP: <strong>{devOtp}</strong>
+                </p>
+              )}
               <input
                 type="text"
                 maxLength={6}
-                placeholder="Enter 6-digit OTP"
+                placeholder="6-digit OTP"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                className="mt-6 w-full rounded-xl border border-slate-200 px-4 py-3 text-center text-2xl tracking-widest outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                className="mt-6 w-full rounded-xl border border-slate-200 px-4 py-3 text-center text-2xl tracking-widest outline-none focus:border-teal-500"
                 required
               />
               <button
                 type="submit"
                 disabled={loading || otp.length !== 6}
-                className="mt-6 w-full rounded-xl bg-teal-600 py-3 font-bold text-white transition hover:bg-teal-700 disabled:opacity-50"
+                className="mt-6 w-full rounded-xl bg-teal-600 py-3 font-bold text-white disabled:opacity-50"
               >
                 {loading ? "Verifying..." : "Verify & Continue →"}
-              </button>
-              <button
-                type="button"
-                onClick={() => setStep("mobile")}
-                className="mt-3 w-full text-sm text-slate-500 hover:text-teal-600"
-              >
-                ← Change mobile number
               </button>
             </form>
           )}
 
           {step === "details" && (
             <form onSubmit={handleSubmitDetails}>
-              <h2 className="text-2xl font-bold text-slate-900">Your Details</h2>
-              <p className="mt-2 text-slate-500">
-                Help us find the best loan offers for you
-              </p>
+              <h2 className="text-2xl font-bold text-slate-900">Aapki Details</h2>
+              <p className="mt-2 text-slate-500">Best offers ke liye basic info chahiye</p>
               <div className="mt-6 space-y-4">
                 <input
                   type="text"
-                  placeholder="Full Name (as per PAN)"
+                  placeholder="Full Name (PAN ke hisaab se)"
                   value={form.full_name}
                   onChange={(e) => setForm({ ...form, full_name: e.target.value })}
                   className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-teal-500"
@@ -219,7 +250,7 @@ export default function ApplyPage() {
                 <input
                   type="text"
                   maxLength={10}
-                  placeholder="PAN Number (e.g. ABCDE1234F)"
+                  placeholder="PAN Number"
                   value={form.pan}
                   onChange={(e) => setForm({ ...form, pan: e.target.value.toUpperCase() })}
                   className="w-full rounded-xl border border-slate-200 px-4 py-3 uppercase outline-none focus:border-teal-500"
@@ -232,7 +263,7 @@ export default function ApplyPage() {
                   onChange={(e) => setForm({ ...form, monthly_income: e.target.value })}
                   className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-teal-500"
                   required
-                  min={10000}
+                  min={15000}
                 />
                 <select
                   value={form.employment_type}
@@ -242,7 +273,7 @@ export default function ApplyPage() {
                       employment_type: e.target.value as typeof form.employment_type,
                     })
                   }
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-teal-500"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none"
                 >
                   <option value="salaried">Salaried</option>
                   <option value="self_employed">Self Employed</option>
@@ -257,24 +288,122 @@ export default function ApplyPage() {
                   required
                 />
               </div>
+              <label className="mt-4 flex items-start gap-3 text-sm text-slate-600">
+                <input
+                  type="checkbox"
+                  checked={consent}
+                  onChange={(e) => setConsent(e.target.checked)}
+                  className="mt-1 accent-teal-600"
+                />
+                <span>
+                  I agree to DSA Lending Pro&apos;s{" "}
+                  <Link href="/compliance" className="font-semibold text-teal-600 underline">
+                    RBI compliance & DPDP data protection
+                  </Link>{" "}
+                  terms. My data will be shared with partner lenders only upon offer selection.
+                </span>
+              </label>
+              <button
+                type="submit"
+                disabled={loading || !consent}
+                className="mt-6 w-full rounded-xl bg-teal-600 py-3 font-bold text-white disabled:opacity-50"
+              >
+                {loading ? "Saving..." : "Check Eligibility →"}
+              </button>
+            </form>
+          )}
+
+          {step === "eligibility" && (
+            <form onSubmit={handleCheckEligibility}>
+              <h2 className="text-2xl font-bold text-slate-900">Eligibility Check</h2>
+              <p className="mt-2 text-slate-500">Phase 2 engine — real-time partner API query</p>
+              <div className="mt-6 space-y-4">
+                <div>
+                  <label className="text-sm font-semibold text-slate-700">Loan Purpose</label>
+                  <select
+                    value={form.loan_purpose}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        loan_purpose: e.target.value as typeof form.loan_purpose,
+                      })
+                    }
+                    className="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 outline-none"
+                  >
+                    <option value="personal">Personal</option>
+                    <option value="medical">Medical Emergency</option>
+                    <option value="wedding">Wedding</option>
+                    <option value="travel">Travel</option>
+                    <option value="business">Business</option>
+                    <option value="education">Education</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm font-semibold text-slate-700">
+                    Existing Monthly EMI (₹)
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="0 if none"
+                    value={form.existing_emi}
+                    onChange={(e) => setForm({ ...form, existing_emi: e.target.value })}
+                    className="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 outline-none"
+                    min={0}
+                  />
+                </div>
+              </div>
+
+              {eligibility && !eligibility.eligible && (
+                <div className="mt-6 rounded-xl bg-red-50 p-4">
+                  <p className="font-bold text-red-700">Not Eligible</p>
+                  <p className="mt-1 text-sm text-red-600">{eligibility.message}</p>
+                  <p className="mt-2 text-xs text-red-500">Score: {eligibility.score}/100</p>
+                </div>
+              )}
+
               <button
                 type="submit"
                 disabled={loading}
-                className="mt-6 w-full rounded-xl bg-teal-600 py-3 font-bold text-white transition hover:bg-teal-700 disabled:opacity-50"
+                className="mt-6 w-full rounded-xl bg-gradient-to-r from-teal-600 to-cyan-600 py-3 font-bold text-white disabled:opacity-50"
               >
-                {loading ? "Fetching offers..." : "Get Best Offers →"}
+                {loading ? "Querying 6 partner APIs..." : "Run Eligibility & Fetch Offers →"}
               </button>
             </form>
           )}
 
           {step === "offers" && (
             <div>
-              <h2 className="text-2xl font-bold text-slate-900">Your Loan Offers</h2>
-              <p className="mt-2 text-slate-500">
-                {offers.length} offers from partner lenders — sorted by best interest rate
-              </p>
+              {eligibility && (
+                <div className="mb-6 rounded-xl bg-green-50 p-4">
+                  <p className="font-bold text-green-800">
+                    ✅ Eligible — Score {eligibility.score}/100
+                  </p>
+                  <p className="text-sm text-green-700">
+                    Max loan: ₹{eligibility.max_loan_amount.toLocaleString("en-IN")} • DTI:{" "}
+                    {eligibility.debt_to_income_ratio}%
+                  </p>
+                </div>
+              )}
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-slate-900">Partner Offers</h2>
+                  <p className="text-sm text-slate-500">
+                    {offers.length} offers from {partnersInfo.responded}/{partnersInfo.queried}{" "}
+                    partners (live engine)
+                  </p>
+                </div>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as SortBy)}
+                  className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                >
+                  <option value="rate">Lowest ROI</option>
+                  <option value="amount">Highest Amount</option>
+                  <option value="emi">Lowest EMI</option>
+                </select>
+              </div>
               <div className="mt-6 space-y-4">
-                {offers.map((offer) => (
+                {sortedOffers.map((offer) => (
                   <OfferCard
                     key={offer.offer_id}
                     offer={offer}
@@ -293,25 +422,24 @@ export default function ApplyPage() {
               </div>
               <h2 className="mt-6 text-2xl font-bold text-slate-900">Offer Selected!</h2>
               <p className="mt-2 text-slate-500">
-                You selected <strong>{selectedOffer.lender_name}</strong> for{" "}
-                <strong>
-                  {new Intl.NumberFormat("en-IN", {
-                    style: "currency",
-                    currency: "INR",
-                    maximumFractionDigits: 0,
-                  }).format(selectedOffer.loan_amount)}
-                </strong>
+                <strong>{selectedOffer.lender_name}</strong> —{" "}
+                {new Intl.NumberFormat("en-IN", {
+                  style: "currency",
+                  currency: "INR",
+                  maximumFractionDigits: 0,
+                }).format(selectedOffer.loan_amount)}{" "}
+                @ {selectedOffer.interest_rate}%
               </p>
               <div className="mt-6 rounded-xl bg-teal-50 p-4 text-sm text-teal-800">
-                <p className="font-semibold">Next Step (Phase 3):</p>
+                <p className="font-semibold">Next: Phase 3 — eKYC</p>
                 <p className="mt-1">
-                  Complete eKYC & digital signing on {selectedOffer.lender_name}&apos;s portal.
-                  Loan will be disbursed directly to your bank account.
+                  Complete verification on {selectedOffer.lender_name}&apos;s portal. Loan seedha
+                  aapke bank account mein jayega.
                 </p>
               </div>
               <Link
                 href="/"
-                className="mt-6 inline-block rounded-xl bg-teal-600 px-8 py-3 font-bold text-white transition hover:bg-teal-700"
+                className="mt-6 inline-block rounded-xl bg-teal-600 px-8 py-3 font-bold text-white"
               >
                 Back to Home
               </Link>

@@ -48,9 +48,22 @@ cd frontend && npm run build
 
 ### Hello-world flow
 
-1. Open http://localhost:3000 — premium homepage with hero image & Hindi copy
-2. Click "Abhi Apply Karo" → complete OTP → details → offers → select
-3. Admin panel: http://localhost:3000/admin (password: `admin123`)
+1. Open http://localhost:3000 — premium homepage
+2. Apply flow: Mobile → OTP → Details (with DPDP consent) → Eligibility → Offers → Select
+3. Compliance page: http://localhost:3000/compliance
+4. Admin panel: http://localhost:3000/admin (password: `admin123`)
+
+### Phase 2 — Partner API integration
+
+Set partner API URLs in `backend/.env` to switch from mock to real APIs:
+
+```
+PARTNER_HDFC_API_URL=https://your-partner-api.com/offers
+PARTNER_HDFC_API_KEY=your-api-key
+```
+
+Adapters live in `backend/app/services/partners/`. Mock adapters used when keys not set.
+Offer engine runs parallel queries to all 6 partners via `backend/app/services/offer_engine.py`.
 
 ### Admin panel
 

@@ -30,4 +30,4 @@ app.include_router(admin.router, prefix="/api")
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "phase": "1.5-premium"}
+    return {"status": "ok", "phase": "2-eligibility-engine"}

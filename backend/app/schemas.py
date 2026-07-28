@@ -73,12 +73,39 @@ class LoanOffer(BaseModel):
     processing_fee: str
     approval_chance: Literal["high", "medium", "low"]
     features: list[str]
+    is_best_deal: bool = False
+    lender_api_source: str = "mock"
+    response_time_ms: int | None = None
+
+
+class EligibilityRequest(BaseModel):
+    session_token: str
+    loan_purpose: Literal["personal", "medical", "wedding", "travel", "business", "education"] = "personal"
+    existing_emi: float = Field(default=0, ge=0)
+
+
+class EligibilityResult(BaseModel):
+    eligible: bool
+    score: int
+    max_loan_amount: int
+    recommended_tenure: int
+    debt_to_income_ratio: float
+    message: str
+    factors: list[str]
+
+
+class EligibilityResponse(BaseModel):
+    lead_id: int
+    eligibility: EligibilityResult
 
 
 class OffersResponse(BaseModel):
     lead_id: int
     offers: list[LoanOffer]
     message: str
+    eligibility_score: int | None = None
+    partners_queried: int = 0
+    partners_responded: int = 0
 
 
 class SelectOfferRequest(BaseModel):
