@@ -14,6 +14,7 @@ import { FAQ } from "@/components/FAQ";
 import { BugReportWidget } from "@/components/BugReportWidget";
 import { FloatingCTA } from "@/components/FloatingCTA";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { AIChatWidget } from "@/components/AIChatWidget";
 
 export default function Home() {
   return (
@@ -30,6 +31,7 @@ export default function Home() {
       <FAQ />
       <Footer />
       <BugReportWidget />
+      <AIChatWidget />
       <FloatingCTA />
       <WhatsAppButton />
     </main>

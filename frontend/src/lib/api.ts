@@ -244,6 +244,29 @@ export async function getEmiSchedule(token: string, appId: number) {
   return res.json();
 }
 
+// --- AI Chat ---
+export type ChatMessage = { role: "user" | "assistant"; content: string };
+
+export async function sendChatMessage(data: {
+  message: string;
+  session_id?: string;
+  page_url?: string;
+  history?: ChatMessage[];
+}) {
+  const res = await fetch(`${API_BASE}/api/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error((await res.json()).detail || "Chat failed");
+  return res.json() as Promise<{
+    reply: string;
+    session_id: string;
+    suggestions: string[];
+    assistant_name: string;
+  }>;
+}
+
 // --- Bug Reports ---
 export async function reportBug(data: {
   title: string;

@@ -2,6 +2,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/LandingSections";
 import { BugReportWidget } from "@/components/BugReportWidget";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { AIChatWidget } from "@/components/AIChatWidget";
 
 export function PageShell({
   children,
@@ -18,6 +19,7 @@ export function PageShell({
       {showWidgets && (
         <>
           <BugReportWidget />
+          <AIChatWidget />
           <WhatsAppButton />
         </>
       )}

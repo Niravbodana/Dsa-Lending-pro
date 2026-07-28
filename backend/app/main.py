@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.database import Base, engine
-from app.routers import admin, auth, dashboard, kyc, leads, webhooks
+from app.routers import admin, auth, chat, dashboard, kyc, leads, webhooks
 
 Base.metadata.create_all(bind=engine)
 
@@ -28,6 +28,7 @@ app.include_router(leads.router, prefix="/api")
 app.include_router(kyc.router, prefix="/api")
 app.include_router(dashboard.router, prefix="/api")
 app.include_router(webhooks.router, prefix="/api")
+app.include_router(chat.router, prefix="/api")
 app.include_router(admin.router, prefix="/api")
 
 
