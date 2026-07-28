@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { NeerCredLogo } from "@/components/NeerCredLogo";
 import { IconMenu, IconX, IconSmartphone } from "@/components/icons";
@@ -17,25 +18,37 @@ const navLinks = [
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/95 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5">
+    <header className="sticky top-0 z-50 border-b border-teal-900/10 bg-white/90 shadow-sm backdrop-blur-xl">
+      <div className="h-0.5 bg-gradient-to-r from-neercred-gold via-neercred-teal to-neercred-cyan" />
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
         <Link href="/" className="flex items-center" onClick={() => setMenuOpen(false)}>
-          <NeerCredLogo size={40} />
+          <NeerCredLogo size={42} />
         </Link>
 
-        <nav className="hidden items-center gap-5 xl:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-sm font-medium text-slate-600 transition hover:text-teal-700"
-            >
-              {link.label}
-            </Link>
-          ))}
-          <Link href="/compliance" className="text-sm font-medium text-slate-600 transition hover:text-teal-700">
+        <nav className="hidden items-center gap-1 xl:flex">
+          {navLinks.map((link) => {
+            const active = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
+                  active
+                    ? "bg-teal-50 text-neercred-teal"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-neercred-teal"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+          <Link
+            href="/compliance"
+            className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 hover:text-neercred-teal"
+          >
             Compliance
           </Link>
         </nav>
@@ -43,13 +56,13 @@ export function Header() {
         <div className="flex items-center gap-2 sm:gap-3">
           <Link
             href="/app"
-            className="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-slate-500 hover:text-teal-700 md:flex"
+            className="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-slate-500 transition hover:bg-teal-50 hover:text-neercred-teal md:flex"
           >
             <IconSmartphone size={14} /> App
           </Link>
           <Link
             href="/apply"
-            className="rounded-full bg-slate-900 px-4 py-2.5 text-sm font-bold text-white shadow-lg transition hover:bg-slate-800 sm:px-5"
+            className="rounded-full bg-neercred-cta px-4 py-2.5 text-sm font-bold text-white shadow-neercred transition hover:brightness-110 sm:px-5"
           >
             Apply Now
           </Link>
@@ -71,7 +84,7 @@ export function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-teal-50 hover:text-neercred-teal"
                 onClick={() => setMenuOpen(false)}
               >
                 {link.label}

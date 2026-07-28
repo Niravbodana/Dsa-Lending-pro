@@ -10,14 +10,15 @@ export function Footer() {
           <div className="lg:col-span-2">
             <NeerCredLogo size={44} dark />
             <p className="mt-3 text-sm leading-relaxed">
-              India&apos;s premium personal loan marketplace. Compare offers from 15+ regulated
-              partner banks and NBFCs.
+              <span className="font-medium text-neercred-gold">{BRAND.logoTagline}</span>
+              {" · "}
+              India&apos;s premium personal loan marketplace. Compare offers from 15+ regulated partner banks and NBFCs.
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
-              <Link href="/apply" className="rounded-lg bg-teal-600 px-4 py-2 text-xs font-bold text-white hover:bg-teal-500">
+              <Link href="/apply" className="rounded-lg bg-gradient-to-r from-neercred-gold to-amber-500 px-4 py-2 text-xs font-bold text-neercred-navy hover:brightness-110">
                 Apply Now
               </Link>
-              <Link href="/partner-with-us" className="rounded-lg border border-slate-700 px-4 py-2 text-xs font-semibold hover:border-slate-500">
+              <Link href="/partner-with-us" className="rounded-lg border border-slate-700 px-4 py-2 text-xs font-semibold hover:border-neercred-gold/50 hover:text-white">
                 Partner With Us
               </Link>
             </div>
