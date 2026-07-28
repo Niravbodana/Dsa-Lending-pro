@@ -1,7 +1,10 @@
 import Link from "next/link";
+import Image from "next/image";
 import { PageShell } from "@/components/PageShell";
 import { InnerHero } from "@/components/InnerHero";
+import { NeerCredLogo } from "@/components/NeerCredLogo";
 import { BRAND } from "@/lib/brand";
+import { INDIAN_IMAGES } from "@/lib/indian-images";
 
 export const metadata = { title: `Download App | ${BRAND.name}` };
 
@@ -21,6 +24,7 @@ export default function AppPage() {
         badge="MOBILE APP"
         title="Neer Loan App — Coming Soon"
         subtitle="Premium mobile app — loans in your pocket. Track, apply, compare. Launching Q3 2026."
+        image={INDIAN_IMAGES.pages.app}
       />
       <div className="mx-auto max-w-5xl px-4 py-16">
         <div className="grid items-center gap-12 lg:grid-cols-2">
@@ -61,21 +65,29 @@ export default function AppPage() {
 
           <div className="flex justify-center">
             <div className="relative h-[500px] w-[260px] rounded-[3rem] border-8 border-slate-800 bg-gradient-to-b from-teal-600 to-cyan-700 p-4 shadow-2xl">
-              <div className="h-full overflow-hidden rounded-[2.2rem] bg-white p-4">
-                <p className="text-center text-xs font-bold text-teal-600">{BRAND.shortName}</p>
-                <p className="mt-4 text-center text-2xl font-black text-slate-900">
-                  ₹5,00,000
-                </p>
-                <p className="text-center text-xs text-slate-500">Pre-approved amount</p>
-                <div className="mt-6 space-y-2">
-                  <div className="rounded-lg bg-teal-50 p-3 text-center text-sm font-bold text-teal-700">
-                    Check Eligibility
+              <div className="relative h-full overflow-hidden rounded-[2.2rem] bg-white">
+                <Image
+                  src={INDIAN_IMAGES.misc.appBanner}
+                  alt="NeerCred app preview"
+                  fill
+                  className="object-cover opacity-30"
+                />
+                <div className="relative flex h-full flex-col p-4">
+                  <div className="flex justify-center">
+                    <NeerCredLogo size={36} className="h-8 w-auto" />
                   </div>
-                  <div className="rounded-lg bg-slate-50 p-3 text-center text-xs text-slate-500">
-                    Track Application
-                  </div>
-                  <div className="rounded-lg bg-slate-50 p-3 text-center text-xs text-slate-500">
-                    EMI Calculator
+                  <p className="mt-4 text-center text-2xl font-black text-slate-900">₹5,00,000</p>
+                  <p className="text-center text-xs text-slate-500">Pre-approved amount</p>
+                  <div className="mt-6 space-y-2">
+                    <div className="rounded-lg bg-teal-50 p-3 text-center text-sm font-bold text-teal-700">
+                      Check Eligibility
+                    </div>
+                    <div className="rounded-lg bg-white/80 p-3 text-center text-xs text-slate-600 backdrop-blur">
+                      Track Application
+                    </div>
+                    <div className="rounded-lg bg-white/80 p-3 text-center text-xs text-slate-600 backdrop-blur">
+                      EMI Calculator
+                    </div>
                   </div>
                 </div>
               </div>

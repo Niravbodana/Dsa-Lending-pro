@@ -9,7 +9,7 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-16">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-6">
           <div className="lg:col-span-2">
-            <NeerCredLogo size={52} className="h-12 w-auto sm:h-14" />
+            <NeerCredLogo dark size={52} className="h-12 w-auto sm:h-14" />
             <p className="mt-3 text-sm leading-relaxed">
               <span className="font-medium text-neercred-gold">{BRAND.logoTagline}</span>
               {" · "}

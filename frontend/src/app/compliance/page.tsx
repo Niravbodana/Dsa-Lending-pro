@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { INDIAN_IMAGES } from "@/lib/indian-images";
 
 type Tab = "rbi" | "dpdp" | "privacy" | "terms" | "grievance";
 
@@ -147,8 +149,16 @@ export default function CompliancePage() {
     <main className="min-h-screen bg-slate-50">
       <Header />
 
-      <div className="bg-gradient-to-br from-slate-900 via-teal-900 to-slate-900 py-16 text-white">
-        <div className="mx-auto max-w-5xl px-4 text-center">
+      <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-teal-900 to-slate-900 py-16 text-white">
+        <Image
+          src={INDIAN_IMAGES.pages.compliance}
+          alt=""
+          fill
+          className="object-cover opacity-25"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/80 via-teal-900/70 to-slate-900/85" />
+        <div className="relative mx-auto max-w-5xl px-4 text-center">
           <span className="rounded-full bg-white/10 px-4 py-1 text-sm font-semibold">
             Trust & Transparency
           </span>

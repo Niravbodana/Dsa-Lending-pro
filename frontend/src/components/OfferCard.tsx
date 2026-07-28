@@ -2,6 +2,7 @@
 
 import { LoanOffer } from "@/lib/api";
 import { IconCheck } from "@/components/icons";
+import { LenderLogo } from "@/components/LenderLogo";
 
 const chanceLabels = {
   high: { label: "Strong match", className: "bg-emerald-50 text-emerald-700" },
@@ -54,9 +55,7 @@ export function OfferCard({
 
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-teal-50 to-cyan-50 text-lg font-bold text-neercred-teal">
-            {offer.lender_logo}
-          </div>
+          <LenderLogo name={offer.lender_name} logo={offer.lender_logo} size={48} />
           <div>
             <h3 className="font-bold text-neercred-navy">{offer.lender_name}</h3>
             <span className={`mt-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${chance.className}`}>

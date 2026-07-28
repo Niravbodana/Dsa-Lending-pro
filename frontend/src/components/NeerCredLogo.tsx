@@ -66,7 +66,7 @@ export function NeerCredLogo({
 
   if (variant === "wordmark" || variant === "stacked") {
     return (
-      <span className={`inline-flex flex-col items-center ${dark ? "rounded-xl bg-white px-3 py-1.5 shadow-sm" : ""}`}>
+      <span className={`inline-flex flex-col items-center ${dark ? "rounded-xl bg-[#fefefe] px-2 py-1 shadow-sm sm:px-2.5 sm:py-1.5" : ""}`}>
         {logo}
       </span>
     );
@@ -74,8 +74,8 @@ export function NeerCredLogo({
 
   if (dark) {
     return (
-      <span className={`inline-flex items-center rounded-xl bg-white px-3 py-1.5 shadow-sm ${className}`}>
-        <LockupImage height={className ? undefined : height} />
+      <span className="inline-flex items-center rounded-xl bg-[#fefefe] px-2 py-1 shadow-sm sm:px-2.5 sm:py-1.5">
+        <LockupImage height={className ? undefined : height} className={className} />
       </span>
     );
   }

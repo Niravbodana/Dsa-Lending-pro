@@ -2,6 +2,7 @@ import Link from "next/link";
 import { PageShell } from "@/components/PageShell";
 import { InnerHero } from "@/components/InnerHero";
 import { BRAND } from "@/lib/brand";
+import { INDIAN_IMAGES } from "@/lib/indian-images";
 
 export const metadata = { title: `Interest Rates & Charges | ${BRAND.name}` };
 
@@ -30,6 +31,7 @@ export default function RatesPage() {
         badge="TRANSPARENT PRICING"
         title="Interest Rates & Charges"
         subtitle="No hidden charges — everything in a clear, transparent table."
+        image={INDIAN_IMAGES.pages.rates}
       />
       <div className="mx-auto max-w-5xl px-4 py-16">
         <div className="overflow-hidden rounded-2xl bg-white shadow-lg">

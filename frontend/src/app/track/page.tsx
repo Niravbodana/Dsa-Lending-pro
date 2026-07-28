@@ -3,7 +3,9 @@
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import Link from "next/link";
-import { Header } from "@/components/Header";
+import { PageShell } from "@/components/PageShell";
+import { InnerHero } from "@/components/InnerHero";
+import { INDIAN_IMAGES } from "@/lib/indian-images";
 import { trackApplication } from "@/lib/api";
 
 function TrackContent() {
@@ -40,9 +42,9 @@ function TrackContent() {
   }
 
   return (
-    <div className="mx-auto max-w-lg px-4 py-16">
+    <div className="mx-auto max-w-lg px-4 py-12">
       <div className="rounded-2xl bg-white p-8 shadow-lg">
-        <h1 className="text-2xl font-black text-center">Track Loan Status</h1>
+        <h1 className="text-center text-2xl font-black">Track Loan Status</h1>
         <p className="mt-2 text-center text-sm text-slate-500">
           Track using your application reference and registered mobile number
         </p>
@@ -79,7 +81,7 @@ function TrackContent() {
               ₹{result.application.loan_amount.toLocaleString("en-IN")} • EMI ₹
               {result.application.emi.toLocaleString("en-IN")}
             </p>
-            <span className="mt-2 inline-block rounded-full bg-teal-100 px-3 py-1 text-sm font-bold text-teal-700 capitalize">
+            <span className="mt-2 inline-block rounded-full bg-teal-100 px-3 py-1 text-sm font-bold capitalize text-teal-700">
               {result.application.status.replace(/_/g, " ")}
             </span>
             <div className="mt-6 space-y-3">
@@ -93,7 +95,7 @@ function TrackContent() {
                 </div>
               ))}
             </div>
-            <Link href="/dashboard" className="mt-6 block text-center text-sm text-teal-600 underline">
+            <Link href="/dashboard?demo=1" className="mt-6 block text-center text-sm text-teal-600 underline">
               Full Dashboard →
             </Link>
           </div>
@@ -105,11 +107,16 @@ function TrackContent() {
 
 export default function TrackPage() {
   return (
-    <main className="min-h-screen bg-slate-50">
-      <Header />
+    <PageShell>
+      <InnerHero
+        badge="TRACK APPLICATION"
+        title="Where Is My Loan?"
+        subtitle="Real-time status updates for your NeerCred application — ref number and mobile OTP verified."
+        image={INDIAN_IMAGES.pages.track}
+      />
       <Suspense>
         <TrackContent />
       </Suspense>
-    </main>
+    </PageShell>
   );
 }
