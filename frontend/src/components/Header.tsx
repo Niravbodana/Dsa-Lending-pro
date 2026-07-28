@@ -26,7 +26,7 @@ export function Header() {
 
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2 lg:gap-6 lg:py-2.5">
         <Link href="/" className="flex shrink-0 items-center" onClick={() => setMenuOpen(false)}>
-          <NeerCredLogo size={58} className="rounded-xl bg-white/95 px-2 py-1 shadow-sm" />
+          <NeerCredLogo size={68} className="rounded-xl bg-white/95 px-2.5 py-1 shadow-sm" />
         </Link>
 
         <nav className="hidden items-center gap-0.5 xl:flex">
