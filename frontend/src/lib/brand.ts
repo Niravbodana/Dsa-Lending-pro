@@ -3,8 +3,8 @@ export const BRAND = {
   legalName: "Neer Loan Solutions",
   appName: "NeerCred",
   shortName: "NeerCred",
-  tagline: "Trusted Credit. Pure & Simple.",
-  logoTagline: "by Neer Loan Solutions",
+  tagline: "Purity & Trust",
+  logoTagline: "Purity & Trust",
   colors: {
     navy: "#0B1220",
     teal: "#0F766E",

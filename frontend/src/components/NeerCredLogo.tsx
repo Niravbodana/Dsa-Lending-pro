@@ -1,5 +1,7 @@
+import { BRAND } from "@/lib/brand";
+
 type NeerCredLogoProps = {
-  variant?: "full" | "icon" | "wordmark";
+  variant?: "full" | "icon" | "wordmark" | "stacked";
   size?: number;
   dark?: boolean;
   className?: string;
@@ -66,6 +68,37 @@ function NeerCredMark({ size = 40 }: { size?: number }) {
   );
 }
 
+function NeerCredWordmark({
+  dark = false,
+  size = "md",
+}: {
+  dark?: boolean;
+  size?: "sm" | "md" | "lg";
+}) {
+  const titleColor = dark ? "text-white" : "text-slate-900";
+  const credColor = dark ? "text-teal-400" : "text-teal-600";
+  const sizeClass =
+    size === "lg" ? "text-2xl" : size === "sm" ? "text-sm" : "text-base";
+
+  return (
+    <span className={`font-extrabold tracking-tight ${sizeClass} ${titleColor}`}>
+      Neer<span className={credColor}>Cred</span>
+    </span>
+  );
+}
+
+function NeerCredTagline({ dark = false }: { dark?: boolean }) {
+  return (
+    <span
+      className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${
+        dark ? "text-teal-500/90" : "text-slate-500"
+      }`}
+    >
+      {BRAND.logoTagline}
+    </span>
+  );
+}
+
 export function NeerCredLogo({
   variant = "full",
   size = 40,
@@ -80,15 +113,22 @@ export function NeerCredLogo({
     );
   }
 
-  const titleColor = dark ? "text-white" : "text-slate-900";
-  const credColor = dark ? "text-teal-400" : "text-teal-600";
-  const subColor = dark ? "text-slate-500" : "text-slate-400";
-
   if (variant === "wordmark") {
     return (
-      <span className={`inline-flex flex-col ${className}`}>
-        <span className={`text-base font-extrabold tracking-tight ${titleColor}`}>
-          Neer<span className={credColor}>Cred</span>
+      <span className={`inline-flex flex-col items-start gap-0.5 ${className}`}>
+        <NeerCredWordmark dark={dark} />
+        <NeerCredTagline dark={dark} />
+      </span>
+    );
+  }
+
+  if (variant === "stacked") {
+    return (
+      <span className={`inline-flex flex-col items-center gap-2 ${className}`}>
+        <NeerCredMark size={size} />
+        <span className="flex flex-col items-center gap-0.5">
+          <NeerCredWordmark dark={dark} size="lg" />
+          <NeerCredTagline dark={dark} />
         </span>
       </span>
     );
@@ -97,13 +137,9 @@ export function NeerCredLogo({
   return (
     <span className={`inline-flex items-center gap-3 ${className}`}>
       <NeerCredMark size={size} />
-      <span className="flex flex-col">
-        <span className={`text-base font-extrabold tracking-tight ${titleColor}`}>
-          Neer<span className={credColor}>Cred</span>
-        </span>
-        <span className={`text-[10px] font-semibold uppercase tracking-[0.14em] ${subColor}`}>
-          by Neer Loan Solutions
-        </span>
+      <span className="flex flex-col gap-0.5">
+        <NeerCredWordmark dark={dark} />
+        <NeerCredTagline dark={dark} />
       </span>
     </span>
   );
