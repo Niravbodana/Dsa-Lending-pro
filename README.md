@@ -33,17 +33,31 @@ Personal Loan Marketplace (LSP model) — premium digital lending platform. Conn
 | `/compliance` | RBI LSP + DPDP Act |
 | `/admin` | Admin panel (`admin123`) |
 
-## Quick Start
+## Quick Start (Mac / Linux)
 
 ```bash
-# Backend
-cd backend && source .venv/bin/activate
+# 1. Clone (if not done)
+git clone https://github.com/Niravbodana/Dsa-Lending-pro.git
+cd Dsa-Lending-pro
+
+# 2. Backend (Terminal 1)
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
+cp .env.example .env
 uvicorn app.main:app --reload --port 8000
 
-# Frontend
-cd frontend && npm install && npm run dev
+# 3. Frontend (Terminal 2)
+cd frontend
+npm install
+echo "NEXT_PUBLIC_API_URL=http://localhost:8000" > .env.local
+npm run dev
 ```
+
+Open **http://localhost:3000** — Admin password: `admin123`
+
+> **Note:** Local dev uses SQLite (no PostgreSQL needed). For Docker/PostgreSQL use `pip install -r requirements-prod.txt`.
 
 ## Partner API Integration
 
