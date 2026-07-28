@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import ApplicationLog, Lead
+from app.models import ApplicationLog, Lead, LoanApplication
 from app.schemas import (
     EligibilityRequest,
     EligibilityResponse,
@@ -13,6 +13,7 @@ from app.schemas import (
     SelectOfferRequest,
     SelectOfferResponse,
 )
+from app.services.application import add_status_history, generate_application_ref, send_notification
 from app.services.eligibility import EligibilityInput, check_eligibility
 from app.services.offer_engine import fetch_partner_offers_sync
 from app.services.otp import get_lead_by_mobile, get_mobile_from_token
@@ -20,12 +21,16 @@ from app.services.otp import get_lead_by_mobile, get_mobile_from_token
 router = APIRouter(prefix="/leads", tags=["leads"])
 
 
-@router.post("/details", response_model=LeadResponse)
-def save_lead_details(payload: LeadDetailsRequest, db: Session = Depends(get_db)):
-    mobile = get_mobile_from_token(payload.session_token)
+def _auth(db: Session, token: str) -> str:
+    mobile = get_mobile_from_token(db, token)
     if not mobile:
         raise HTTPException(status_code=401, detail="Invalid or expired session")
+    return mobile
 
+
+@router.post("/details", response_model=LeadResponse)
+def save_lead_details(payload: LeadDetailsRequest, db: Session = Depends(get_db)):
+    mobile = _auth(db, payload.session_token)
     lead = get_lead_by_mobile(db, mobile)
     if not lead:
         raise HTTPException(status_code=404, detail="Lead not found")
@@ -44,10 +49,7 @@ def save_lead_details(payload: LeadDetailsRequest, db: Session = Depends(get_db)
 
 @router.post("/check-eligibility", response_model=EligibilityResponse)
 def check_lead_eligibility(payload: EligibilityRequest, db: Session = Depends(get_db)):
-    mobile = get_mobile_from_token(payload.session_token)
-    if not mobile:
-        raise HTTPException(status_code=401, detail="Invalid or expired session")
-
+    mobile = _auth(db, payload.session_token)
     lead = get_lead_by_mobile(db, mobile)
     if not lead or not lead.monthly_income:
         raise HTTPException(status_code=400, detail="Please submit your details first")
@@ -92,16 +94,13 @@ def check_lead_eligibility(payload: EligibilityRequest, db: Session = Depends(ge
 
 @router.get("/offers", response_model=OffersResponse)
 def get_offers(session_token: str, db: Session = Depends(get_db)):
-    mobile = get_mobile_from_token(session_token)
-    if not mobile:
-        raise HTTPException(status_code=401, detail="Invalid or expired session")
-
+    mobile = _auth(db, session_token)
     lead = get_lead_by_mobile(db, mobile)
     if not lead or not lead.monthly_income:
         raise HTTPException(status_code=400, detail="Please submit your details first")
 
     if lead.status == "not_eligible":
-        raise HTTPException(status_code=400, detail="Not eligible for loan based on eligibility check")
+        raise HTTPException(status_code=400, detail="Not eligible for loan")
 
     max_loan = lead.max_loan_amount or min(int(lead.monthly_income * 20), 500000)
 
@@ -114,10 +113,7 @@ def get_offers(session_token: str, db: Session = Depends(get_db)):
     )
 
     if not offers:
-        raise HTTPException(
-            status_code=404,
-            detail="No offers available from partner lenders at this time. Please try again later.",
-        )
+        raise HTTPException(status_code=404, detail="No offers available from partners")
 
     lead.status = "offers_fetched"
     db.add(
@@ -141,10 +137,7 @@ def get_offers(session_token: str, db: Session = Depends(get_db)):
 
 @router.post("/select-offer", response_model=SelectOfferResponse)
 def select_offer(payload: SelectOfferRequest, db: Session = Depends(get_db)):
-    mobile = get_mobile_from_token(payload.session_token)
-    if not mobile:
-        raise HTTPException(status_code=401, detail="Invalid or expired session")
-
+    mobile = _auth(db, payload.session_token)
     lead = get_lead_by_mobile(db, mobile)
     if not lead:
         raise HTTPException(status_code=404, detail="Lead not found")
@@ -152,19 +145,47 @@ def select_offer(payload: SelectOfferRequest, db: Session = Depends(get_db)):
     lead.selected_lender = payload.lender_name
     lead.selected_offer_id = payload.offer_id
     lead.status = "offer_selected"
+
+    app_ref = generate_application_ref()
+    application = LoanApplication(
+        lead_id=lead.id,
+        application_ref=app_ref,
+        lender_name=payload.lender_name,
+        offer_id=payload.offer_id,
+        loan_amount=payload.loan_amount,
+        interest_rate=payload.interest_rate,
+        tenure_months=payload.tenure_months,
+        emi=payload.emi,
+        status="kyc_pending",
+    )
+    db.add(application)
+    db.flush()
+    add_status_history(db, application.id, "offer_selected", f"Offer from {payload.lender_name}")
+    add_status_history(db, application.id, "kyc_pending", "Complete KYC to proceed")
     db.add(
         ApplicationLog(
             lead_id=lead.id,
             event="offer_selected",
-            details=f"{payload.lender_name} - {payload.offer_id}",
+            details=f"{payload.lender_name} - {app_ref}",
         )
     )
     db.commit()
+    db.refresh(application)
+
+    send_notification(
+        db,
+        mobile,
+        "sms",
+        "offer_selected",
+        f"Your loan application {app_ref} with {payload.lender_name} is initiated. Complete KYC to proceed.",
+    )
 
     return SelectOfferResponse(
-        message="Offer selected successfully",
+        message="Offer selected — complete KYC to proceed",
         lead_id=lead.id,
         lender_name=payload.lender_name,
         offer_id=payload.offer_id,
-        next_step="Complete KYC on partner portal (Phase 3)",
+        application_id=application.id,
+        application_ref=app_ref,
+        next_step="/application/{id}/kyc",
     )

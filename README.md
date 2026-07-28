@@ -1,70 +1,60 @@
-# DSA Lending Pro
+# DSA Lending Pro — Complete A to Z Loan Marketplace
 
-Personal Loan Marketplace — connect customers with partner banks & NBFCs. Similar to MoneyView / Navi.
+Personal Loan Marketplace (LSP model) — MoneyView/Navi style. Connect customers with partner banks, earn commission on disbursal.
 
-## Phase 1 MVP (Current)
+## Full Platform Features
 
-- Landing page with eligibility CTA
-- Mobile OTP verification (mock in dev)
-- Lead capture form (Name, PAN, Income, Employment, City)
-- Partner loan offers display (mock — ready for real API integration in Phase 2)
-- Offer selection & lead storage in PostgreSQL
+| Phase | Feature |
+|-------|---------|
+| **1** | Landing page, OTP login, lead capture, partner offers |
+| **2** | Eligibility engine, parallel partner API offers, best deal ranking |
+| **3** | Aadhaar eKYC, bank penny drop, digital eSign, application submit |
+| **4** | Status tracking, partner webhooks, SMS notifications |
+| **5** | User dashboard, EMI schedule, application timeline |
+| **6** | Admin panel — leads, applications, commissions, bug fixer |
 
-## Tech Stack
+## Pages
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | Next.js 15, React, Tailwind CSS |
-| Backend | FastAPI, SQLAlchemy, Pydantic |
-| Database | PostgreSQL |
-| Cache | Redis (ready for Phase 2) |
+| URL | Description |
+|-----|-------------|
+| `/` | Premium homepage |
+| `/apply` | 5-step loan application |
+| `/application/[id]/kyc` | KYC + eSign flow |
+| `/dashboard` | User dashboard (OTP login) |
+| `/track` | Track loan by ref + mobile |
+| `/compliance` | RBI LSP + DPDP Act |
+| `/admin` | Admin panel (`admin123`) |
 
 ## Quick Start
 
-### 1. Start database
-
 ```bash
-docker compose up -d
-```
-
-### 2. Backend
-
-```bash
-cd backend
-python3 -m venv .venv
-source .venv/bin/activate
+# Backend
+cd backend && source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env   # if .env doesn't exist
 uvicorn app.main:app --reload --port 8000
+
+# Frontend
+cd frontend && npm install && npm run dev
 ```
 
-### 3. Frontend
+## Partner API Integration
+
+```env
+PARTNER_HDFC_API_URL=https://your-api.com/offers
+PARTNER_HDFC_API_KEY=your-key
+```
+
+## Webhook (Partner Status Updates)
 
 ```bash
-cd frontend
-npm install
-npm run dev
+POST /api/webhooks/partner/status
+{
+  "application_ref": "DSA123456",
+  "status": "disbursed",
+  "message": "Loan disbursed",
+  "disbursal_amount": 500000
+}
 ```
-
-Open **http://localhost:3000**
-
-## API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/send-otp` | Send OTP to mobile |
-| POST | `/api/auth/verify-otp` | Verify OTP, get session token |
-| POST | `/api/leads/details` | Save lead details |
-| GET | `/api/leads/offers` | Fetch partner offers |
-| POST | `/api/leads/select-offer` | Select an offer |
-
-## Roadmap
-
-- **Phase 2:** Real partner lender API integration
-- **Phase 3:** eKYC, bank verification, eSign
-- **Phase 4:** Loan status tracking & webhooks
-- **Phase 5:** User dashboard & EMI calculator
-- **Phase 6:** Admin panel & commission tracking
 
 ## License
 

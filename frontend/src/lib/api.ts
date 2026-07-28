@@ -96,6 +96,10 @@ export async function selectOffer(data: {
   session_token: string;
   offer_id: string;
   lender_name: string;
+  loan_amount: number;
+  interest_rate: number;
+  tenure_months: number;
+  emi: number;
 }) {
   const res = await fetch(`${API_BASE}/api/leads/select-offer`, {
     method: "POST",
@@ -103,6 +107,140 @@ export async function selectOffer(data: {
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error((await res.json()).detail || "Failed to select offer");
+  return res.json() as Promise<{
+    application_id: number;
+    application_ref: string;
+    lender_name: string;
+    message: string;
+  }>;
+}
+
+// --- KYC (Phase 3) ---
+export async function aadhaarSendOtp(data: {
+  session_token: string;
+  application_id: number;
+  aadhaar: string;
+}) {
+  const res = await fetch(`${API_BASE}/api/kyc/aadhaar/send-otp`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error((await res.json()).detail || "Failed");
+  return res.json() as Promise<{ message: string; dev_otp?: string }>;
+}
+
+export async function aadhaarVerify(data: {
+  session_token: string;
+  application_id: number;
+  otp: string;
+}) {
+  const res = await fetch(`${API_BASE}/api/kyc/aadhaar/verify`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error((await res.json()).detail || "Invalid OTP");
+  return res.json();
+}
+
+export async function bankVerify(data: {
+  session_token: string;
+  application_id: number;
+  account_number: string;
+  ifsc: string;
+  address: string;
+}) {
+  const res = await fetch(`${API_BASE}/api/kyc/bank/verify`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error((await res.json()).detail || "Bank verification failed");
+  return res.json();
+}
+
+export async function esignComplete(data: {
+  session_token: string;
+  application_id: number;
+  agreed: boolean;
+}) {
+  const res = await fetch(`${API_BASE}/api/kyc/esign`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error((await res.json()).detail || "eSign failed");
+  return res.json();
+}
+
+export async function submitApplication(data: {
+  session_token: string;
+  application_id: number;
+}) {
+  const res = await fetch(`${API_BASE}/api/kyc/submit`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error((await res.json()).detail || "Submit failed");
+  return res.json();
+}
+
+// --- Dashboard (Phase 4/5) ---
+export type LoanApplication = {
+  id: number;
+  application_ref: string;
+  lender_name: string;
+  loan_amount: number;
+  interest_rate: number;
+  tenure_months: number;
+  emi: number;
+  status: string;
+  aadhaar_verified: boolean;
+  bank_verified: boolean;
+  esign_completed: boolean;
+  disbursal_amount: number | null;
+  created_at: string;
+};
+
+export async function getDashboardProfile(token: string) {
+  const res = await fetch(
+    `${API_BASE}/api/dashboard/profile?session_token=${encodeURIComponent(token)}`
+  );
+  if (!res.ok) throw new Error("Failed to load profile");
+  return res.json();
+}
+
+export async function getApplications(token: string) {
+  const res = await fetch(
+    `${API_BASE}/api/dashboard/applications?session_token=${encodeURIComponent(token)}`
+  );
+  if (!res.ok) throw new Error("Failed to load applications");
+  return res.json() as Promise<LoanApplication[]>;
+}
+
+export async function getApplicationDetail(token: string, appId: number) {
+  const res = await fetch(
+    `${API_BASE}/api/dashboard/applications/${appId}?session_token=${encodeURIComponent(token)}`
+  );
+  if (!res.ok) throw new Error("Failed to load application");
+  return res.json();
+}
+
+export async function trackApplication(ref: string, mobile: string) {
+  const res = await fetch(
+    `${API_BASE}/api/dashboard/track/${encodeURIComponent(ref)}?mobile=${mobile}`
+  );
+  if (!res.ok) throw new Error((await res.json()).detail || "Not found");
+  return res.json();
+}
+
+export async function getEmiSchedule(token: string, appId: number) {
+  const res = await fetch(
+    `${API_BASE}/api/dashboard/applications/${appId}/emi-schedule?session_token=${encodeURIComponent(token)}`
+  );
+  if (!res.ok) throw new Error("Failed to load EMI schedule");
   return res.json();
 }
 
@@ -134,6 +272,10 @@ export type AdminStats = {
   fixed_bugs: number;
   total_bugs: number;
   conversion_rate: number;
+  total_applications: number;
+  disbursed_count: number;
+  total_disbursed: number;
+  total_commission: number;
 };
 
 export type Lead = {
@@ -215,5 +357,38 @@ export async function deleteBug(token: string, bugId: number) {
     headers: adminHeaders(token),
   });
   if (!res.ok) throw new Error("Failed to delete bug");
+  return res.json();
+}
+
+export type AdminApplication = {
+  id: number;
+  application_ref: string;
+  lead_id: number;
+  lender_name: string;
+  loan_amount: number;
+  interest_rate: number;
+  emi: number;
+  status: string;
+  commission_amount: number | null;
+  created_at: string;
+};
+
+export async function getAdminApplications(token: string) {
+  const res = await fetch(`${API_BASE}/api/admin/applications`, { headers: adminHeaders(token) });
+  if (!res.ok) throw new Error("Failed to fetch applications");
+  return res.json() as Promise<AdminApplication[]>;
+}
+
+export async function updateApplicationStatus(
+  token: string,
+  appId: number,
+  data: { status: string; message?: string }
+) {
+  const res = await fetch(`${API_BASE}/api/admin/applications/${appId}`, {
+    method: "PATCH",
+    headers: adminHeaders(token),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to update");
   return res.json();
 }

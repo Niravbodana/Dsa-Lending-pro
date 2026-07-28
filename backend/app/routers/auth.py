@@ -23,7 +23,7 @@ def api_verify_otp(payload: VerifyOtpRequest, db: Session = Depends(get_db)):
     if not verify_otp(db, payload.mobile, payload.otp):
         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
 
-    token = create_session_token(payload.mobile)
+    token = create_session_token(db, payload.mobile)
     return VerifyOtpResponse(
         message="OTP verified successfully",
         verified=True,

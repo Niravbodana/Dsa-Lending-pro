@@ -8,17 +8,21 @@ from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.database import get_db
-from app.models import BugReport, Lead
+from app.models import BugReport, Lead, LoanApplication
 from app.schemas_admin import (
     AdminLoginRequest,
     AdminLoginResponse,
     AdminStatsResponse,
+    ApplicationAdminResponse,
+    ApplicationStatusUpdate,
     BugReportCreate,
     BugReportResponse,
     BugReportUpdate,
     LeadAdminResponse,
     LeadStatusUpdate,
 )
+
+from app.services.application import update_application_status
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -71,6 +75,26 @@ def get_stats(db: Session = Depends(get_db), _: None = Depends(verify_admin)):
     total_bugs = db.query(func.count(BugReport.id)).scalar() or 0
     conversion = round((offer_selected / total * 100) if total else 0, 1)
 
+    total_apps = db.query(func.count(LoanApplication.id)).scalar() or 0
+    disbursed_count = (
+        db.query(func.count(LoanApplication.id))
+        .filter(LoanApplication.status == "disbursed")
+        .scalar()
+        or 0
+    )
+    total_disbursed = (
+        db.query(func.sum(LoanApplication.disbursal_amount))
+        .filter(LoanApplication.status == "disbursed")
+        .scalar()
+        or 0
+    )
+    total_commission = (
+        db.query(func.sum(LoanApplication.commission_amount))
+        .filter(LoanApplication.commission_amount.isnot(None))
+        .scalar()
+        or 0
+    )
+
     return AdminStatsResponse(
         total_leads=total,
         otp_verified=otp_verified,
@@ -81,6 +105,10 @@ def get_stats(db: Session = Depends(get_db), _: None = Depends(verify_admin)):
         fixed_bugs=fixed_bugs,
         total_bugs=total_bugs,
         conversion_rate=conversion,
+        total_applications=total_apps,
+        disbursed_count=disbursed_count,
+        total_disbursed=int(total_disbursed),
+        total_commission=float(total_commission),
     )
 
 
@@ -163,3 +191,22 @@ def delete_bug(
     db.delete(bug)
     db.commit()
     return {"message": "Bug deleted"}
+
+
+@router.get("/applications", response_model=list[ApplicationAdminResponse])
+def list_applications(db: Session = Depends(get_db), _: None = Depends(verify_admin)):
+    return db.query(LoanApplication).order_by(LoanApplication.created_at.desc()).all()
+
+
+@router.patch("/applications/{app_id}", response_model=ApplicationAdminResponse)
+def update_application(
+    app_id: int,
+    payload: ApplicationStatusUpdate,
+    db: Session = Depends(get_db),
+    _: None = Depends(verify_admin),
+):
+    app = db.query(LoanApplication).filter(LoanApplication.id == app_id).first()
+    if not app:
+        raise HTTPException(status_code=404, detail="Application not found")
+    update_application_status(db, app, payload.status, payload.message, source="admin")
+    return app

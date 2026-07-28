@@ -5,6 +5,7 @@ import { Testimonials } from "@/components/Testimonials";
 import { FAQ } from "@/components/FAQ";
 import { BugReportWidget } from "@/components/BugReportWidget";
 import { FloatingCTA } from "@/components/FloatingCTA";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 export default function Home() {
   return (
@@ -19,6 +20,7 @@ export default function Home() {
       <Footer />
       <BugReportWidget />
       <FloatingCTA />
+      <WhatsAppButton />
     </main>
   );
 }

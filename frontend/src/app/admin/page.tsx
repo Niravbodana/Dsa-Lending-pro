@@ -7,14 +7,17 @@ import {
   AdminStats,
   Bug,
   deleteBug,
+  getAdminApplications,
   getAdminBugs,
   getAdminLeads,
   getAdminStats,
+  AdminApplication,
+  updateApplicationStatus,
   Lead,
   updateBug,
 } from "@/lib/api";
 
-type Tab = "dashboard" | "leads" | "bugs";
+type Tab = "dashboard" | "leads" | "applications" | "bugs";
 
 const statusColors: Record<string, string> = {
   open: "bg-red-100 text-red-700",
@@ -41,6 +44,7 @@ export default function AdminPage() {
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [bugs, setBugs] = useState<Bug[]>([]);
+  const [applications, setApplications] = useState<AdminApplication[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [fixNotes, setFixNotes] = useState<Record<number, string>>({});
@@ -57,6 +61,7 @@ export default function AdminPage() {
       try {
         if (tab === "dashboard") setStats(await getAdminStats(token));
         if (tab === "leads") setLeads(await getAdminLeads(token));
+        if (tab === "applications") setApplications(await getAdminApplications(token));
         if (tab === "bugs") setBugs(await getAdminBugs(token));
       } catch {
         localStorage.removeItem("admin_token");
@@ -74,6 +79,7 @@ export default function AdminPage() {
     try {
       if (tab === "dashboard") setStats(await getAdminStats(token));
       if (tab === "leads") setLeads(await getAdminLeads(token));
+      if (tab === "applications") setApplications(await getAdminApplications(token));
       if (tab === "bugs") setBugs(await getAdminBugs(token));
     } catch {
       localStorage.removeItem("admin_token");
@@ -166,6 +172,7 @@ export default function AdminPage() {
             [
               { id: "dashboard" as Tab, label: "📊 Dashboard" },
               { id: "leads" as Tab, label: "👥 Leads" },
+              { id: "applications" as Tab, label: "📋 Applications" },
               { id: "bugs" as Tab, label: "🐛 Bug Fixer" },
             ]
           ).map((item) => (
@@ -214,7 +221,7 @@ export default function AdminPage() {
                 { label: "Total Leads", value: stats.total_leads, color: "from-teal-500 to-cyan-500" },
                 { label: "Offers Selected", value: stats.offer_selected, color: "from-green-500 to-emerald-500" },
                 { label: "Conversion Rate", value: `${stats.conversion_rate}%`, color: "from-amber-500 to-orange-500" },
-                { label: "Open Bugs", value: stats.open_bugs, color: "from-red-500 to-rose-500" },
+                { label: "Total Commission", value: `₹${(stats.total_commission || 0).toLocaleString("en-IN")}`, color: "from-purple-500 to-violet-500" },
               ].map((card) => (
                 <div
                   key={card.label}
@@ -307,6 +314,69 @@ export default function AdminPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-teal-600">{lead.selected_lender || "—"}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Applications */}
+        {tab === "applications" && !loading && (
+          <div className="overflow-hidden rounded-2xl bg-white shadow">
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
+                <tr>
+                  <th className="px-6 py-4">Ref</th>
+                  <th className="px-6 py-4">Lender</th>
+                  <th className="px-6 py-4">Amount</th>
+                  <th className="px-6 py-4">EMI</th>
+                  <th className="px-6 py-4">Status</th>
+                  <th className="px-6 py-4">Commission</th>
+                  <th className="px-6 py-4">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {applications.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-12 text-center text-slate-400">
+                      No applications yet
+                    </td>
+                  </tr>
+                ) : (
+                  applications.map((app) => (
+                    <tr key={app.id} className="hover:bg-slate-50">
+                      <td className="px-6 py-4 font-mono text-xs">{app.application_ref}</td>
+                      <td className="px-6 py-4 font-semibold">{app.lender_name}</td>
+                      <td className="px-6 py-4">₹{app.loan_amount.toLocaleString("en-IN")}</td>
+                      <td className="px-6 py-4">₹{app.emi.toLocaleString("en-IN")}</td>
+                      <td className="px-6 py-4">
+                        <span className={`rounded-full px-2 py-1 text-xs font-semibold ${statusColors[app.status] || "bg-slate-100"}`}>
+                          {app.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-green-600">
+                        {app.commission_amount ? `₹${app.commission_amount}` : "—"}
+                      </td>
+                      <td className="px-6 py-4">
+                        {app.status === "submitted" && token && (
+                          <div className="flex gap-1">
+                            <button
+                              onClick={() => updateApplicationStatus(token, app.id, { status: "approved", message: "Approved by admin" }).then(loadData)}
+                              className="rounded bg-green-100 px-2 py-1 text-xs text-green-700"
+                            >
+                              Approve
+                            </button>
+                            <button
+                              onClick={() => updateApplicationStatus(token, app.id, { status: "disbursed", message: "Loan disbursed" }).then(loadData)}
+                              className="rounded bg-teal-100 px-2 py-1 text-xs text-teal-700"
+                            >
+                              Disburse
+                            </button>
+                          </div>
+                        )}
+                      </td>
                     </tr>
                   ))
                 )}

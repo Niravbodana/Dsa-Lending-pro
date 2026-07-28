@@ -1,0 +1,323 @@
+"use client";
+
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Header } from "@/components/Header";
+import {
+  aadhaarSendOtp,
+  aadhaarVerify,
+  bankVerify,
+  esignComplete,
+  submitApplication,
+} from "@/lib/api";
+
+type KycStep = "aadhaar" | "aadhaar_otp" | "bank" | "esign" | "submit" | "done";
+
+export default function KycPage() {
+  const params = useParams();
+  const router = useRouter();
+  const appId = Number(params.id);
+
+  const [step, setStep] = useState<KycStep>("aadhaar");
+  const [token, setToken] = useState("");
+  const [aadhaar, setAadhaar] = useState("");
+  const [aadhaarOtp, setAadhaarOtp] = useState("");
+  const [devOtp, setDevOtp] = useState<string | null>(null);
+  const [account, setAccount] = useState("");
+  const [ifsc, setIfsc] = useState("");
+  const [address, setAddress] = useState("");
+  const [agreed, setAgreed] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [appRef, setAppRef] = useState("");
+
+  useEffect(() => {
+    const t = localStorage.getItem("session_token");
+    const ref = localStorage.getItem(`app_ref_${appId}`);
+    if (!t) {
+      router.push("/apply");
+      return;
+    }
+    setToken(t);
+    if (ref) setAppRef(ref);
+  }, [appId, router]);
+
+  const steps: KycStep[] = ["aadhaar", "bank", "esign", "submit", "done"];
+
+  async function handleAadhaar(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      const res = await aadhaarSendOtp({ session_token: token, application_id: appId, aadhaar });
+      setDevOtp(res.dev_otp || null);
+      setStep("aadhaar_otp");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleAadhaarOtp(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      await aadhaarVerify({ session_token: token, application_id: appId, otp: aadhaarOtp });
+      setStep("bank");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Invalid OTP");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleBank(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      await bankVerify({
+        session_token: token,
+        application_id: appId,
+        account_number: account,
+        ifsc,
+        address,
+      });
+      setStep("esign");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleEsign(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      await esignComplete({ session_token: token, application_id: appId, agreed });
+      setStep("submit");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleSubmit() {
+    setLoading(true);
+    setError("");
+    try {
+      await submitApplication({ session_token: token, application_id: appId });
+      setStep("done");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const stepIndex = step === "aadhaar_otp" ? 0 : steps.indexOf(step as typeof steps[number]);
+
+  return (
+    <main className="min-h-screen bg-slate-50">
+      <Header />
+      <div className="mx-auto max-w-2xl px-4 py-10">
+        <div className="mb-6 text-center">
+          <span className="rounded-full bg-teal-100 px-4 py-1 text-sm font-bold text-teal-700">
+            Phase 3 — KYC & eSign
+          </span>
+          {appRef && (
+            <p className="mt-2 font-mono text-sm text-slate-500">Ref: {appRef}</p>
+          )}
+        </div>
+
+        <div className="mb-8 flex justify-between">
+          {["Aadhaar", "Bank", "eSign", "Submit", "Done"].map((label, i) => (
+            <div key={label} className="flex flex-col items-center">
+              <div
+                className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${
+                  i <= stepIndex ? "bg-teal-600 text-white" : "bg-slate-200 text-slate-400"
+                }`}
+              >
+                {i + 1}
+              </div>
+              <span className="mt-1 text-[10px] text-slate-500">{label}</span>
+            </div>
+          ))}
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+          {error && (
+            <div className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</div>
+          )}
+
+          {(step === "aadhaar" || step === "aadhaar_otp") && (
+            <>
+              {step === "aadhaar" ? (
+                <form onSubmit={handleAadhaar}>
+                  <h2 className="text-2xl font-bold">Aadhaar eKYC</h2>
+                  <p className="mt-2 text-slate-500">UIDAI se OTP aayega registered mobile pe</p>
+                  <input
+                    placeholder="12-digit Aadhaar number"
+                    value={aadhaar}
+                    onChange={(e) => setAadhaar(e.target.value.replace(/\D/g, "").slice(0, 12))}
+                    className="mt-6 w-full rounded-xl border px-4 py-3 outline-none focus:border-teal-500"
+                    required
+                  />
+                  <button
+                    type="submit"
+                    disabled={loading || aadhaar.length !== 12}
+                    className="mt-6 w-full rounded-xl bg-teal-600 py-3 font-bold text-white disabled:opacity-50"
+                  >
+                    Send Aadhaar OTP →
+                  </button>
+                </form>
+              ) : (
+                <form onSubmit={handleAadhaarOtp}>
+                  <h2 className="text-2xl font-bold">Aadhaar OTP</h2>
+                  {devOtp && (
+                    <p className="mt-2 rounded-lg bg-yellow-50 px-3 py-2 text-sm font-mono text-yellow-800">
+                      Dev OTP: {devOtp}
+                    </p>
+                  )}
+                  <input
+                    placeholder="6-digit OTP"
+                    value={aadhaarOtp}
+                    onChange={(e) => setAadhaarOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                    className="mt-6 w-full rounded-xl border px-4 py-3 text-center text-2xl tracking-widest"
+                    required
+                  />
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="mt-6 w-full rounded-xl bg-teal-600 py-3 font-bold text-white"
+                  >
+                    Verify Aadhaar →
+                  </button>
+                </form>
+              )}
+            </>
+          )}
+
+          {step === "bank" && (
+            <form onSubmit={handleBank}>
+              <h2 className="text-2xl font-bold">Bank Verification</h2>
+              <p className="mt-2 text-slate-500">Penny drop — ₹1 credit & reverse for verification</p>
+              <div className="mt-6 space-y-4">
+                <input
+                  placeholder="Bank Account Number"
+                  value={account}
+                  onChange={(e) => setAccount(e.target.value.replace(/\D/g, ""))}
+                  className="w-full rounded-xl border px-4 py-3 outline-none focus:border-teal-500"
+                  required
+                />
+                <input
+                  placeholder="IFSC Code"
+                  value={ifsc}
+                  onChange={(e) => setIfsc(e.target.value.toUpperCase().slice(0, 11))}
+                  className="w-full rounded-xl border px-4 py-3 uppercase outline-none"
+                  required
+                />
+                <textarea
+                  placeholder="Current Address"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  rows={3}
+                  className="w-full rounded-xl border px-4 py-3 outline-none"
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="mt-6 w-full rounded-xl bg-teal-600 py-3 font-bold text-white"
+              >
+                Verify Bank Account →
+              </button>
+            </form>
+          )}
+
+          {step === "esign" && (
+            <form onSubmit={handleEsign}>
+              <h2 className="text-2xl font-bold">Digital Loan Agreement</h2>
+              <div className="mt-4 max-h-48 overflow-y-auto rounded-xl bg-slate-50 p-4 text-sm text-slate-600">
+                <p>
+                  I hereby authorize the lender to process my personal loan application. I confirm
+                  that all information provided is accurate. I agree to the terms of the loan
+                  agreement including interest rate, EMI, processing fees, and foreclosure charges as
+                  disclosed in the Key Fact Statement. Loan will be disbursed directly to my
+                  verified bank account. This agreement is governed by RBI guidelines and DPDP Act
+                  2023.
+                </p>
+              </div>
+              <label className="mt-4 flex items-start gap-3 text-sm">
+                <input
+                  type="checkbox"
+                  checked={agreed}
+                  onChange={(e) => setAgreed(e.target.checked)}
+                  className="mt-1 accent-teal-600"
+                />
+                <span>
+                  I have read and agree to the loan agreement and{" "}
+                  <Link href="/compliance" className="text-teal-600 underline">
+                    RBI/DPDP compliance terms
+                  </Link>
+                </span>
+              </label>
+              <button
+                type="submit"
+                disabled={loading || !agreed}
+                className="mt-6 w-full rounded-xl bg-teal-600 py-3 font-bold text-white disabled:opacity-50"
+              >
+                Sign Digitally →
+              </button>
+            </form>
+          )}
+
+          {step === "submit" && (
+            <div className="text-center">
+              <p className="text-4xl">📤</p>
+              <h2 className="mt-4 text-2xl font-bold">Ready to Submit</h2>
+              <p className="mt-2 text-slate-500">
+                Application partner lender ko bhej di jayegi for final approval
+              </p>
+              <button
+                onClick={handleSubmit}
+                disabled={loading}
+                className="mt-6 w-full rounded-xl bg-gradient-to-r from-teal-600 to-cyan-600 py-3 font-bold text-white"
+              >
+                {loading ? "Submitting..." : "Submit Application →"}
+              </button>
+            </div>
+          )}
+
+          {step === "done" && (
+            <div className="text-center">
+              <p className="text-5xl">🎉</p>
+              <h2 className="mt-4 text-2xl font-bold text-green-700">Application Submitted!</h2>
+              <p className="mt-2 text-slate-500">
+                Partner lender review karega. Status dashboard pe track karo.
+              </p>
+              <div className="mt-6 flex flex-col gap-3">
+                <Link
+                  href="/dashboard"
+                  className="rounded-xl bg-teal-600 py-3 font-bold text-white"
+                >
+                  Go to Dashboard →
+                </Link>
+                <Link href={`/track?ref=${appRef}`} className="text-sm text-teal-600 underline">
+                  Track Application
+                </Link>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </main>
+  );
+}

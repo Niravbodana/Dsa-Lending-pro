@@ -74,3 +74,31 @@ class AdminStatsResponse(BaseModel):
     fixed_bugs: int
     total_bugs: int
     conversion_rate: float
+    total_applications: int = 0
+    disbursed_count: int = 0
+    total_disbursed: int = 0
+    total_commission: float = 0
+
+
+class ApplicationAdminResponse(BaseModel):
+    id: int
+    application_ref: str
+    lead_id: int
+    lender_name: str
+    loan_amount: int
+    interest_rate: float
+    emi: int
+    status: str
+    aadhaar_verified: bool
+    bank_verified: bool
+    esign_completed: bool
+    commission_amount: float | None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class ApplicationStatusUpdate(BaseModel):
+    status: Literal["under_review", "approved", "disbursed", "rejected"]
+    message: str | None = None

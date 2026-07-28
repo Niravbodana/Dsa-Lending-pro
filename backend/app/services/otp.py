@@ -6,10 +6,9 @@ from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 
 from app.config import settings
-from app.models import Lead, OtpSession
+from app.models import Lead, OtpSession, UserSession
 
-# In-memory session store for MVP (maps token -> mobile)
-_sessions: dict[str, str] = {}
+SESSION_HOURS = 24
 
 
 def _hash_otp(otp: str) -> str:
@@ -20,14 +19,28 @@ def generate_otp() -> str:
     return f"{random.randint(0, 999999):06d}"
 
 
-def create_session_token(mobile: str) -> str:
+def create_session_token(db: Session, mobile: str) -> str:
     token = secrets.token_urlsafe(32)
-    _sessions[token] = mobile
+    expires_at = datetime.now(timezone.utc) + timedelta(hours=SESSION_HOURS)
+    db.query(UserSession).filter(UserSession.mobile == mobile).delete()
+    db.add(UserSession(token=token, mobile=mobile, expires_at=expires_at))
+    db.commit()
     return token
 
 
-def get_mobile_from_token(token: str) -> str | None:
-    return _sessions.get(token)
+def get_mobile_from_token(db: Session, token: str) -> str | None:
+    session = db.query(UserSession).filter(UserSession.token == token).first()
+    if not session:
+        return None
+    now = datetime.now(timezone.utc)
+    expires = session.expires_at
+    if expires.tzinfo is None:
+        expires = expires.replace(tzinfo=timezone.utc)
+    if now > expires:
+        db.delete(session)
+        db.commit()
+        return None
+    return session.mobile
 
 
 def send_otp(db: Session, mobile: str) -> tuple[str | None, int]:

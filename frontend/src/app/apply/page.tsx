@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Header } from "@/components/Header";
@@ -15,13 +16,14 @@ import {
   verifyOtp,
 } from "@/lib/api";
 
-type Step = "mobile" | "otp" | "details" | "eligibility" | "offers" | "success";
+type Step = "mobile" | "otp" | "details" | "eligibility" | "offers";
 type SortBy = "rate" | "amount" | "emi";
 
-const STEPS: Step[] = ["mobile", "otp", "details", "eligibility", "offers", "success"];
-const STEP_LABELS = ["Mobile", "OTP", "Details", "Eligibility", "Offers", "Done"];
+const STEPS: Step[] = ["mobile", "otp", "details", "eligibility", "offers"];
+const STEP_LABELS = ["Mobile", "OTP", "Details", "Eligibility", "Offers"];
 
 export default function ApplyPage() {
+  const router = useRouter();
   const [step, setStep] = useState<Step>("mobile");
   const [mobile, setMobile] = useState("");
   const [otp, setOtp] = useState("");
@@ -29,10 +31,9 @@ export default function ApplyPage() {
   const [sessionToken, setSessionToken] = useState("");
   const [offers, setOffers] = useState<LoanOffer[]>([]);
   const [partnersInfo, setPartnersInfo] = useState({ queried: 0, responded: 0 });
-  const [eligibility, setEligibility] = useState<EligibilityResult | null>(null);
-  const [selectedOffer, setSelectedOffer] = useState<LoanOffer | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [eligibility, setEligibility] = useState<EligibilityResult | null>(null);
   const [sortBy, setSortBy] = useState<SortBy>("rate");
   const [consent, setConsent] = useState(false);
 
@@ -78,6 +79,7 @@ export default function ApplyPage() {
     try {
       const res = await verifyOtp(mobile, otp);
       setSessionToken(res.session_token);
+      localStorage.setItem("session_token", res.session_token);
       setStep("details");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Invalid OTP");
@@ -144,13 +146,17 @@ export default function ApplyPage() {
     setError("");
     setLoading(true);
     try {
-      await selectOffer({
+      const res = await selectOffer({
         session_token: sessionToken,
         offer_id: offer.offer_id,
         lender_name: offer.lender_name,
+        loan_amount: offer.loan_amount,
+        interest_rate: offer.interest_rate,
+        tenure_months: offer.tenure_months,
+        emi: offer.emi,
       });
-      setSelectedOffer(offer);
-      setStep("success");
+      localStorage.setItem(`app_ref_${res.application_id}`, res.application_ref);
+      router.push(`/application/${res.application_id}/kyc`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to select offer");
     } finally {
@@ -412,37 +418,6 @@ export default function ApplyPage() {
                   />
                 ))}
               </div>
-            </div>
-          )}
-
-          {step === "success" && selectedOffer && (
-            <div className="text-center">
-              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-green-100 text-4xl">
-                ✅
-              </div>
-              <h2 className="mt-6 text-2xl font-bold text-slate-900">Offer Selected!</h2>
-              <p className="mt-2 text-slate-500">
-                <strong>{selectedOffer.lender_name}</strong> —{" "}
-                {new Intl.NumberFormat("en-IN", {
-                  style: "currency",
-                  currency: "INR",
-                  maximumFractionDigits: 0,
-                }).format(selectedOffer.loan_amount)}{" "}
-                @ {selectedOffer.interest_rate}%
-              </p>
-              <div className="mt-6 rounded-xl bg-teal-50 p-4 text-sm text-teal-800">
-                <p className="font-semibold">Next: Phase 3 — eKYC</p>
-                <p className="mt-1">
-                  Complete verification on {selectedOffer.lender_name}&apos;s portal. Loan seedha
-                  aapke bank account mein jayega.
-                </p>
-              </div>
-              <Link
-                href="/"
-                className="mt-6 inline-block rounded-xl bg-teal-600 px-8 py-3 font-bold text-white"
-              >
-                Back to Home
-              </Link>
             </div>
           )}
         </div>

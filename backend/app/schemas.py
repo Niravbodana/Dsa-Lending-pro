@@ -112,6 +112,10 @@ class SelectOfferRequest(BaseModel):
     session_token: str
     offer_id: str
     lender_name: str
+    loan_amount: int
+    interest_rate: float
+    tenure_months: int
+    emi: int
 
 
 class SelectOfferResponse(BaseModel):
@@ -119,4 +123,6 @@ class SelectOfferResponse(BaseModel):
     lead_id: int
     lender_name: str
     offer_id: str
+    application_id: int
+    application_ref: str
     next_step: str

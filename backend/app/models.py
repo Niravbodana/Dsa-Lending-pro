@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, Float, Integer, String, Text, func
+from sqlalchemy import Boolean, DateTime, Float, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -29,6 +29,16 @@ class Lead(Base):
     )
 
 
+class UserSession(Base):
+    __tablename__ = "user_sessions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    token: Mapped[str] = mapped_column(String(128), unique=True, index=True)
+    mobile: Mapped[str] = mapped_column(String(10), index=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
 class OtpSession(Base):
     __tablename__ = "otp_sessions"
 
@@ -40,6 +50,49 @@ class OtpSession(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
+class LoanApplication(Base):
+    __tablename__ = "loan_applications"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    lead_id: Mapped[int] = mapped_column(Integer, index=True)
+    application_ref: Mapped[str] = mapped_column(String(20), unique=True, index=True)
+    lender_name: Mapped[str] = mapped_column(String(100))
+    offer_id: Mapped[str] = mapped_column(String(100))
+    loan_amount: Mapped[int] = mapped_column(Integer)
+    interest_rate: Mapped[float] = mapped_column(Float)
+    tenure_months: Mapped[int] = mapped_column(Integer)
+    emi: Mapped[int] = mapped_column(Integer)
+    status: Mapped[str] = mapped_column(String(30), default="offer_selected", index=True)
+    # KYC fields
+    aadhaar_masked: Mapped[str | None] = mapped_column(String(14), nullable=True)
+    aadhaar_verified: Mapped[bool] = mapped_column(Boolean, default=False)
+    bank_account: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    bank_ifsc: Mapped[str | None] = mapped_column(String(11), nullable=True)
+    bank_verified: Mapped[bool] = mapped_column(Boolean, default=False)
+    esign_completed: Mapped[bool] = mapped_column(Boolean, default=False)
+    address: Mapped[str | None] = mapped_column(String(300), nullable=True)
+    # Disbursal
+    disbursal_amount: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    disbursal_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    commission_amount: Mapped[float | None] = mapped_column(Float, nullable=True)
+    partner_ref_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+
+class ApplicationStatusHistory(Base):
+    __tablename__ = "application_status_history"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    application_id: Mapped[int] = mapped_column(Integer, index=True)
+    status: Mapped[str] = mapped_column(String(30))
+    message: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    source: Mapped[str] = mapped_column(String(30), default="system")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
 class ApplicationLog(Base):
     __tablename__ = "application_logs"
 
@@ -47,6 +100,17 @@ class ApplicationLog(Base):
     lead_id: Mapped[int] = mapped_column(Integer, index=True)
     event: Mapped[str] = mapped_column(String(80))
     details: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class NotificationLog(Base):
+    __tablename__ = "notification_logs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    mobile: Mapped[str] = mapped_column(String(10), index=True)
+    channel: Mapped[str] = mapped_column(String(20))
+    template: Mapped[str] = mapped_column(String(80))
+    message: Mapped[str] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
@@ -63,4 +127,3 @@ class BugReport(Base):
     fix_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     fixed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-

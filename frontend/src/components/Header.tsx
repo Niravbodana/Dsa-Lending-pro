@@ -26,6 +26,12 @@ export function Header() {
           <a href="#emi-calculator" className="text-sm font-medium text-slate-600 transition hover:text-teal-600">
             EMI Calculator
           </a>
+          <Link href="/track" className="text-sm font-medium text-slate-600 transition hover:text-teal-600">
+            Track Loan
+          </Link>
+          <Link href="/dashboard" className="text-sm font-medium text-slate-600 transition hover:text-teal-600">
+            Dashboard
+          </Link>
           <Link href="/compliance" className="text-sm font-medium text-slate-600 transition hover:text-teal-600">
             Compliance
           </Link>
