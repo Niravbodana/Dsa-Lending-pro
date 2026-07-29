@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -18,6 +18,8 @@ import {
   verifyOtp,
 } from "@/lib/api";
 import { CONSENT_VERSIONS } from "@/lib/consent";
+import { LoanGuideMascot } from "@/components/loan-guide/LoanGuideMascot";
+import type { GuideField } from "@/components/loan-guide/loanGuideMessages";
 
 type Step = "mobile" | "otp" | "details" | "offers";
 type SortBy = "rate" | "amount" | "emi";
@@ -66,6 +68,7 @@ export default function ApplyPage() {
   const [creditConsent, setCreditConsent] = useState(false);
   const [marketingConsent, setMarketingConsent] = useState(false);
   const [lenderConsent, setLenderConsent] = useState(false);
+  const [activeField, setActiveField] = useState<GuideField>("mobile");
 
   const allRequiredConsents = privacyConsent && termsConsent && dpdpConsent;
 
@@ -220,8 +223,19 @@ export default function ApplyPage() {
 
   const tip = STEP_TIPS[step];
 
+  useEffect(() => {
+    const defaults: Record<Step, GuideField> = {
+      mobile: "mobile",
+      otp: "otp",
+      details: "full_name",
+      offers: "offers",
+    };
+    setActiveField(defaults[step]);
+  }, [step]);
+
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-teal-50/30">
+    <main className="relative min-h-screen bg-gradient-to-b from-slate-50 via-white to-teal-50/30 pb-36 sm:pb-44">
+      <LoanGuideMascot step={step} activeField={activeField} show />
       <Header />
 
       <div className="mx-auto max-w-2xl px-4 py-8 sm:py-12">
@@ -270,7 +284,9 @@ export default function ApplyPage() {
                 placeholder="10-digit mobile"
                 value={mobile}
                 onChange={(e) => setMobile(e.target.value.replace(/\D/g, ""))}
-                className={`${inputClass} mt-6 text-lg`}
+                onFocus={() => setActiveField("mobile")}
+                data-guide-field="mobile"
+                className={`${inputClass} mt-6 text-lg ring-2 ring-transparent transition-[box-shadow] focus:ring-neercred-teal/30`}
                 required
               />
               <label className="mt-4 flex items-start gap-3 text-sm text-slate-600">
@@ -278,6 +294,7 @@ export default function ApplyPage() {
                   type="checkbox"
                   checked={smsConsent}
                   onChange={(e) => setSmsConsent(e.target.checked)}
+                  onFocus={() => setActiveField("sms_consent")}
                   className="mt-1 accent-neercred-teal"
                 />
                 <span>I agree to receive OTP via SMS for verification (DPDP Act 2023).</span>
@@ -308,7 +325,9 @@ export default function ApplyPage() {
                 placeholder="• • • • • •"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                className={`${inputClass} mt-6 text-center text-2xl tracking-[0.4em]`}
+                onFocus={() => setActiveField("otp")}
+                data-guide-field="otp"
+                className={`${inputClass} mt-6 text-center text-2xl tracking-[0.4em] ring-2 ring-transparent transition-[box-shadow] focus:ring-neercred-teal/30`}
                 required
               />
               <button
@@ -338,7 +357,9 @@ export default function ApplyPage() {
                   placeholder="Full name (as per PAN)"
                   value={form.full_name}
                   onChange={(e) => setForm({ ...form, full_name: e.target.value })}
-                  className={inputClass}
+                  onFocus={() => setActiveField("full_name")}
+                  data-guide-field="full_name"
+                  className={`${inputClass} ring-2 ring-transparent transition-[box-shadow] focus:ring-neercred-teal/30`}
                   required
                 />
                 <input
@@ -347,7 +368,9 @@ export default function ApplyPage() {
                   placeholder="PAN number"
                   value={form.pan}
                   onChange={(e) => setForm({ ...form, pan: e.target.value.toUpperCase() })}
-                  className={`${inputClass} uppercase`}
+                  onFocus={() => setActiveField("pan")}
+                  data-guide-field="pan"
+                  className={`${inputClass} uppercase ring-2 ring-transparent transition-[box-shadow] focus:ring-amber-400/50 focus:ring-4`}
                   required
                 />
                 <input
@@ -355,7 +378,9 @@ export default function ApplyPage() {
                   placeholder="Monthly income (₹)"
                   value={form.monthly_income}
                   onChange={(e) => setForm({ ...form, monthly_income: e.target.value })}
-                  className={inputClass}
+                  onFocus={() => setActiveField("monthly_income")}
+                  data-guide-field="monthly_income"
+                  className={`${inputClass} ring-2 ring-transparent transition-[box-shadow] focus:ring-neercred-teal/30`}
                   required
                   min={15000}
                 />
@@ -364,7 +389,9 @@ export default function ApplyPage() {
                   onChange={(e) =>
                     setForm({ ...form, employment_type: e.target.value as typeof form.employment_type })
                   }
-                  className={inputClass}
+                  onFocus={() => setActiveField("employment_type")}
+                  data-guide-field="employment_type"
+                  className={`${inputClass} ring-2 ring-transparent transition-[box-shadow] focus:ring-neercred-teal/30`}
                 >
                   <option value="salaried">Salaried</option>
                   <option value="self_employed">Self employed</option>
@@ -375,7 +402,9 @@ export default function ApplyPage() {
                   placeholder="City"
                   value={form.city}
                   onChange={(e) => setForm({ ...form, city: e.target.value })}
-                  className={inputClass}
+                  onFocus={() => setActiveField("city")}
+                  data-guide-field="city"
+                  className={`${inputClass} ring-2 ring-transparent transition-[box-shadow] focus:ring-neercred-teal/30`}
                   required
                 />
                 <div>
@@ -385,7 +414,9 @@ export default function ApplyPage() {
                     onChange={(e) =>
                       setForm({ ...form, loan_purpose: e.target.value as typeof form.loan_purpose })
                     }
-                    className={`${inputClass} mt-1`}
+                    onFocus={() => setActiveField("loan_purpose")}
+                    data-guide-field="loan_purpose"
+                    className={`${inputClass} mt-1 ring-2 ring-transparent transition-[box-shadow] focus:ring-neercred-teal/30`}
                   >
                     <option value="personal">Personal</option>
                     <option value="medical">Medical</option>
@@ -402,13 +433,18 @@ export default function ApplyPage() {
                     placeholder="0"
                     value={form.existing_emi}
                     onChange={(e) => setForm({ ...form, existing_emi: e.target.value })}
-                    className={`${inputClass} mt-1`}
+                    onFocus={() => setActiveField("existing_emi")}
+                    data-guide-field="existing_emi"
+                    className={`${inputClass} mt-1 ring-2 ring-transparent transition-[box-shadow] focus:ring-neercred-teal/30`}
                     min={0}
                   />
                 </div>
               </div>
 
-              <div className="mt-6 space-y-3 rounded-2xl border border-slate-100 bg-slate-50/80 p-4 text-sm text-slate-600">
+              <div
+                className="mt-6 space-y-3 rounded-2xl border border-slate-100 bg-slate-50/80 p-4 text-sm text-slate-600"
+                onFocus={() => setActiveField("consent")}
+              >
                 <p className="flex items-center gap-2 font-semibold text-slate-800">
                   <IconShield size={16} className="text-neercred-teal" />
                   Consent
@@ -458,7 +494,7 @@ export default function ApplyPage() {
           )}
 
           {step === "offers" && (
-            <div>
+            <div onMouseEnter={() => setActiveField("offers")}>
               {eligibility && (
                 <div className="mb-6 rounded-2xl border border-emerald-100 bg-emerald-50/80 p-4">
                   <p className="flex items-center gap-2 font-semibold text-emerald-800">

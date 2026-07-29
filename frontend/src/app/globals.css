@@ -138,3 +138,279 @@ body {
     transition: none;
   }
 }
+
+/* —— Loan journey guide mascot (Neer Buddy) —— */
+.loan-guide-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  max-width: min(100%, 320px);
+  transform-origin: bottom right;
+  animation: loanGuideBob 3.2s ease-in-out infinite;
+}
+
+.loan-guide-character {
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  padding: 0;
+  transition: transform 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.loan-guide-character:active {
+  transform: scale(0.96);
+}
+
+.loan-guide-bubble {
+  position: relative;
+  margin-bottom: 0.35rem;
+  margin-right: 0.25rem;
+  max-width: 260px;
+  animation: loanGuideBubbleIn 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.loan-guide-bubble-cloud {
+  position: relative;
+  z-index: 2;
+  border-radius: 1.25rem;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  background: linear-gradient(145deg, #ffffff 0%, #f0fdfa 55%, #e0f2fe 100%);
+  padding: 0.85rem 1rem;
+  box-shadow:
+    0 12px 28px -8px rgba(15, 118, 110, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.loan-guide-bubble-tail {
+  position: absolute;
+  right: 2.5rem;
+  bottom: -10px;
+  width: 18px;
+  height: 18px;
+  background: #f0fdfa;
+  border-right: 2px solid rgba(255, 255, 255, 0.85);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.85);
+  transform: rotate(45deg);
+  z-index: 1;
+}
+
+.loan-guide-bubble-puff {
+  position: absolute;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.75);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 12px rgba(15, 118, 110, 0.12);
+}
+
+.loan-guide-bubble-puff--1 {
+  width: 14px;
+  height: 14px;
+  right: 1.25rem;
+  bottom: -18px;
+}
+
+.loan-guide-bubble-puff--2 {
+  width: 9px;
+  height: 9px;
+  right: 0.35rem;
+  bottom: -26px;
+}
+
+/* Default poses */
+.loan-guide-arm {
+  transform-origin: 132px 118px;
+  transition: transform 0.35s ease;
+}
+
+.loan-guide-pencil {
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.loan-guide-belly-hands {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.loan-guide-eyes-ouch {
+  opacity: 0;
+}
+
+.loan-guide-mouth-ouch {
+  opacity: 0;
+}
+
+.loan-guide-legs {
+  transition: transform 0.35s ease;
+}
+
+/* Enter from background */
+.loan-guide-wrap.loan-guide-mascot--enter {
+  animation:
+    loanGuideEnter 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+    loanGuideBob 3.2s ease-in-out 0.95s infinite;
+}
+
+/* Point at field */
+.loan-guide-wrap.loan-guide-mascot--point .loan-guide-arm {
+  transform: rotate(-18deg) translate(-6px, -4px);
+  animation: loanGuidePoint 0.9s ease-in-out infinite;
+}
+
+/* Hand filling (PAN etc.) */
+.loan-guide-wrap.loan-guide-mascot--fill .loan-guide-arm {
+  transform: rotate(-42deg) translate(-12px, 8px);
+  animation: loanGuideWrite 0.55s ease-in-out infinite;
+}
+
+.loan-guide-wrap.loan-guide-mascot--fill .loan-guide-pencil {
+  opacity: 1;
+}
+
+/* Ouch — sit & hold belly */
+.loan-guide-wrap.loan-guide-mascot--ouch,
+.loan-guide-wrap.loan-guide-mascot--recover {
+  animation: loanGuideOuchSit 0.5s ease forwards;
+}
+
+.loan-guide-wrap.loan-guide-mascot--ouch .loan-guide-legs,
+.loan-guide-wrap.loan-guide-mascot--recover .loan-guide-legs {
+  transform: translateY(14px) scaleX(1.08);
+}
+
+.loan-guide-wrap.loan-guide-mascot--ouch .loan-guide-arm,
+.loan-guide-wrap.loan-guide-mascot--recover .loan-guide-arm {
+  transform: rotate(48deg) translate(8px, 24px);
+  animation: none;
+}
+
+.loan-guide-wrap.loan-guide-mascot--ouch .loan-guide-belly-hands,
+.loan-guide-wrap.loan-guide-mascot--recover .loan-guide-belly-hands {
+  opacity: 1;
+}
+
+.loan-guide-wrap.loan-guide-mascot--ouch .loan-guide-eyes,
+.loan-guide-wrap.loan-guide-mascot--recover .loan-guide-eyes {
+  opacity: 0;
+}
+
+.loan-guide-wrap.loan-guide-mascot--ouch .loan-guide-eyes-ouch,
+.loan-guide-wrap.loan-guide-mascot--recover .loan-guide-eyes-ouch {
+  opacity: 1;
+}
+
+.loan-guide-wrap.loan-guide-mascot--ouch .loan-guide-mouth-smile {
+  opacity: 0;
+}
+
+.loan-guide-wrap.loan-guide-mascot--ouch .loan-guide-mouth-ouch,
+.loan-guide-wrap.loan-guide-mascot--recover .loan-guide-mouth-ouch {
+  opacity: 1;
+}
+
+.loan-guide-wrap.loan-guide-mascot--recover {
+  animation: loanGuideOuchSit 0.5s ease forwards, loanGuideRecover 0.45s ease 0.55s forwards;
+}
+
+.loan-guide-wrap.loan-guide-mascot--recover .loan-guide-eyes {
+  opacity: 1;
+  transition: opacity 0.3s ease 0.5s;
+}
+
+.loan-guide-wrap.loan-guide-mascot--recover .loan-guide-eyes-ouch {
+  opacity: 0;
+  transition: opacity 0.3s ease 0.5s;
+}
+
+.loan-guide-wrap.loan-guide-mascot--recover .loan-guide-belly-hands {
+  opacity: 0;
+  transition: opacity 0.3s ease 0.5s;
+}
+
+.loan-guide-wrap.loan-guide-mascot--recover .loan-guide-mouth-smile {
+  opacity: 1;
+  transition: opacity 0.3s ease 0.5s;
+}
+
+.loan-guide-wrap.loan-guide-mascot--recover .loan-guide-mouth-ouch {
+  opacity: 0;
+  transition: opacity 0.3s ease 0.5s;
+}
+
+.loan-guide-wrap.loan-guide-mascot--recover .loan-guide-arm {
+  transform: rotate(0);
+  transition: transform 0.4s ease 0.5s;
+}
+
+.loan-guide-wrap.loan-guide-mascot--recover .loan-guide-legs {
+  transform: translateY(0) scaleX(1);
+  transition: transform 0.4s ease 0.5s;
+}
+
+@keyframes loanGuideEnter {
+  0% {
+    opacity: 0;
+    transform: translate(40px, 80px) scale(0.35);
+    filter: blur(8px);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(-6px, -8px) scale(1.04);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes loanGuideBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes loanGuideBubbleIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.92); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes loanGuidePoint {
+  0%, 100% { transform: rotate(-18deg) translate(-6px, -4px); }
+  50% { transform: rotate(-24deg) translate(-10px, -8px); }
+}
+
+@keyframes loanGuideWrite {
+  0%, 100% { transform: rotate(-42deg) translate(-12px, 8px); }
+  50% { transform: rotate(-38deg) translate(-6px, 4px); }
+}
+
+@keyframes loanGuideOuchSit {
+  from { transform: translateY(0) scale(1); }
+  to { transform: translateY(10px) scale(0.98); }
+}
+
+@keyframes loanGuideRecover {
+  from { transform: translateY(10px) scale(0.98); }
+  to { transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loan-guide-wrap,
+  .loan-guide-wrap.loan-guide-mascot--enter,
+  .loan-guide-wrap.loan-guide-mascot--point .loan-guide-arm,
+  .loan-guide-wrap.loan-guide-mascot--fill .loan-guide-arm {
+    animation: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .loan-guide-root {
+    bottom: 5.5rem;
+  }
+  .loan-guide-bubble {
+    max-width: min(72vw, 240px);
+  }
+}
