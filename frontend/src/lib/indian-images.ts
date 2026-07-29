@@ -1,12 +1,13 @@
+import { HERO_PRIMARY_IMAGE, HERO_REVIEWS } from "@/lib/hero-reviews";
+
 /**
  * Curated Indian lifestyle imagery — natural portraits, families, cities, celebrations.
  * All URLs verified against images.unsplash.com (200 OK).
  */
 export const INDIAN_IMAGES = {
   hero: {
-    /** Young Indian woman — natural smile, homepage hero */
-    customer:
-      "https://images.unsplash.com/photo-1463335361701-e90f4c5045d0?w=600&h=750&fit=crop&crop=faces",
+    /** Business professional — homepage hero default */
+    customer: HERO_PRIMARY_IMAGE,
     skyline:
       "https://images.unsplash.com/photo-1619895862022-09114b41f16f?w=1920&h=1080&fit=crop",
   },
@@ -42,18 +43,13 @@ export const INDIAN_IMAGES = {
       "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=600&h=400&fit=crop",
   },
   testimonials: {
-    priya:
-      "https://images.unsplash.com/photo-1463335361701-e90f4c5045d0?w=200&h=200&fit=crop&crop=faces",
-    arjun:
-      "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&h=200&fit=crop&crop=faces",
-    kavita:
-      "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200&h=200&fit=crop&crop=faces",
-    rahul:
-      "https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?w=200&h=200&fit=crop&crop=faces",
-    meera:
-      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&h=200&fit=crop&crop=faces",
+    priya: HERO_REVIEWS[0].image.replace("600&h=750", "200&h=200"),
+    arjun: HERO_REVIEWS[1].image.replace("600&h=750", "200&h=200"),
+    kavita: HERO_REVIEWS[2].image.replace("600&h=750", "200&h=200"),
+    rahul: HERO_REVIEWS[3].image.replace("600&h=750", "200&h=200"),
+    meera: HERO_REVIEWS[4].image.replace("600&h=750", "200&h=200"),
     vikram:
-      "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=200&h=200&fit=crop&crop=faces",
+      "https://images.unsplash.com/photo-1580894732444-8ecded7900cd?w=200&h=200&fit=crop&crop=faces",
   },
   trust: [
     "https://images.unsplash.com/photo-1511763508683-99dc7949e97f?w=400&h=300&fit=crop",
@@ -103,7 +99,6 @@ export const INDIAN_IMAGES = {
       "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&h=200&fit=crop",
     appBanner:
       "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&h=400&fit=crop",
-    legacyHero:
-      "https://images.unsplash.com/photo-1463335361701-e90f4c5045d0?w=600&h=750&fit=crop&crop=faces",
+    legacyHero: HERO_PRIMARY_IMAGE,
   },
 } as const;

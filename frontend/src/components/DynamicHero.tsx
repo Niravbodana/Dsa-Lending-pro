@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import { HeroPhotoCarousel } from "@/components/HeroPhotoCarousel";
+import { HeroReviewScroller } from "@/components/HeroReviewScroller";
 import {
   IconRupee,
   IconChart,
@@ -15,7 +16,6 @@ import {
   IconStar,
 } from "@/components/icons";
 import type { SiteConfig } from "@/lib/cms";
-import { INDIAN_IMAGES } from "@/lib/indian-images";
 
 const STAT_ICONS = [IconRupee, IconChart, IconBolt, IconUsers];
 
@@ -27,7 +27,10 @@ export function DynamicHero({ config }: Props) {
 
   return (
     <section className="gradient-hero relative min-h-[95vh] overflow-hidden text-white">
-      <div className="absolute inset-0 bg-cover bg-center opacity-[0.07]" style={{ backgroundImage: `url('${INDIAN_IMAGES.hero.skyline}')` }} />
+      <div
+        className="absolute inset-0 bg-cover bg-center opacity-[0.07]"
+        style={{ backgroundImage: `url('https://images.unsplash.com/photo-1619895862022-09114b41f16f?w=1920&h=1080&fit=crop')` }}
+      />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(251,191,36,0.2)_0%,_transparent_55%)]" />
       <div className="absolute -left-32 top-20 h-[28rem] w-[28rem] rounded-full bg-amber-400/10 blur-3xl" />
       <div className="absolute -right-32 bottom-10 h-[28rem] w-[28rem] rounded-full bg-cyan-400/15 blur-3xl" />
@@ -75,12 +78,14 @@ export function DynamicHero({ config }: Props) {
             </Link>
           </div>
 
-          <div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <HeroReviewScroller />
+
+          <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:mt-6">
             {stats.map((s, i) => {
               const Icon = STAT_ICONS[i] || IconRupee;
               return (
                 <ScrollReveal key={s.label} variant="up" delay={i * 80}>
-                  <div className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-md transition hover:bg-white/15 hover:scale-105">
+                  <div className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-md transition hover:scale-105 hover:bg-white/15">
                     <Icon size={20} className="text-amber-300" />
                     <p className="mt-2 text-2xl font-black">{s.value}</p>
                     <p className="text-xs text-teal-100/80">{s.label}</p>
@@ -93,29 +98,12 @@ export function DynamicHero({ config }: Props) {
 
         <ScrollReveal variant="right" delay={150} className="relative flex justify-center lg:justify-end">
           <div className="relative w-full max-w-md">
-            <div className="absolute -inset-4 rounded-[2.5rem] bg-gradient-to-br from-amber-400/30 via-teal-400/20 to-cyan-400/30 blur-2xl" />
-            <div className="relative overflow-hidden rounded-[2rem] border-4 border-white/25 shadow-2xl ring-1 ring-white/20">
-              <Image
-                src={h.image_url}
-                alt="Young Indian woman — NeerCred customer"
-                width={600}
-                height={750}
-                className="h-[460px] w-full object-cover object-top md:h-[520px]"
-                priority
-              />
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950 via-slate-900/85 to-transparent p-6 pt-20">
-                <p className="text-lg font-bold leading-snug text-white">&ldquo;{h.testimonial_quote}&rdquo;</p>
-                <p className="mt-2 flex items-center gap-2 text-sm text-teal-200">
-                  — {h.testimonial_author}
-                  <span className="flex text-amber-400">
-                    {[1, 2, 3, 4, 5].map((n) => (
-                      <IconStar key={n} size={12} className="fill-current" />
-                    ))}
-                  </span>
-                </p>
-              </div>
-            </div>
-            <div className="glass-card absolute -bottom-4 -left-4 max-w-[240px] rounded-2xl p-4 shadow-2xl lg:-left-8">
+            <HeroPhotoCarousel
+              fallbackImage={h.image_url}
+              fallbackQuote={h.testimonial_quote}
+              fallbackAuthor={h.testimonial_author}
+            />
+            <div className="glass-card absolute -bottom-4 -left-4 z-10 max-w-[240px] rounded-2xl p-4 shadow-2xl lg:-left-8">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-full bg-teal-50 text-neercred-teal">
                   <IconCheckCircle size={22} />
@@ -126,7 +114,7 @@ export function DynamicHero({ config }: Props) {
                 </div>
               </div>
             </div>
-            <div className="absolute -right-2 top-6 rounded-2xl border border-neercred-gold/30 bg-neercred-navy/90 px-5 py-4 text-center text-white shadow-2xl backdrop-blur lg:-right-6">
+            <div className="absolute -right-2 top-6 z-10 rounded-2xl border border-neercred-gold/30 bg-neercred-navy/90 px-5 py-4 text-center text-white shadow-2xl backdrop-blur lg:-right-6">
               <p className="text-3xl font-bold leading-none text-neercred-gold">{h.roi_badge}</p>
               <p className="mt-1 text-[10px] uppercase tracking-widest text-slate-300">{h.roi_badge_label}</p>
             </div>

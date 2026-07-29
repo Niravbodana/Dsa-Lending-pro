@@ -68,6 +68,23 @@ body {
   50% { transform: translateY(-12px); }
 }
 
+.hero-review-scroll {
+  mask-image: linear-gradient(to bottom, transparent, black 8%, black 92%, transparent);
+}
+
+.hero-review-track {
+  animation: hero-review-scroll 28s linear infinite;
+}
+
+.hero-review-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes hero-review-scroll {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
 .reveal {
   opacity: 0;
   transition:
@@ -94,5 +111,8 @@ body {
     opacity: 1;
     transform: none;
     transition: none;
+  }
+  .hero-review-track {
+    animation: none;
   }
 }
