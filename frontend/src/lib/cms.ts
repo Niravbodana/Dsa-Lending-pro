@@ -49,8 +49,9 @@ export const FALLBACK_CONFIG: SiteConfig = {
     cta_primary: "Get My Loan Offer",
     cta_secondary: "View Interest Rates",
     image_url: INDIAN_IMAGES.hero.customer,
-    testimonial_quote: "The process was seamless — offer selected, KYC done, and funds credited within 48 hours.",
-    testimonial_author: "Rahul Mehta, Bengaluru",
+    testimonial_quote:
+      "Shaadi ke liye apply kiya tha — teen lenders ka offer ek screen par mila. KYC ghar baithe ho gayi, 48 ghante mein paise account mein aa gaye.",
+    testimonial_author: "Priya Sharma, Pune",
     approval_card_label: "Loan Disbursed",
     approval_card_amount: "₹4,80,000",
     roi_badge: "10.99%",

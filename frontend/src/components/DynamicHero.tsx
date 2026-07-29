@@ -97,7 +97,7 @@ export function DynamicHero({ config }: Props) {
             <div className="relative overflow-hidden rounded-[2rem] border-4 border-white/25 shadow-2xl ring-1 ring-white/20">
               <Image
                 src={h.image_url}
-                alt="Happy Neer Loan customer"
+                alt="Young Indian woman — NeerCred customer"
                 width={600}
                 height={750}
                 className="h-[460px] w-full object-cover object-top md:h-[520px]"
