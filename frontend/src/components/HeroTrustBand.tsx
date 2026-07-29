@@ -1,60 +1,79 @@
 "use client";
 
+import Link from "next/link";
+import { LenderLogo } from "@/components/LenderLogo";
 import {
-  IconBolt,
-  IconChart,
+  IconBuilding,
   IconCheckCircle,
-  IconLock,
   IconRupee,
   IconShield,
   IconStar,
   IconUsers,
 } from "@/components/icons";
 
+const PARTNERS = [
+  { name: "HDFC Bank", logo: "HDFC" },
+  { name: "ICICI Bank", logo: "ICICI" },
+  { name: "Bajaj Finserv", logo: "BAJAJ" },
+  { name: "Tata Capital", logo: "TATA" },
+  { name: "Kotak Mahindra Bank", logo: "KOTAK" },
+  { name: "Axis Bank", logo: "AXIS" },
+];
+
 const STATS = [
-  { value: "₹100+ Cr", label: "Loans Disbursed", Icon: IconRupee, color: "bg-rose-50 text-rose-500" },
-  { value: "50,000+", label: "Happy Customers", Icon: IconUsers, color: "bg-blue-50 text-blue-500" },
-  { value: "25+", label: "RBI-Registered Partners", Icon: IconShield, color: "bg-violet-50 text-violet-500" },
-  { value: "4.8 ★", label: "Customer Rating", Icon: IconStar, color: "bg-amber-50 text-amber-500" },
-  { value: "100%", label: "Digital Process", Icon: IconBolt, color: "bg-emerald-50 text-emerald-600" },
+  { value: "₹100+ Cr", label: "Loans Disbursed", Icon: IconRupee },
+  { value: "50,000+", label: "Happy Customers", Icon: IconUsers },
+  { value: "25+", label: "RBI-Registered Partners", Icon: IconBuilding },
+  { value: "4.8 ★", label: "Customer Rating", Icon: IconStar },
+  { value: "100%", label: "Digital Process", Icon: IconShield },
 ];
 
 const FEATURES = [
-  { label: "No Hidden Charges", Icon: IconCheckCircle },
-  { label: "Flexible Tenure Options", Icon: IconChart },
-  { label: "Minimal Documentation", Icon: IconLock },
-  { label: "End-to-End Digital Journey", Icon: IconBolt },
+  "No Hidden Charges",
+  "Flexible Tenure Options",
+  "Minimal Documentation",
+  "End-to-End Digital Journey",
 ];
 
-/** Trust stats card + bottom feature bar (reference layout, no partner logos) */
+/** Reference trust strip — partners, stats, bottom features */
 export function HeroTrustBand() {
   return (
-    <section className="bg-white pb-2 pt-2">
-      <div className="mx-auto max-w-7xl px-4">
-        <div className="rounded-3xl border border-slate-100 bg-white px-4 py-10 shadow-[0_20px_50px_-24px_rgba(15,23,42,0.18)] md:px-8">
-          <div className="grid grid-cols-2 gap-8 md:grid-cols-5">
-            {STATS.map((s) => (
-              <div key={s.label} className="text-center">
-                <span
-                  className={`mx-auto flex h-12 w-12 items-center justify-center rounded-2xl ${s.color}`}
-                >
-                  <s.Icon size={22} />
-                </span>
-                <p className="mt-3 text-xl font-extrabold text-slate-900 md:text-2xl">{s.value}</p>
-                <p className="mt-1 text-xs font-medium text-slate-500">{s.label}</p>
-              </div>
-            ))}
-          </div>
+    <section className="border-t border-slate-100 bg-white">
+      <div className="mx-auto max-w-7xl px-4 py-8">
+        <p className="text-center text-sm font-medium text-slate-500">Trusted by 50,000+ customers</p>
+
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 md:gap-x-10">
+          {PARTNERS.map((p) => (
+            <div key={p.name} className="flex items-center gap-2 opacity-90">
+              <LenderLogo name={p.name} logo={p.logo} size={32} />
+              <span className="text-xs font-bold uppercase tracking-wide text-slate-600">{p.name}</span>
+            </div>
+          ))}
+          <Link href="/partners" className="text-sm font-semibold text-[#2DB2A2] hover:underline">
+            &amp; more
+          </Link>
+        </div>
+
+        <div className="mt-8 grid grid-cols-2 gap-6 border-t border-slate-100 pt-8 md:grid-cols-5">
+          {STATS.map((s) => (
+            <div key={s.label} className="text-center">
+              <s.Icon size={24} className="mx-auto text-[#2DB2A2]" />
+              <p className="mt-2 text-lg font-bold text-[#004B4D] md:text-xl">{s.value}</p>
+              <p className="mt-0.5 text-xs text-slate-500">{s.label}</p>
+            </div>
+          ))}
         </div>
       </div>
 
-      <div className="mx-auto mt-6 flex max-w-7xl flex-wrap items-center justify-center gap-x-10 gap-y-3 border-t border-slate-100 px-4 py-5 text-xs font-semibold text-slate-600 md:text-sm">
-        {FEATURES.map((f) => (
-          <span key={f.label} className="flex items-center gap-2">
-            <f.Icon size={16} className="text-[#00796B]" />
-            {f.label}
-          </span>
-        ))}
+      <div className="border-t border-slate-100 bg-slate-50/60">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-8 gap-y-2 px-4 py-4 text-xs font-semibold text-slate-600 md:text-sm">
+          {FEATURES.map((label) => (
+            <span key={label} className="flex items-center gap-2">
+              <IconCheckCircle size={16} className="text-[#2DB2A2]" />
+              {label}
+            </span>
+          ))}
+        </div>
       </div>
     </section>
   );

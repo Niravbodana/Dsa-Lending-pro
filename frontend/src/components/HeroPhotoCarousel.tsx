@@ -2,17 +2,18 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { HERO_CAROUSEL } from "@/lib/hero-images";
+import { HERO_CAROUSEL, REFERENCE_HERO } from "@/lib/hero-images";
+import { IconCheckCircle } from "@/components/icons";
 
 type Props = {
   roiRate?: string;
   roiLabel?: string;
 };
 
-/** Auto-rotating Indian lifestyle hero photos — matches reference mockup */
+/** Reference hero — Indian photos auto-fade, ROI card bottom-right */
 export function HeroPhotoCarousel({
-  roiRate = "9.99%",
-  roiLabel = "Starting Interest Rate",
+  roiRate = REFERENCE_HERO.roiRate,
+  roiLabel = REFERENCE_HERO.roiLabel,
 }: Props) {
   const [active, setActive] = useState(0);
   const slides = HERO_CAROUSEL;
@@ -20,17 +21,17 @@ export function HeroPhotoCarousel({
   useEffect(() => {
     const timer = setInterval(() => {
       setActive((prev) => (prev + 1) % slides.length);
-    }, 4500);
+    }, 5000);
     return () => clearInterval(timer);
   }, [slides.length]);
 
   return (
-    <div className="relative w-full max-w-[520px]">
-      <div className="relative overflow-hidden rounded-[1.75rem] bg-slate-100 shadow-[0_24px_60px_-20px_rgba(15,23,42,0.22)]">
+    <div className="relative w-full max-w-[540px]">
+      <div className="relative overflow-hidden rounded-[2rem] bg-slate-100 shadow-[0_28px_64px_-24px_rgba(0,75,77,0.35)]">
         {slides.map((slide, index) => (
           <div
             key={slide.id}
-            className={`transition-opacity duration-1000 ease-in-out ${
+            className={`transition-opacity duration-[1200ms] ease-in-out ${
               index === active
                 ? "relative opacity-100"
                 : "pointer-events-none absolute inset-0 opacity-0"
@@ -39,20 +40,23 @@ export function HeroPhotoCarousel({
             <Image
               src={slide.src}
               alt={slide.alt}
-              width={720}
-              height={860}
-              className="h-[360px] w-full object-cover object-center sm:h-[420px] lg:h-[460px]"
+              width={900}
+              height={1050}
+              className="h-[340px] w-full object-cover object-center sm:h-[400px] lg:h-[480px]"
               priority={index === 0}
             />
           </div>
         ))}
 
-        <div className="absolute bottom-6 left-6 max-w-[220px] rounded-2xl border border-white/80 bg-white/95 p-4 shadow-lg backdrop-blur-sm">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">{roiLabel}</p>
-          <p className="text-[1.65rem] font-extrabold leading-tight text-[#00796B]">
-            {roiRate} <span className="text-lg">p.a.</span>
+        <div className="absolute bottom-5 right-5 w-[210px] rounded-2xl border border-slate-100 bg-white p-4 shadow-xl">
+          <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-[#E8F8F5] text-[#2DB2A2]">
+            <IconCheckCircle size={18} />
+          </div>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">{roiLabel}</p>
+          <p className="mt-0.5 text-[1.75rem] font-bold leading-none text-[#004B4D]">
+            {roiRate} <span className="text-base font-semibold">p.a.</span>
           </p>
-          <p className="text-xs font-semibold text-slate-600">Lowest ROI Guaranteed</p>
+          <p className="mt-1 text-xs font-medium text-slate-600">{REFERENCE_HERO.roiFooter}</p>
         </div>
       </div>
     </div>

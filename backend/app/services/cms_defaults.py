@@ -2,7 +2,7 @@
 
 DEFAULT_SITE_CONFIG: dict = {
     "hero": {
-        "badge": "RBI Registered LSP Partner",
+        "badge": "RBI REGISTERED LSP PARTNER",
         "headline_line1": "Dream Big.",
         "headline_highlight": "Borrow Smart.",
         "headline_sub": "Personal loans up to ₹10,00,000",

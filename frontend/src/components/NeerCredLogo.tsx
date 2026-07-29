@@ -15,7 +15,7 @@ const ICON_SRC = "/neercred-icon.svg";
 
 const DIMENSIONS = {
   full: { width: 400, height: 92 },
-  header: { width: 220, height: 64 },
+  header: { width: 240, height: 68 },
   stacked: { width: 280, height: 248 },
   icon: { width: 96, height: 96 },
 } as const;

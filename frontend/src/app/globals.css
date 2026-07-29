@@ -6,11 +6,12 @@
   --background: #f8fafc;
   --foreground: #0b1220;
   --neercred-navy: #0b1220;
-  --neercred-teal: #0f766e;
-  --neercred-cyan: #0891b2;
+  --neercred-teal: #004b4d;
+  --neercred-mint: #2db2a2;
+  --neercred-cyan: #2db2a2;
   --neercred-gold: #d4a017;
   --neercred-logo-bay: #fefefe;
-  --primary: #0f766e;
+  --primary: #2db2a2;
   --primary-dark: #0b1220;
 }
 

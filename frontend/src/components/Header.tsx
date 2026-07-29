@@ -27,7 +27,7 @@ export function Header() {
   }, [pathname]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/98 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-slate-200/70 bg-white">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3">
         <Link
           href="/"
@@ -35,20 +35,18 @@ export function Header() {
           aria-label="NeerCred — Go to homepage"
           className="flex shrink-0 items-center"
         >
-          <NeerCredLogo variant="header" className="h-14 w-auto sm:h-[3.75rem]" />
+          <NeerCredLogo variant="header" className="h-[4.25rem] w-auto" />
         </Link>
 
-        <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Main navigation">
+        <nav className="hidden items-center gap-1 lg:flex" aria-label="Main navigation">
           {navLinks.map((link) => {
             const active = pathname === link.href;
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${
-                  active
-                    ? "text-[#00796B]"
-                    : "text-slate-700 hover:text-[#00796B]"
+                className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
+                  active ? "text-[#2DB2A2]" : "text-slate-700 hover:text-[#004B4D]"
                 }`}
               >
                 {link.label}
@@ -60,14 +58,14 @@ export function Header() {
         <div className="flex items-center gap-2 sm:gap-3">
           <Link
             href="/app"
-            className="hidden items-center gap-2 rounded-full border border-slate-300 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-white md:inline-flex"
+            className="hidden items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-slate-700 transition hover:text-[#004B4D] md:inline-flex"
           >
-            <IconSmartphone size={16} />
+            <IconSmartphone size={17} />
             Download App
           </Link>
           <Link
             href="/apply"
-            className="rounded-full bg-[#00796B] px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#00695C]"
+            className="rounded-full bg-[#2DB2A2] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#259a8c]"
           >
             Apply Now
           </Link>
@@ -88,22 +86,20 @@ export function Header() {
             <Link
               href="/"
               onClick={goHome}
-              className="rounded-lg px-3 py-2.5 text-sm font-semibold text-[#00796B] hover:bg-slate-50"
+              className="rounded-lg px-3 py-2.5 text-sm font-semibold text-[#2DB2A2]"
             >
               Home
             </Link>
-            {[...navLinks, { href: "/app", label: "Download App" }, { href: "/compliance", label: "Compliance" }].map(
-              (link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-[#00796B]"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {link.label}
-                </Link>
-              ),
-            )}
+            {[...navLinks, { href: "/app", label: "Download App" }].map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:text-[#004B4D]"
+                onClick={() => setMenuOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
         </nav>
       )}
