@@ -36,7 +36,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export const FALLBACK_CONFIG: SiteConfig = {
   hero: {
-    badge: "RBI Registered LSP Partner",
+    badge: "RBI REGISTERED LSP PARTNER",
     headline_line1: "Dream Big.",
     headline_highlight: "Borrow Smart.",
     headline_sub: "Personal loans up to ₹10,00,000",

@@ -49,7 +49,7 @@ export function HomePage() {
   }, []);
 
   return (
-    <main className="min-h-screen pb-20 md:pb-0">
+    <main className="min-h-screen pb-20 font-[family-name:var(--font-poppins)] md:pb-0">
       <Header />
       <DynamicHero config={config} />
       <HeroTrustBand />
