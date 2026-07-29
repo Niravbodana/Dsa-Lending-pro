@@ -7,9 +7,9 @@ export const BRAND = {
   logoTagline: "Dream Big. Borrow Smart.",
   logoSubtagline: "LOANS MADE SIMPLE",
   colors: {
-    navy: "#004B4D",
-    teal: "#004B4D",
-    mint: "#2DB2A2",
+    navy: "#0B1220",
+    teal: "#0F766E",
+    mint: "#14B8A6",
     gold: "#D4A017",
     logoBay: "#FEFEFE",
   },
