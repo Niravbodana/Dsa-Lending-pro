@@ -8,22 +8,18 @@ type NeerCredLogoProps = {
   className?: string;
 };
 
-const LOGO_SRC = "/neercred-logo.svg";
-const HEADER_SRC = "/neercred-logo-header.svg";
-const STACKED_SRC = "/neercred-logo-stacked.svg";
+/** Official brand lockup — user-provided PNG (icon + NeerCred + tagline) */
+const LOCKUP_SRC = "/neercred-logo-lockup.png";
 const ICON_SRC = "/neercred-icon.svg";
 
 const DIMENSIONS = {
-  full: { width: 400, height: 92 },
-  header: { width: 248, height: 72 },
-  stacked: { width: 280, height: 248 },
+  lockup: { width: 1536, height: 1024 },
   icon: { width: 96, height: 96 },
 } as const;
 
 export function NeerCredLogo({
   variant = "full",
   size,
-  dark = false,
   className = "",
 }: NeerCredLogoProps) {
   if (variant === "icon") {
@@ -41,25 +37,17 @@ export function NeerCredLogo({
     );
   }
 
-  const isStacked = variant === "stacked" || variant === "wordmark" || dark;
-  const isHeader = variant === "header";
-  const src = isHeader ? HEADER_SRC : isStacked ? STACKED_SRC : LOGO_SRC;
-  const dims = isHeader
-    ? DIMENSIONS.header
-    : isStacked
-      ? DIMENSIONS.stacked
-      : DIMENSIONS.full;
-  const height = size ?? (isHeader ? 64 : isStacked ? 120 : 56);
+  const height = size ?? 64;
 
   return (
     <span className="inline-flex items-center">
       <Image
-        src={src}
+        src={LOCKUP_SRC}
         alt={`${BRAND.appName} — ${BRAND.logoTagline}`}
-        width={dims.width}
-        height={dims.height}
-        className={`h-auto w-auto object-contain ${className}`}
-        style={className ? undefined : { height, width: "auto" }}
+        width={DIMENSIONS.lockup.width}
+        height={DIMENSIONS.lockup.height}
+        className={`h-auto w-auto object-contain object-left ${className}`}
+        style={className ? undefined : { height, width: "auto", maxWidth: 240 }}
         priority
       />
     </span>
