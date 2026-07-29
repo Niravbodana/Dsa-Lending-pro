@@ -1,4 +1,5 @@
 import { INDIAN_IMAGES } from "@/lib/indian-images";
+import { HERO_REVIEWS } from "@/lib/hero-reviews";
 
 export type SiteConfig = {
   hero: {
@@ -49,9 +50,8 @@ export const FALLBACK_CONFIG: SiteConfig = {
     cta_primary: "Get My Loan Offer",
     cta_secondary: "View Interest Rates",
     image_url: INDIAN_IMAGES.hero.customer,
-    testimonial_quote:
-      "Shaadi ke liye apply kiya tha — teen lenders ka offer ek screen par mila. KYC ghar baithe ho gayi, 48 ghante mein paise account mein aa gaye.",
-    testimonial_author: "Priya Sharma, Pune",
+    testimonial_quote: HERO_REVIEWS[0].quote,
+    testimonial_author: `${HERO_REVIEWS[0].name}, ${HERO_REVIEWS[0].city}`,
     approval_card_label: "Loan Disbursed",
     approval_card_amount: "₹4,80,000",
     roi_badge: "10.99%",
