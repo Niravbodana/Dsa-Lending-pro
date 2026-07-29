@@ -1,22 +1,29 @@
-<svg width="32" height="32" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="32" height="32" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="bg" x1="8" y1="4" x2="40" y2="44" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#0B1220"/>
-      <stop offset="1" stop-color="#0F766E"/>
+    <linearGradient id="fav-blue" x1="24" y1="16" x2="52" y2="80" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22D3EE"/>
+      <stop offset="0.55" stop-color="#3B82F6"/>
+      <stop offset="1" stop-color="#1E3A8A"/>
     </linearGradient>
-    <linearGradient id="drop" x1="24" y1="10" x2="24" y2="38" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#5EEAD4"/>
-      <stop offset="1" stop-color="#0891B2"/>
-    </linearGradient>
-    <linearGradient id="arc" x1="14" y1="30" x2="34" y2="14" gradientUnits="userSpaceOnUse">
+    <linearGradient id="fav-gold" x1="58" y1="20" x2="72" y2="78" gradientUnits="userSpaceOnUse">
       <stop stop-color="#FDE68A"/>
-      <stop offset="1" stop-color="#D4A017"/>
+      <stop offset="0.45" stop-color="#E8C547"/>
+      <stop offset="1" stop-color="#B8860B"/>
+    </linearGradient>
+    <linearGradient id="fav-ring-blue" x1="20" y1="48" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38BDF8"/>
+      <stop offset="1" stop-color="#1D4ED8"/>
+    </linearGradient>
+    <linearGradient id="fav-ring-gold" x1="48" y1="48" x2="76" y2="48" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F5D76E"/>
+      <stop offset="1" stop-color="#C9A227"/>
     </linearGradient>
   </defs>
-  <rect width="48" height="48" rx="14" fill="url(#bg)"/>
-  <path d="M11 31C11 31 13.5 22 24 14C34.5 22 37 31 37 31" stroke="url(#arc)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-  <path d="M33 28L36.5 24.5L40 28" stroke="url(#arc)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M24 11.5C24 11.5 31 19.2 31 26.2C31 32.4 26.8 37.5 24 37.5C21.2 37.5 17 32.4 17 26.2C17 19.2 24 11.5 24 11.5Z" fill="url(#drop)"/>
-  <path d="M20.5 26.5L23 29.5L28.5 22.5" stroke="#0B1220" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.85"/>
-  <circle cx="24" cy="13.5" r="2" fill="#FDE68A"/>
+  <rect width="96" height="96" rx="22" fill="#0A0E18"/>
+  <path d="M48 14 A34 34 0 0 0 48 82" stroke="url(#fav-ring-blue)" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+  <path d="M48 14 A34 34 0 0 1 48 82" stroke="url(#fav-ring-gold)" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+  <path d="M34 30 L34 66" stroke="url(#fav-blue)" stroke-width="7.5" stroke-linecap="round"/>
+  <path d="M34 30 L62 66" stroke="url(#fav-blue)" stroke-width="7.5" stroke-linecap="round"/>
+  <path d="M62 30 L62 66" stroke="url(#fav-gold)" stroke-width="7.5" stroke-linecap="round"/>
+  <path d="M48 9.5 L49.8 13.8 L54.4 13.8 L50.8 16.6 L52.2 21 L48 18.4 L43.8 21 L45.2 16.6 L41.6 13.8 L46.2 13.8 Z" fill="url(#fav-gold)"/>
 </svg>
