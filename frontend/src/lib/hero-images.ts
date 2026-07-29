@@ -1,6 +1,6 @@
-/** Single homepage hero image — Indian couple in festive attire (reference mockup) */
+/** Single homepage hero image — Indian couple planning loan on tablet */
 export const HERO_IMAGE = {
-  src: "https://images.unsplash.com/photo-1609220136736-443aae489eca?auto=format&w=960&h=1100&fit=crop&q=85",
+  src: "/hero-couple.jpg",
   alt: "Indian couple in traditional attire checking loan offers on tablet at home",
 };
 
