@@ -117,7 +117,9 @@ export function PartnerAdminPanel({ token }: Props) {
 
     try {
       if (editingId) {
-        const { partner_id: _pid, ...update } = payload;
+        const update = Object.fromEntries(
+          Object.entries(payload).filter(([key]) => key !== "partner_id"),
+        ) as Omit<typeof payload, "partner_id">;
         await updateAdminPartner(token, editingId, update);
       } else {
         await createAdminPartner(token, payload);

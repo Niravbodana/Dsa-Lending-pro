@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { DynamicHero } from "@/components/DynamicHero";
-import { PremiumTrustStrip } from "@/components/ConversionBars";
+import { HeroTrustBand } from "@/components/HeroTrustBand";
 import {
   DreamSection,
   EmotionalCtaBand,
@@ -53,8 +53,8 @@ export function HomePage() {
   return (
     <main className="min-h-screen pb-20 md:pb-0">
       <Header />
-      <PremiumTrustStrip />
       <DynamicHero config={config} />
+      <HeroTrustBand />
       {config.sections.metrics_ticker !== false && <MetricsTicker />}
       <DreamSection config={config} />
       <BusinessModelFlow />
