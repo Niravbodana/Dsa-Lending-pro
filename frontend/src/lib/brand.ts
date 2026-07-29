@@ -5,6 +5,7 @@ export const BRAND = {
   shortName: "NeerCred",
   tagline: "Dream Big. Borrow Smart.",
   logoTagline: "Dream Big. Borrow Smart.",
+  logoSubtagline: "LOANS MADE SIMPLE",
   colors: {
     navy: "#0B1220",
     teal: "#0F766E",
