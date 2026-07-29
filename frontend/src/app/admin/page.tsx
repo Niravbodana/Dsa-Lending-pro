@@ -104,7 +104,7 @@ export default function AdminPage() {
       localStorage.setItem("admin_token", res.token);
       setToken(res.token);
     } catch {
-      setError("Galat password! Default dev password: admin123");
+      setError("Galat password. Dobara try karein.");
     }
   }
 

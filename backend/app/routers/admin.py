@@ -1,14 +1,15 @@
 import hashlib
+import hmac
 import secrets
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter, Depends, Header, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.database import get_db
-from app.models import BugReport, Lead, LoanApplication, UserConsent
+from app.models import AdminSession, BugReport, Lead, LoanApplication, UserConsent
 from app.schemas_admin import (
     AdminLoginRequest,
     AdminLoginResponse,
@@ -22,33 +23,67 @@ from app.schemas_admin import (
     LeadStatusUpdate,
 )
 from app.schemas_consent import ConsentRecordResponse
-
 from app.services.application import update_application_status
+from app.services.rate_limit import rate_limit
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
-_admin_tokens: set[str] = set()
+
+def _purge_expired_admin_sessions(db: Session) -> None:
+    now = datetime.now(timezone.utc)
+    db.query(AdminSession).filter(AdminSession.expires_at < now).delete()
+    db.commit()
 
 
-def _admin_token(password: str) -> str:
-    return hashlib.sha256(f"admin:{password}:{settings.secret_key}".encode()).hexdigest()
-
-
-def verify_admin(authorization: str | None = Header(None)) -> None:
+def verify_admin(
+    authorization: str | None = Header(None),
+    db: Session = Depends(get_db),
+) -> None:
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Admin authentication required")
-    token = authorization.removeprefix("Bearer ")
-    if token not in _admin_tokens:
-        raise HTTPException(status_code=401, detail="Invalid admin token")
+    token = authorization.removeprefix("Bearer ").strip()
+    if not token:
+        raise HTTPException(status_code=401, detail="Admin authentication required")
+
+    _purge_expired_admin_sessions(db)
+    session = db.query(AdminSession).filter(AdminSession.token == token).first()
+    if not session:
+        raise HTTPException(status_code=401, detail="Invalid or expired admin token")
+
+    now = datetime.now(timezone.utc)
+    expires = session.expires_at
+    if expires.tzinfo is None:
+        expires = expires.replace(tzinfo=timezone.utc)
+    if now > expires:
+        db.delete(session)
+        db.commit()
+        raise HTTPException(status_code=401, detail="Admin session expired")
 
 
 @router.post("/login", response_model=AdminLoginResponse)
-def admin_login(payload: AdminLoginRequest):
+def admin_login(payload: AdminLoginRequest, request: Request, db: Session = Depends(get_db)):
+    rate_limit(request, key="admin-login", max_hits=10, window_seconds=900)
+
     if payload.password != settings.admin_password:
         raise HTTPException(status_code=401, detail="Invalid admin password")
+
     token = secrets.token_urlsafe(32)
-    _admin_tokens.add(token)
+    expires_at = datetime.now(timezone.utc) + timedelta(hours=settings.admin_session_hours)
+    db.add(AdminSession(token=token, expires_at=expires_at))
+    db.commit()
     return AdminLoginResponse(token=token, message="Admin login successful")
+
+
+@router.post("/logout")
+def admin_logout(
+    authorization: str | None = Header(None),
+    db: Session = Depends(get_db),
+):
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.removeprefix("Bearer ").strip()
+        db.query(AdminSession).filter(AdminSession.token == token).delete()
+        db.commit()
+    return {"message": "Logged out"}
 
 
 @router.get("/stats", response_model=AdminStatsResponse)
@@ -140,10 +175,11 @@ def list_bugs(db: Session = Depends(get_db), _: None = Depends(verify_admin)):
 
 
 @router.post("/bugs", response_model=BugReportResponse)
-def create_bug(payload: BugReportCreate, db: Session = Depends(get_db)):
+def create_bug(payload: BugReportCreate, request: Request, db: Session = Depends(get_db)):
+    rate_limit(request, key="bug-report", max_hits=10, window_seconds=3600)
     bug = BugReport(
-        title=payload.title,
-        description=payload.description,
+        title=payload.title[:200],
+        description=payload.description[:5000],
         severity=payload.severity,
         page_url=payload.page_url,
         reported_by=payload.reported_by,

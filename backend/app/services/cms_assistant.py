@@ -8,6 +8,7 @@ from typing import Any
 
 from app.services.cms_defaults import DEFAULT_SITE_CONFIG
 from app.services.cms_store import deep_merge, get_default_config
+from app.services.url_safety import is_safe_https_image_url
 
 PRESET_IMAGES = {
     "wedding": "https://images.unsplash.com/photo-1519741497674-611481863552?w=600&h=750&fit=crop",
@@ -201,6 +202,8 @@ def process_cms_command(message: str, config: dict) -> tuple[dict, str, list[str
                 return updated, f"✅ Hero photo changed to **{key}** theme.", changes
         val = _extract_after(raw, [r"(?:photo|image)\s+(?:url\s+)?(?:to\s+)?(https?://\S+)$"])
         if val:
+            if not is_safe_https_image_url(val):
+                return updated, "❌ Image URL rejected — only approved HTTPS hosts are allowed.", changes
             updated["hero"]["image_url"] = val
             changes.append("hero.image_url")
             return updated, "✅ Hero image URL updated.", changes
