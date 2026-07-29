@@ -147,6 +147,7 @@ export function AdvancedSiteBuilder({ token }: { token: string }) {
                 Smart Prompt
               </span>
             )}
+            <span className="ml-2 text-slate-400">· Unsplash/Pexels keys = live photo search</span>
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
