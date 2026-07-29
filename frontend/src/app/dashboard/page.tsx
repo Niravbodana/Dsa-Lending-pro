@@ -201,7 +201,7 @@ function DashboardContent() {
             <div className="grid items-center gap-8 lg:grid-cols-[1fr_auto]">
               <div>
                 <Link href="/" aria-label="NeerCred home" className="mb-5 inline-flex">
-                  <NeerCredLogo dark size={52} className="h-11 w-auto sm:h-12" />
+                  <NeerCredLogo dark className="h-11 w-auto sm:h-12" />
                 </Link>
                 <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-neercred-gold/30 bg-neercred-gold/15 px-3 py-1 text-xs font-semibold text-neercred-gold">
                   <IconShield size={14} />
@@ -406,7 +406,7 @@ function DashboardContent() {
               className="object-cover opacity-20"
             />
             <div className="relative flex items-center gap-4">
-              <NeerCredLogo dark size={44} className="h-10 w-auto shrink-0" />
+              <NeerCredLogo dark className="h-10 w-auto shrink-0" />
               <div>
                 <p className="font-semibold">{BRAND.appName}</p>
                 <p className="text-sm text-white/70">RBI-regulated partners · 256-bit encryption · Zero hidden charges</p>

@@ -145,7 +145,7 @@ export default function KycPage() {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-neercred-navy/95 to-neercred-teal/80" />
           <div className="relative mx-auto flex max-w-2xl flex-col items-center gap-4 px-4 text-center sm:flex-row sm:text-left">
-            <NeerCredLogo dark size={48} className="h-10 w-auto shrink-0" />
+            <NeerCredLogo dark className="h-10 w-auto shrink-0" />
             <div>
               <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold">Phase 3 — KYC &amp; eSign</span>
               {appRef && <p className="mt-2 font-mono text-sm text-teal-200">Ref: {appRef}</p>}

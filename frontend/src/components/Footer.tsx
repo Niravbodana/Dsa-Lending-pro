@@ -9,9 +9,9 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-16">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-6">
           <div className="lg:col-span-2">
-            <NeerCredLogo dark size={52} className="h-12 w-auto sm:h-14" />
+            <NeerCredLogo dark className="h-12 w-auto sm:h-14" />
             <p className="mt-3 text-sm leading-relaxed">
-              <span className="font-medium text-neercred-gold">{BRAND.logoTagline}</span>
+              <span className="font-medium text-neercred-gold">{BRAND.tagline}</span>
               {" · "}
               India&apos;s premium personal loan marketplace. Compare offers from 15+ regulated partner banks and NBFCs.
             </p>
@@ -67,7 +67,7 @@ export function Footer() {
         </div>
 
         <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-slate-800 pt-8 text-xs">
-          <p>© 2026 {BRAND.name}. {BRAND.rbiNote}. We are an LSP — not a lender.</p>
+          <p>© 2026 {BRAND.name}. {BRAND.appName}™ — {BRAND.logoTagline}. {BRAND.rbiNote}.</p>
           <p className="text-slate-500">Licensed marketplace · Regulated partners only</p>
         </div>
       </div>

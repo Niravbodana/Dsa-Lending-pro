@@ -20,8 +20,8 @@ export const metadata: Metadata = {
   description:
     "NeerCred by Neer Loan Solutions — compare personal loan offers from top partner banks & NBFCs. Up to ₹5,00,000, instant eligibility, RBI LSP compliant.",
   icons: {
-    icon: "/neercred-icon.svg",
-    apple: "/neercred-icon.svg",
+    icon: "/brand/neercred-icon.svg",
+    apple: "/brand/neercred-icon.svg",
   },
 };
 

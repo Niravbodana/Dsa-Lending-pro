@@ -74,7 +74,7 @@ export default function AppPage() {
                 />
                 <div className="relative flex h-full flex-col p-4">
                   <div className="flex justify-center">
-                    <NeerCredLogo size={36} className="h-8 w-auto" />
+                    <NeerCredLogo className="h-8 w-auto" />
                   </div>
                   <p className="mt-4 text-center text-2xl font-black text-slate-900">₹5,00,000</p>
                   <p className="text-center text-xs text-slate-500">Pre-approved amount</p>

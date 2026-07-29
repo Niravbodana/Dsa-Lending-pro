@@ -1,36 +1,38 @@
-<svg width="640" height="120" viewBox="0 0 640 120" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="NeerCred">
+<svg width="680" height="130" viewBox="0 0 680 130" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="NeerCred">
   <defs>
-    <linearGradient id="b-blue" x1="10" y1="10" x2="80" y2="80" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#7DD3FC"/><stop offset="0.5" stop-color="#3B82F6"/><stop offset="1" stop-color="#1E40AF"/>
+    <linearGradient id="b-blue" x1="12" y1="12" x2="88" y2="88" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#BAE6FD"/><stop offset="0.35" stop-color="#3B82F6"/><stop offset="1" stop-color="#1E3A8A"/>
     </linearGradient>
-    <linearGradient id="b-gold" x1="52" y1="14" x2="88" y2="78" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#FEF9C3"/><stop offset="0.4" stop-color="#F5D76E"/><stop offset="1" stop-color="#B45309"/>
+    <linearGradient id="b-gold" x1="56" y1="16" x2="96" y2="86" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF8E1"/><stop offset="0.25" stop-color="#F5D76E"/><stop offset="1" stop-color="#92600A"/>
     </linearGradient>
-    <linearGradient id="b-ring-b" x1="4" y1="44" x2="44" y2="44" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#38BDF8"/><stop offset="1" stop-color="#1D4ED8"/>
+    <linearGradient id="b-ring-b" x1="6" y1="48" x2="46" y2="48" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7DD3FC"/><stop offset="1" stop-color="#1D4ED8"/>
     </linearGradient>
-    <linearGradient id="b-ring-g" x1="44" y1="44" x2="84" y2="44" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#FDE68A"/><stop offset="1" stop-color="#CA8A04"/>
+    <linearGradient id="b-ring-g" x1="46" y1="48" x2="86" y2="48" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FDE68A"/><stop offset="1" stop-color="#A16207"/>
     </linearGradient>
-    <linearGradient id="b-cred" x1="100" y1="0" x2="400" y2="0" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#0F766E"/><stop offset="0.5" stop-color="#14B8A6"/><stop offset="1" stop-color="#2DD4BF"/>
+    <linearGradient id="b-cred" x1="108" y1="0" x2="420" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0D5C56"/><stop offset="0.5" stop-color="#0F766E"/><stop offset="1" stop-color="#2DD4BF"/>
     </linearGradient>
-    <linearGradient id="b-shine" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.5"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    <linearGradient id="b-gold-text" x1="108" y1="88" x2="520" y2="88" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FEF3C7"/><stop offset="0.3" stop-color="#E8C547"/><stop offset="0.7" stop-color="#D4A017"/><stop offset="1" stop-color="#B8860B"/>
     </linearGradient>
+    <filter id="b-depth" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="2" stdDeviation="1.5" flood-color="#0B1220" flood-opacity="0.16"/>
+    </filter>
   </defs>
-  <g transform="translate(8, 12)">
-    <path d="M44 10 A34 34 0 0 0 44 78" stroke="url(#b-ring-b)" stroke-width="3" fill="none" stroke-linecap="round"/>
-    <path d="M44 10 A34 34 0 0 1 44 78" stroke="url(#b-ring-g)" stroke-width="3" fill="none" stroke-linecap="round"/>
-    <path d="M31 26 L31 62" stroke="url(#b-blue)" stroke-width="7" stroke-linecap="round"/>
-    <path d="M31 26 L57 62" stroke="url(#b-blue)" stroke-width="7" stroke-linecap="round"/>
-    <path d="M57 26 L57 62" stroke="url(#b-gold)" stroke-width="7" stroke-linecap="round"/>
-    <path d="M44 6 L46 11 L51 11 L47.2 14 L48.8 19 L44 16 L39.2 19 L40.8 14 L37 11 L42 11 Z" fill="url(#b-gold)"/>
-    <ellipse cx="40" cy="36" rx="12" ry="18" fill="url(#b-shine)" opacity="0.25"/>
-    <text x="96" y="52" dominant-baseline="middle" font-family="Poppins, system-ui, sans-serif" font-size="52" font-weight="800" letter-spacing="-0.8">
+  <g filter="url(#b-depth)" transform="translate(10, 14)">
+    <path d="M48 12 A36 36 0 0 0 48 84" stroke="url(#b-ring-b)" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <path d="M48 12 A36 36 0 0 1 48 84" stroke="url(#b-ring-g)" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <path d="M34 28 L34 68" stroke="url(#b-blue)" stroke-width="7.5" stroke-linecap="round"/>
+    <path d="M34 28 L62 68" stroke="url(#b-blue)" stroke-width="7.5" stroke-linecap="round"/>
+    <path d="M62 28 L62 68" stroke="url(#b-gold)" stroke-width="7.5" stroke-linecap="round"/>
+    <path d="M48 7 L50.2 12.5 L55.8 12.5 L51.4 16 L53 21.5 L48 18.5 L43 21.5 L44.6 16 L40.2 12.5 L45.8 12.5 Z" fill="url(#b-gold)"/>
+    <text x="104" y="56" dominant-baseline="middle" font-family="Poppins, system-ui, sans-serif" font-size="56" font-weight="800" letter-spacing="-0.8">
       <tspan fill="#0B1220">Neer</tspan><tspan fill="url(#b-cred)">Cred</tspan>
     </text>
   </g>
-  <text x="104" y="98" font-family="Poppins, system-ui, sans-serif" font-size="12" font-weight="700" fill="#0B1220" letter-spacing="5" opacity="0.9">DREAM BIG. BORROW SMART.</text>
-  <text x="104" y="114" font-family="Poppins, system-ui, sans-serif" font-size="9" font-weight="600" fill="#64748B" letter-spacing="2.4">RBI REGISTERED LSP - PERSONAL LOAN MARKETPLACE</text>
+  <text x="114" y="108" font-family="Poppins, system-ui, sans-serif" font-size="13" font-weight="600" fill="url(#b-gold-text)" letter-spacing="5.5">DREAM BIG · BORROW SMART</text>
+  <text x="114" y="124" font-family="Poppins, system-ui, sans-serif" font-size="9.5" font-weight="500" fill="#64748B" letter-spacing="2.8">RBI REGISTERED LSP · PERSONAL LOAN MARKETPLACE</text>
 </svg>
