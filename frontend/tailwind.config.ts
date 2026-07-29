@@ -20,6 +20,9 @@ export default {
           "gold-light": "#FDE68A",
         },
       },
+      fontFamily: {
+        "plus-jakarta": ["var(--font-plus-jakarta)", "system-ui", "sans-serif"],
+      },
       boxShadow: {
         neercred: "0 20px 50px -12px rgba(11, 18, 32, 0.18)",
         "neercred-glow": "0 0 40px -8px rgba(15, 118, 110, 0.35)",
