@@ -67,6 +67,15 @@ export function IconBolt({ size, className }: IconProps) {
   );
 }
 
+export function IconClock({ size, className }: IconProps) {
+  return (
+    <Icon size={size} className={className}>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 6v6l4 2" />
+    </Icon>
+  );
+}
+
 export function IconUsers({ size, className }: IconProps) {
   return (
     <Icon size={size} className={className}>

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { DynamicHero } from "@/components/DynamicHero";
-import { PremiumTrustStrip } from "@/components/ConversionBars";
+import { HeroTrustBand } from "@/components/HeroTrustBand";
 import {
   DreamSection,
   EmotionalCtaBand,
@@ -11,7 +11,6 @@ import {
 } from "@/components/ConversionSections";
 import {
   HowItWorks,
-  Partners,
   LoanProductsStrip,
   LifestyleShowcase,
   TrustGallery,
@@ -22,7 +21,6 @@ import {
   BusinessModelFlow,
   PlatformCapabilities,
   PremiumFeaturesGrid,
-  MetricsTicker,
 } from "@/components/PremiumSections";
 import { Footer } from "@/components/Footer";
 import { EmiCalculator } from "@/components/EmiCalculator";
@@ -51,11 +49,10 @@ export function HomePage() {
   }, []);
 
   return (
-    <main className="min-h-screen pb-20 md:pb-0">
+    <main className="min-h-screen pb-20 font-[family-name:var(--font-poppins)] md:pb-0">
       <Header />
-      <PremiumTrustStrip />
       <DynamicHero config={config} />
-      {config.sections.metrics_ticker !== false && <MetricsTicker />}
+      <HeroTrustBand />
       <DreamSection config={config} />
       <BusinessModelFlow />
       <LoanProductsStrip />
@@ -67,7 +64,6 @@ export function HomePage() {
       {config.sections.testimonials !== false && <Testimonials />}
       <PlatformCapabilities />
       <TrustGallery />
-      <Partners />
       <ReferBanner />
       <AppDownloadBanner />
       <FAQ />

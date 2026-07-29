@@ -1,31 +1,47 @@
-<svg width="360" height="120" viewBox="0 0 360 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="400" height="92" viewBox="0 0 400 92" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="NeerCred — Dream Big. Borrow Smart.">
   <defs>
-    <linearGradient id="bg" x1="8" y1="4" x2="40" y2="44" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#0B1220"/>
-      <stop offset="1" stop-color="#0F766E"/>
+    <linearGradient id="logo-blue" x1="18" y1="14" x2="46" y2="78" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22D3EE"/>
+      <stop offset="0.55" stop-color="#3B82F6"/>
+      <stop offset="1" stop-color="#1E3A8A"/>
     </linearGradient>
-    <linearGradient id="drop" x1="24" y1="10" x2="24" y2="38" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#5EEAD4"/>
-      <stop offset="1" stop-color="#0891B2"/>
-    </linearGradient>
-    <linearGradient id="arc" x1="14" y1="30" x2="34" y2="14" gradientUnits="userSpaceOnUse">
+    <linearGradient id="logo-gold" x1="52" y1="18" x2="66" y2="76" gradientUnits="userSpaceOnUse">
       <stop stop-color="#FDE68A"/>
-      <stop offset="1" stop-color="#D4A017"/>
+      <stop offset="0.45" stop-color="#E8C547"/>
+      <stop offset="1" stop-color="#B8860B"/>
     </linearGradient>
-    <linearGradient id="textCred" x1="0" y1="0" x2="1" y2="0">
-      <stop stop-color="#0D9488"/>
-      <stop offset="1" stop-color="#0891B2"/>
+    <linearGradient id="logo-ring-blue" x1="14" y1="46" x2="42" y2="46" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38BDF8"/>
+      <stop offset="1" stop-color="#1D4ED8"/>
+    </linearGradient>
+    <linearGradient id="logo-ring-gold" x1="42" y1="46" x2="70" y2="46" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F5D76E"/>
+      <stop offset="1" stop-color="#C9A227"/>
+    </linearGradient>
+    <linearGradient id="logo-cred" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#22D3EE"/>
+      <stop offset="1" stop-color="#2563EB"/>
+    </linearGradient>
+    <linearGradient id="logo-gold-text" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#F5D76E"/>
+      <stop offset="0.5" stop-color="#E8C547"/>
+      <stop offset="1" stop-color="#C9A227"/>
     </linearGradient>
   </defs>
-  <g transform="translate(24,28)">
-    <rect width="64" height="64" rx="18" fill="url(#bg)"/>
-    <path d="M14.5 41.5C14.5 41.5 18 29.5 32 18.5C46 29.5 49.5 41.5 49.5 41.5" stroke="url(#arc)" stroke-width="3.2" stroke-linecap="round" fill="none"/>
-    <path d="M44 38L48.5 33.5L53 38" stroke="url(#arc)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    <path d="M32 15C32 15 41.5 25.5 41.5 35C41.5 43 36.5 50 32 50C27.5 50 22.5 43 22.5 35C22.5 25.5 32 15 32 15Z" fill="url(#drop)"/>
-    <path d="M27.5 35.5L30.5 39.5L37.5 30.5" stroke="#0B1220" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.85"/>
-    <circle cx="32" cy="18" r="2.6" fill="#FDE68A"/>
+  <rect width="400" height="92" rx="16" fill="#0A0E18"/>
+  <g transform="translate(10, 10) scale(0.76)">
+    <path d="M48 14 A34 34 0 0 0 48 82" stroke="url(#logo-ring-blue)" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+    <path d="M48 14 A34 34 0 0 1 48 82" stroke="url(#logo-ring-gold)" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+    <path d="M34 30 L34 66" stroke="url(#logo-blue)" stroke-width="7.5" stroke-linecap="round"/>
+    <path d="M34 30 L62 66" stroke="url(#logo-blue)" stroke-width="7.5" stroke-linecap="round"/>
+    <path d="M62 30 L62 66" stroke="url(#logo-gold)" stroke-width="7.5" stroke-linecap="round"/>
+    <path d="M48 9.5 L49.8 13.8 L54.4 13.8 L50.8 16.6 L52.2 21 L48 18.4 L43.8 21 L45.2 16.6 L41.6 13.8 L46.2 13.8 Z" fill="url(#logo-gold)"/>
   </g>
-  <text x="108" y="58" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="42" font-weight="800" fill="#0F172A" letter-spacing="-0.5">Neer</text>
-  <text x="198" y="58" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="42" font-weight="800" fill="url(#textCred)" letter-spacing="-0.5">Cred</text>
-  <text x="108" y="84" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="13" font-weight="600" fill="#64748B" letter-spacing="3.2">PURITY &amp; TRUST</text>
+  <text x="92" y="40" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="30" font-weight="800" letter-spacing="-0.5">
+    <tspan fill="#FFFFFF">Neer</tspan><tspan fill="url(#logo-cred)">Cred</tspan>
+  </text>
+  <text x="92" y="58" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="8.5" font-weight="700" fill="url(#logo-gold-text)" letter-spacing="2.6">DREAM BIG. BORROW SMART.</text>
+  <line x1="92" y1="68" x2="128" y2="68" stroke="#C9A227" stroke-width="1" opacity="0.85"/>
+  <text x="200" y="70" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="7.5" font-weight="600" fill="#E2E8F0" letter-spacing="2">LOANS MADE SIMPLE</text>
+  <line x1="272" y1="68" x2="308" y2="68" stroke="#C9A227" stroke-width="1" opacity="0.85"/>
 </svg>

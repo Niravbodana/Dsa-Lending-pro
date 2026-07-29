@@ -54,7 +54,7 @@ export const FALLBACK_CONFIG: SiteConfig = {
     testimonial_author: "Priya Sharma, Pune",
     approval_card_label: "Loan Disbursed",
     approval_card_amount: "₹4,80,000",
-    roi_badge: "10.99%",
+    roi_badge: "9.99%",
     roi_badge_label: "From",
   },
   stats: [
