@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { DynamicHero } from "@/components/DynamicHero";
 import { HeroTrustBand } from "@/components/HeroTrustBand";
+import { UrgencyBar, PromoStrip, LiveSocialProof } from "@/components/ConversionBars";
 import {
   DreamSection,
   EmotionalCtaBand,
@@ -19,6 +20,7 @@ import {
 } from "@/components/LandingSections";
 import {
   BusinessModelFlow,
+  MetricsTicker,
   PlatformCapabilities,
   PremiumFeaturesGrid,
 } from "@/components/PremiumSections";
@@ -71,22 +73,26 @@ export function HomePage({ previewConfig, isPreview = false }: Props) {
         </div>
       )}
       <Header />
+      <UrgencyBar config={config} />
+      <PromoStrip config={config} />
+      <LiveSocialProof config={config} />
       <DynamicHero config={config} />
-      <HeroTrustBand />
-      <DreamSection config={config} />
+      <HeroTrustBand config={config} />
+      {config.sections.metrics_ticker !== false && <MetricsTicker config={config} />}
+      {config.sections.dream_section !== false && <DreamSection config={config} />}
       <BusinessModelFlow />
-      <LoanProductsStrip />
-      <EmotionalCtaBand />
+      <LoanProductsStrip config={config} />
+      <EmotionalCtaBand config={config} />
       <LifestyleShowcase />
-      <HowItWorks />
+      <HowItWorks config={config} />
       <PremiumFeaturesGrid />
       {config.sections.emi_calculator !== false && <EmiCalculator />}
-      {config.sections.testimonials !== false && <Testimonials />}
+      {config.sections.testimonials !== false && <Testimonials config={config} />}
       <PlatformCapabilities />
       <TrustGallery />
       <ReferBanner />
       <AppDownloadBanner />
-      <FAQ />
+      {config.sections.faq !== false && <FAQ config={config} />}
       <Footer />
       {!isPreview && (
         <>

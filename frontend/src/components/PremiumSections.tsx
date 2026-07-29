@@ -171,14 +171,11 @@ export function PremiumFeaturesGrid() {
   );
 }
 
-export function MetricsTicker() {
-  const metrics = [
-    { label: "Partner Lenders", value: "15+" },
-    { label: "Loans Facilitated", value: "₹250Cr+" },
-    { label: "Avg. Approval Time", value: "5 min" },
-    { label: "Customer Rating", value: "4.8/5" },
-    { label: "Digital KYC", value: "100%" },
-  ];
+export function MetricsTicker({ config }: { config: import("@/lib/cms").SiteConfig }) {
+  if (config.sections?.metrics_ticker === false) return null;
+  const metrics = config.metrics_ticker?.length ? config.metrics_ticker : [];
+
+  if (!metrics.length) return null;
 
   return (
     <section className="border-b border-neercred-gold/20 bg-neercred-navy py-8">

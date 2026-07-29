@@ -31,6 +31,7 @@ export function DynamicHero({ config, heroOverlay }: Props) {
 
   const headline1 = h.headline_line1 || REFERENCE_HERO.headlineLine1;
   const headlineHi = h.headline_highlight || REFERENCE_HERO.headlineHighlight;
+  const headlineSub = h.headline_sub;
   const description = h.description || REFERENCE_HERO.description;
   const badge = h.badge || REFERENCE_HERO.badge;
   const ctaPrimary = h.cta_primary || REFERENCE_HERO.ctaPrimary;
@@ -81,6 +82,12 @@ export function DynamicHero({ config, heroOverlay }: Props) {
             <span style={{ color: REF.teal }}>{headlineHi}</span>
           </h1>
 
+          {headlineSub && (
+            <p className="mt-3 text-lg font-bold md:text-xl" style={{ color: REF.navy }}>
+              {headlineSub}
+            </p>
+          )}
+
           <p className="mt-5 max-w-lg text-[15px] leading-relaxed md:text-base" style={{ color: REF.textMuted }}>
             {description}
           </p>
@@ -128,14 +135,36 @@ export function DynamicHero({ config, heroOverlay }: Props) {
         </div>
 
         <div className="relative hidden min-h-[280px] lg:block">
+          {h.approval_card_amount && (
+            <div className="absolute left-4 top-8 glass-panel rounded-2xl px-4 py-3">
+              <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">
+                {h.approval_card_label || "Loan Disbursed"}
+              </p>
+              <p className="text-2xl font-black text-teal-700">{h.approval_card_amount}</p>
+            </div>
+          )}
+          {h.testimonial_quote && (
+            <div className="absolute right-0 top-4 max-w-[240px] glass-panel rounded-2xl p-4 text-xs leading-relaxed text-slate-600">
+              &ldquo;{h.testimonial_quote}&rdquo;
+              {h.testimonial_author && (
+                <p className="mt-2 font-semibold text-slate-800">— {h.testimonial_author}</p>
+              )}
+            </div>
+          )}
           <div className="absolute bottom-8 right-0">
-            <HeroRoiCard roiRate={h.roi_badge || REFERENCE_HERO.roiRate} roiLabel={REFERENCE_HERO.roiLabel} />
+            <HeroRoiCard
+              roiRate={h.roi_badge || REFERENCE_HERO.roiRate}
+              roiLabel={h.roi_badge_label || REFERENCE_HERO.roiLabel}
+            />
           </div>
         </div>
       </div>
 
       <div className="relative z-10 flex justify-end px-4 pb-8 lg:hidden">
-        <HeroRoiCard roiRate={h.roi_badge || REFERENCE_HERO.roiRate} roiLabel={REFERENCE_HERO.roiLabel} />
+        <HeroRoiCard
+          roiRate={h.roi_badge || REFERENCE_HERO.roiRate}
+          roiLabel={h.roi_badge_label || REFERENCE_HERO.roiLabel}
+        />
       </div>
     </section>
   );

@@ -112,6 +112,12 @@ def process_brain_command(
         image_options = search_images(query)
         _last_search[session_id] = image_options
         lines = ["🔍 **Photo options** (preview ke liye pick karo):\n"]
+        from app.services.cms_image_search import image_search_status
+
+        api = image_search_status()
+        if api.get("unsplash") or api.get("pexels"):
+            sources = [k for k, v in api.items() if v and k != "catalog"]
+            lines.append(f"_Live search: {', '.join(sources)} + local catalog_\n")
         for i, img in enumerate(image_options, 1):
             lines.append(f"{i}. **{img['label']}** — `{img['url']}`")
         lines.append('\nBolo: **use photo 1** ya **set hero image https://...**')

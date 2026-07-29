@@ -237,23 +237,24 @@ export function LifestyleShowcase() {
   );
 }
 
-export function LoanProductsStrip() {
+export function LoanProductsStrip({ config }: { config: import("@/lib/cms").SiteConfig }) {
+  if (config.sections?.loan_products === false) return null;
+  const section = config.loan_products;
+  const cards = section.cards?.length
+    ? section.cards
+    : loanCards.map((c) => ({ title: c.title, rate: c.rate, image: c.image }));
   return (
     <section className="py-20">
       <div className="mx-auto max-w-7xl px-4">
         <ScrollReveal variant="up" className="text-center">
-          <span className="rounded-full bg-teal-100 px-4 py-1 text-sm font-bold text-teal-700">
-            LOAN PRODUCTS
-          </span>
-          <h2 className="mt-4 text-4xl font-black text-slate-900">
-            The <span className="text-teal-600">Right Loan</span> for Every Need
-          </h2>
+          <span className="rounded-full bg-teal-100 px-4 py-1 text-sm font-bold text-teal-700">LOAN PRODUCTS</span>
+          <h2 className="mt-4 text-4xl font-black text-slate-900">{section.title}</h2>
         </ScrollReveal>
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {loanCards.map((c, i) => (
+          {cards.map((c, i) => (
             <ScrollRevealAlternate key={c.title} index={i} delay={i * 100}>
               <Link
-                href={c.href}
+                href="/loans"
                 className="group block overflow-hidden rounded-3xl glass-panel transition hover:-translate-y-2 hover:shadow-2xl"
               >
                 <div className="relative h-44 overflow-hidden">
@@ -376,22 +377,29 @@ export function ReferBanner() {
   );
 }
 
-export function HowItWorks() {
-  const steps = [
-    { num: "01", title: "Verify Mobile", desc: "Secure OTP login — 30 seconds", image: INDIAN_IMAGES.howItWorks.mobile },
-    { num: "02", title: "Enter Details", desc: "PAN, income, city — simple form", image: INDIAN_IMAGES.howItWorks.form },
-    { num: "03", title: "Compare Offers", desc: "Choose the best rate from 15+ lenders", image: INDIAN_IMAGES.howItWorks.compare },
-    { num: "04", title: "Money in Account", desc: "Direct disbursal from partner bank", image: INDIAN_IMAGES.howItWorks.disbursal },
+export function HowItWorks({ config }: { config: import("@/lib/cms").SiteConfig }) {
+  if (config.sections?.how_it_works === false) return null;
+  const section = config.how_it_works;
+  const defaultImages = [
+    INDIAN_IMAGES.howItWorks.mobile,
+    INDIAN_IMAGES.howItWorks.form,
+    INDIAN_IMAGES.howItWorks.compare,
+    INDIAN_IMAGES.howItWorks.disbursal,
   ];
+  const steps = (section.steps?.length ? section.steps : []).map((s, i) => ({
+    num: String(i + 1).padStart(2, "0"),
+    title: s.title,
+    desc: s.desc,
+    image: defaultImages[i % defaultImages.length],
+  }));
 
   return (
     <section id="how-it-works" className="py-24">
       <div className="mx-auto max-w-7xl px-4">
         <ScrollReveal variant="up" className="text-center">
           <span className="rounded-full bg-teal-50 px-4 py-1 text-sm font-bold text-teal-600">SIMPLE PROCESS</span>
-          <h2 className="mt-4 text-4xl font-black text-slate-900">
-            Getting a Loan Is Now <span className="text-teal-600">Effortless</span>
-          </h2>
+          <h2 className="mt-4 text-4xl font-black text-slate-900">{section.title}</h2>
+          {section.subtitle && <p className="mt-3 text-slate-500">{section.subtitle}</p>}
         </ScrollReveal>
         <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
           {steps.map((step, i) => (

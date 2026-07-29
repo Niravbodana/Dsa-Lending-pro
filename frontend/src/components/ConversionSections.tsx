@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { ScrollReveal, ScrollRevealAlternate } from "@/components/ScrollReveal";
 import type { SiteConfig } from "@/lib/cms";
-import { INDIAN_IMAGES } from "@/lib/indian-images";
 
 export function DreamSection({ config }: { config: SiteConfig }) {
   if (!config.sections.dream_section) return null;
@@ -68,36 +67,34 @@ export function DreamSection({ config }: { config: SiteConfig }) {
   );
 }
 
-export function EmotionalCtaBand() {
+export function EmotionalCtaBand({ config }: { config: SiteConfig }) {
+  if (config.sections?.cta_band === false) return null;
+  const c = config.cta_band;
+  const titleParts = c.title.split(c.title_highlight);
   return (
     <section className="relative overflow-hidden py-20">
-      <Image
-        src={INDIAN_IMAGES.lifestyle.celebration}
-        alt="Happy customers"
-        fill
-        className="object-cover"
-      />
+      <Image src={c.image} alt="" fill className="object-cover" />
       <div className="absolute inset-0 bg-gradient-to-r from-teal-900/95 via-teal-800/90 to-slate-900/85" />
       <div className="relative mx-auto max-w-4xl px-4 text-center text-white">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-neercred-gold">Institutional-grade lending</p>
+        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-neercred-gold">{c.badge}</p>
         <h2 className="mt-4 text-4xl font-bold md:text-5xl">
-          Compare offers with <span className="text-neercred-gold">confidence</span>
+          {titleParts[0]}
+          <span className="text-neercred-gold">{c.title_highlight}</span>
+          {titleParts[1] || ""}
         </h2>
-        <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-300">
-          Select from regulated partner lenders, review terms transparently, and complete your application entirely online.
-        </p>
+        <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-300">{c.subtitle}</p>
         <div className="mt-10 flex flex-wrap justify-center gap-4">
           <Link
             href="/apply"
             className="rounded-2xl bg-gradient-to-r from-neercred-gold to-amber-500 px-10 py-4 text-lg font-bold text-neercred-navy shadow-xl transition hover:brightness-110"
           >
-            Start Application
+            {c.cta_primary}
           </Link>
           <Link
             href="/loans"
             className="rounded-2xl border border-white/30 px-8 py-4 text-lg font-semibold text-white transition hover:bg-white/10"
           >
-            Explore Loan Types
+            {c.cta_secondary}
           </Link>
         </div>
       </div>

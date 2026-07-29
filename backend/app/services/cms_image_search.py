@@ -1,8 +1,15 @@
-"""Curated image search for Site Builder — maps queries to safe local/HTTPS URLs."""
+"""Curated + live image search for Site Builder."""
 
 from __future__ import annotations
 
+import logging
 import re
+
+import httpx
+
+from app.config import settings
+
+logger = logging.getLogger(__name__)
 
 # Expandable catalog — all URLs verified safe (local or unsplash)
 IMAGE_CATALOG: dict[str, list[dict[str, str]]] = {
@@ -62,11 +69,11 @@ _ALIASES = {
     "parivar": "family",
     "customer": "professional",
     "jodi": "couple",
+    "indian": "wedding",
 }
 
 
-def search_images(query: str, limit: int = 6) -> list[dict[str, str]]:
-    """Return ranked image options for a natural-language query."""
+def _search_catalog(query: str, limit: int) -> list[dict[str, str]]:
     q = re.sub(r"\s+", " ", query.lower().strip())
     if not q:
         return []
@@ -93,7 +100,6 @@ def search_images(query: str, limit: int = 6) -> list[dict[str, str]]:
     results = [item for _, item in scored[:limit]]
 
     if not results:
-        # fallback: return wedding + professional mix
         for key in ("wedding", "professional", "family"):
             for item in IMAGE_CATALOG.get(key, [])[:1]:
                 if item["url"] not in seen_urls:
@@ -105,7 +111,94 @@ def search_images(query: str, limit: int = 6) -> list[dict[str, str]]:
     return results[:limit]
 
 
+def _search_unsplash(query: str, limit: int) -> list[dict[str, str]]:
+    key = settings.unsplash_access_key
+    if not key:
+        return []
+    try:
+        with httpx.Client(timeout=12.0) as client:
+            res = client.get(
+                "https://api.unsplash.com/search/photos",
+                params={"query": query, "per_page": limit, "orientation": "landscape"},
+                headers={"Authorization": f"Client-ID {key}"},
+            )
+            res.raise_for_status()
+            data = res.json()
+        out: list[dict[str, str]] = []
+        for photo in data.get("results", []):
+            urls = photo.get("urls") or {}
+            url = urls.get("regular") or urls.get("small")
+            if not url:
+                continue
+            label = (photo.get("alt_description") or photo.get("description") or query)[:80]
+            out.append({"url": url, "label": label, "source": "unsplash"})
+        return out
+    except Exception as exc:
+        logger.warning("Unsplash search failed: %s", exc)
+        return []
+
+
+def _search_pexels(query: str, limit: int) -> list[dict[str, str]]:
+    key = settings.pexels_api_key
+    if not key:
+        return []
+    try:
+        with httpx.Client(timeout=12.0) as client:
+            res = client.get(
+                "https://api.pexels.com/v1/search",
+                params={"query": query, "per_page": limit, "orientation": "landscape"},
+                headers={"Authorization": key},
+            )
+            res.raise_for_status()
+            data = res.json()
+        out: list[dict[str, str]] = []
+        for photo in data.get("photos", []):
+            src = photo.get("src") or {}
+            url = src.get("large") or src.get("medium")
+            if not url:
+                continue
+            label = (photo.get("alt") or query)[:80]
+            out.append({"url": url, "label": label, "source": "pexels"})
+        return out
+    except Exception as exc:
+        logger.warning("Pexels search failed: %s", exc)
+        return []
+
+
+def search_images(query: str, limit: int = 6) -> list[dict[str, str]]:
+    """Return ranked image options — live API when keys set, plus local catalog."""
+    q = re.sub(r"\s+", " ", query.strip())
+    if not q:
+        q = "loan"
+
+    live: list[dict[str, str]] = []
+    live.extend(_search_unsplash(q, limit))
+    if len(live) < limit:
+        live.extend(_search_pexels(q, limit - len(live)))
+
+    catalog = _search_catalog(q, limit)
+    merged: list[dict[str, str]] = []
+    seen: set[str] = set()
+    for item in live + catalog:
+        url = item["url"]
+        if url in seen:
+            continue
+        seen.add(url)
+        merged.append({"url": item["url"], "label": item.get("label", "Photo")})
+        if len(merged) >= limit:
+            break
+    return merged
+
+
 def image_by_index(query_results: list[dict[str, str]], index: int) -> str | None:
     if 1 <= index <= len(query_results):
         return query_results[index - 1]["url"]
     return None
+
+
+def image_search_status() -> dict[str, bool]:
+    return {
+        "unsplash": bool(settings.unsplash_access_key),
+        "pexels": bool(settings.pexels_api_key),
+        "catalog": True,
+    }

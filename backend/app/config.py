@@ -31,6 +31,8 @@ class Settings(BaseSettings):
     openai_base_url: str = "https://api.openai.com/v1"
     cms_llm_model: str = "gpt-4o-mini"
     cms_llm_enabled: bool = True
+    unsplash_access_key: str | None = None
+    pexels_api_key: str | None = None
 
     @property
     def is_production(self) -> bool:

@@ -29,9 +29,14 @@ import type { CSSProperties } from "react";
 
 export function themeStyleVars(theme: ThemeConfig): CSSProperties {
   const bg = BACKGROUNDS[theme.background || "glass-blue"] || BACKGROUNDS["glass-blue"];
+  const glassBlur =
+    theme.glass_intensity === "high" ? "20px" : theme.glass_intensity === "low" ? "8px" : "14px";
+  const accent = theme.accent === "gold" ? "#D4A853" : "#0F766E";
   return {
     ["--site-bg" as string]: bg,
     ["--hero-overlay" as string]: OVERLAYS[theme.hero_overlay || "sky-glass"] || OVERLAYS["sky-glass"],
+    ["--glass-blur" as string]: glassBlur,
+    ["--site-accent" as string]: accent,
   };
 }
 

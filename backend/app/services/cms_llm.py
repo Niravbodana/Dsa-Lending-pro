@@ -34,6 +34,13 @@ Site config schema (partial updates allowed):
   "urgency_bar": {"enabled": bool, "text", "emoji"},
   "promo_strip": {"enabled": bool, "text", "highlight"},
   "dream_section": {"title", "subtitle", "cards": [{"title","desc","image","cta"}]},
+  "trust_band": {"tagline", "features": [strings]},
+  "metrics_ticker": [{"value","label"}],
+  "testimonials_section": {"badge","title","title_highlight","subtitle","items":[...]},
+  "faq_section": {"title","title_highlight","subtitle","items":[{"q","a"}]},
+  "cta_band": {"badge","title","title_highlight","subtitle","image","cta_primary","cta_secondary"},
+  "how_it_works": {"title","subtitle","steps":[{"title","desc"}]},
+  "loan_products": {"title","cards":[{"title","rate","image"}]},
   "theme": {
     "background": "glass-blue"|"glass-white"|"navy-gradient"|"teal-mist",
     "accent": "teal"|"gold", "hero_overlay": "sky-glass"|"white-glass"|"navy"|"mint-glass",
@@ -41,7 +48,7 @@ Site config schema (partial updates allowed):
   },
   "sections": {
     "urgency_bar", "promo_strip", "dream_section", "metrics_ticker",
-    "emi_calculator", "testimonials": bool each
+    "emi_calculator", "testimonials", "cta_band", "faq", "how_it_works", "loan_products": bool each
   }
 }
 
