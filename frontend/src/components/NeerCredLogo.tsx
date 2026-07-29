@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { BRAND } from "@/lib/brand";
 
 type NeerCredLogoProps = {
@@ -8,48 +7,41 @@ type NeerCredLogoProps = {
   className?: string;
 };
 
-/** Official brand lockup — user-provided PNG (icon + NeerCred + tagline) */
-const LOCKUP_SRC = "/neercred-logo-lockup.png";
+const HEADER_SRC = "/neercred-logo-header.svg";
+const LIGHT_SRC = "/neercred-logo-light.svg";
 const ICON_SRC = "/neercred-icon.svg";
 
-const DIMENSIONS = {
-  lockup: { width: 1536, height: 1024 },
-  icon: { width: 96, height: 96 },
-} as const;
-
+/** Transparent SVG lockups — no white/dark background box */
 export function NeerCredLogo({
   variant = "full",
   size,
+  dark = false,
   className = "",
 }: NeerCredLogoProps) {
   if (variant === "icon") {
     const iconSize = size ?? 40;
     return (
-      <Image
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
         src={ICON_SRC}
         alt=""
-        width={DIMENSIONS.icon.width}
-        height={DIMENSIONS.icon.height}
-        className={`shrink-0 rounded-[22%] ${className}`}
-        style={{ width: iconSize, height: iconSize }}
-        priority
+        width={iconSize}
+        height={iconSize}
+        className={`shrink-0 ${className}`}
       />
     );
   }
 
+  const src = dark ? LIGHT_SRC : HEADER_SRC;
   const height = size ?? 64;
 
   return (
-    <span className="inline-flex items-center">
-      <Image
-        src={LOCKUP_SRC}
-        alt={`${BRAND.appName} — ${BRAND.logoTagline}`}
-        width={DIMENSIONS.lockup.width}
-        height={DIMENSIONS.lockup.height}
-        className={`h-auto w-auto object-contain object-left ${className}`}
-        style={className ? undefined : { height, width: "auto", maxWidth: 240 }}
-        priority
-      />
-    </span>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      alt={`${BRAND.appName} — ${BRAND.logoTagline}`}
+      className={`h-auto w-auto bg-transparent object-contain object-left ${className}`}
+      style={className ? undefined : { height, width: "auto" }}
+    />
   );
 }

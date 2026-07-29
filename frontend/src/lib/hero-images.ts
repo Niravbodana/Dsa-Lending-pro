@@ -1,7 +1,13 @@
-/** Single homepage hero image — Indian couple planning loan on tablet */
+/** Single homepage hero image — local Indian borrower */
 export const HERO_IMAGE = {
-  src: "/hero-indian-portrait.jpg",
-  alt: "Indian couple in traditional attire checking loan offers on tablet at home",
+  src: "/hero-rahul-indore.jpg",
+  alt: "Rahul Das from Indore — NeerCred personal loan customer",
+};
+
+export const HERO_TESTIMONIAL = {
+  quote:
+    "Dukaan expand karne ke liye NeerCred pe apply kiya — 5 minute mein teen lenders ka offer ek screen par! Koi agent nahi, koi hidden charge nahi. Agle din ₹2.8 lakh seedha account mein aa gaye.",
+  author: "Rahul Das, Indore",
 };
 
 export const HERO_PRIMARY_IMAGE = HERO_IMAGE.src;

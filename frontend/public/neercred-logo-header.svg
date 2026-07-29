@@ -34,5 +34,5 @@
   <text x="64" y="34" font-family="Poppins, system-ui, sans-serif" font-size="28" font-weight="700" letter-spacing="-0.3">
     <tspan fill="#0B1220">Neer</tspan><tspan fill="url(#hdr-cred)">Cred</tspan>
   </text>
-  <text x="64" y="52" font-family="Poppins, system-ui, sans-serif" font-size="8" font-weight="600" fill="#64748B" letter-spacing="2.8">DREAM BIG. BORROW SMART.</text>
+  <text x="64" y="52" font-family="Poppins, system-ui, sans-serif" font-size="8" font-weight="600" fill="#0B1220" letter-spacing="2.8">DREAM BIG. BORROW SMART.</text>
 </svg>
