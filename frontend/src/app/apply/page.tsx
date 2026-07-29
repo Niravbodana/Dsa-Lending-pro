@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -11,7 +11,9 @@ import {
   checkEligibility,
   EligibilityResult,
   fetchOffers,
+  getRequiredFields,
   LoanOffer,
+  RequiredField,
   selectOffer,
   sendOtp,
   submitDetails,
@@ -69,9 +71,22 @@ export default function ApplyPage() {
 
   const allRequiredConsents = privacyConsent && termsConsent && dpdpConsent;
 
+  const [requiredFields, setRequiredFields] = useState<RequiredField[]>([]);
+  const needs = (key: string) => requiredFields.some((f) => f.key === key);
+
+  useEffect(() => {
+    void getRequiredFields()
+      .then((res) => setRequiredFields(res.fields))
+      .catch(() => setRequiredFields([]));
+  }, []);
+
   const [form, setForm] = useState({
     full_name: "",
     pan: "",
+    date_of_birth: "",
+    email: "",
+    pincode: "",
+    gender: "" as "" | "male" | "female" | "other",
     monthly_income: "",
     employment_type: "salaried" as "salaried" | "self_employed" | "business",
     city: "",
@@ -155,6 +170,10 @@ export default function ApplyPage() {
         monthly_income: Number(form.monthly_income),
         employment_type: form.employment_type,
         city: form.city,
+        date_of_birth: form.date_of_birth || undefined,
+        email: form.email || undefined,
+        pincode: form.pincode || undefined,
+        gender: form.gender || undefined,
         page_url: "/apply",
         consents: {
           dpdp_data_processing: dpdpConsent,
@@ -350,6 +369,54 @@ export default function ApplyPage() {
                   className={`${inputClass} uppercase`}
                   required
                 />
+                {needs("date_of_birth") && (
+                  <div>
+                    <label className="text-sm font-medium text-slate-700">Date of birth</label>
+                    <input
+                      type="date"
+                      value={form.date_of_birth}
+                      onChange={(e) => setForm({ ...form, date_of_birth: e.target.value })}
+                      className={`${inputClass} mt-1`}
+                      required
+                    />
+                  </div>
+                )}
+                {needs("email") && (
+                  <input
+                    type="email"
+                    placeholder="Email address"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    className={inputClass}
+                    required
+                  />
+                )}
+                {needs("pincode") && (
+                  <input
+                    type="text"
+                    maxLength={6}
+                    placeholder="PIN code"
+                    value={form.pincode}
+                    onChange={(e) => setForm({ ...form, pincode: e.target.value.replace(/\D/g, "") })}
+                    className={inputClass}
+                    required
+                  />
+                )}
+                {needs("gender") && (
+                  <select
+                    value={form.gender}
+                    onChange={(e) =>
+                      setForm({ ...form, gender: e.target.value as typeof form.gender })
+                    }
+                    className={inputClass}
+                    required
+                  >
+                    <option value="">Select gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                )}
                 <input
                   type="number"
                   placeholder="Monthly income (₹)"

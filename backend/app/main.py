@@ -3,11 +3,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from app.config import settings
-from app.database import Base, engine
+from app.database import Base, SessionLocal, engine
+from app.migrations import run_schema_patches
 from app.middleware.security import SecurityHeadersMiddleware
-from app.routers import admin, auth, chat, cms, consent, dashboard, kyc, leads, webhooks
+from app.routers import admin, auth, chat, cms, consent, dashboard, kyc, leads, partners, webhooks
+from app.services.partner_store import seed_lending_partners
 
 Base.metadata.create_all(bind=engine)
+run_schema_patches()
+
+with SessionLocal() as db:
+    seed_lending_partners(db)
 
 app = FastAPI(
     title="Neer Loan Solutions API",
@@ -42,6 +48,7 @@ app.include_router(kyc.router, prefix="/api")
 app.include_router(dashboard.router, prefix="/api")
 app.include_router(webhooks.router, prefix="/api")
 app.include_router(chat.router, prefix="/api")
+app.include_router(partners.router, prefix="/api")
 app.include_router(admin.router, prefix="/api")
 
 

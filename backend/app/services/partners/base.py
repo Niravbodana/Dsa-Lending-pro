@@ -1,7 +1,7 @@
 """Base partner lender adapter — plug in real APIs here."""
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import time
 
 
@@ -27,6 +27,11 @@ class PartnerConfig:
     api_key: str | None
     enabled: bool
     timeout_seconds: float = 5.0
+    mock_profile: dict | None = None
+    required_fields: list[str] = field(default_factory=list)
+    offers_endpoint_path: str = "/offers"
+    auth_header_name: str = "Authorization"
+    auth_type: str = "bearer"
 
 
 class PartnerAdapter(ABC):
@@ -34,14 +39,7 @@ class PartnerAdapter(ABC):
         self.config = config
 
     @abstractmethod
-    async def fetch_offers(
-        self,
-        monthly_income: float,
-        employment_type: str,
-        city: str,
-        pan: str,
-        max_loan_amount: int,
-    ) -> list[PartnerOfferRaw]:
+    async def fetch_offers(self, lead_data: dict) -> list[PartnerOfferRaw]:
         pass
 
     def _timed(self) -> float:

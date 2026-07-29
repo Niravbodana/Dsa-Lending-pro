@@ -1,4 +1,4 @@
-"""HTTP partner adapter — calls real partner lender APIs."""
+"""HTTP partner adapter — calls lending partner APIs configured in admin panel."""
 
 import httpx
 
@@ -7,50 +7,50 @@ from app.services.partners.base import PartnerAdapter, PartnerOfferRaw
 
 class HttpPartnerAdapter(PartnerAdapter):
     """
-    Real partner API integration.
-    Set PARTNER_{ID}_API_URL and PARTNER_{ID}_API_KEY in .env to enable.
-    Expected API response format:
-    {
-      "offers": [{
-        "offer_id": "...",
-        "loan_amount": 300000,
-        "interest_rate": 11.5,
-        "tenure_months": 36,
-        "processing_fee": "2%",
-        "features": ["..."],
-        "approval_chance": "high"
-      }]
-    }
+    POST lead payload to partner offers API.
+    Default path: {api_url}/offers — configurable per partner in admin.
+  Expected response:
+    {"offers": [{"offer_id", "loan_amount", "interest_rate", "tenure_months", ...}]}
     """
 
-    async def fetch_offers(
-        self,
-        monthly_income: float,
-        employment_type: str,
-        city: str,
-        pan: str,
-        max_loan_amount: int,
-    ) -> list[PartnerOfferRaw]:
+    def _build_url(self) -> str:
+        base = (self.config.api_url or "").rstrip("/")
+        path = (self.config.offers_endpoint_path or "/offers").strip()
+        if not path.startswith("/"):
+            path = f"/{path}"
+        return f"{base}{path}"
+
+    def _auth_headers(self) -> dict[str, str]:
+        headers = {"Content-Type": "application/json"}
+        if not self.config.api_key:
+            return headers
+        name = self.config.auth_header_name or "Authorization"
+        if self.config.auth_type == "api_key_header":
+            headers[name] = self.config.api_key
+        else:
+            headers[name] = f"Bearer {self.config.api_key}"
+        return headers
+
+    def _payload(self, lead_data: dict) -> dict:
+        required = set(self.config.required_fields or [])
+        if required:
+            return {k: lead_data.get(k) for k in required if lead_data.get(k) is not None}
+        return {
+            k: v
+            for k, v in lead_data.items()
+            if v is not None and k not in {"eligibility_score"}
+        }
+
+    async def fetch_offers(self, lead_data: dict) -> list[PartnerOfferRaw]:
         if not self.config.api_url or not self.config.api_key:
             return []
-
-        payload = {
-            "monthly_income": monthly_income,
-            "employment_type": employment_type,
-            "city": city,
-            "pan": pan,
-            "max_loan_amount": max_loan_amount,
-        }
 
         try:
             async with httpx.AsyncClient(timeout=self.config.timeout_seconds) as client:
                 response = await client.post(
-                    self.config.api_url,
-                    json=payload,
-                    headers={
-                        "Authorization": f"Bearer {self.config.api_key}",
-                        "Content-Type": "application/json",
-                    },
+                    self._build_url(),
+                    json=self._payload(lead_data),
+                    headers=self._auth_headers(),
                 )
                 response.raise_for_status()
                 data = response.json()

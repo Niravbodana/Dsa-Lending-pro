@@ -102,3 +102,85 @@ class ApplicationAdminResponse(BaseModel):
 class ApplicationStatusUpdate(BaseModel):
     status: Literal["under_review", "approved", "disbursed", "rejected"]
     message: str | None = None
+
+
+class PartnerFieldCatalogItem(BaseModel):
+    key: str
+    label: str
+    step: str
+    type: str
+
+
+class LendingPartnerCreate(BaseModel):
+    partner_id: str = Field(..., min_length=2, max_length=50, pattern=r"^[a-z0-9_]+$")
+    lender_name: str = Field(..., min_length=2, max_length=120)
+    lender_logo: str = Field(..., min_length=2, max_length=40)
+    api_url: str | None = None
+    api_key: str | None = None
+    webhook_url: str | None = None
+    enabled: bool = True
+    sort_order: int = 0
+    required_fields: list[str] = Field(default_factory=list)
+    mock_interest_rate: float = 12.99
+    mock_tenure_months: int = 36
+    mock_processing_fee: str = "2%"
+    mock_features: list[str] = Field(default_factory=lambda: ["Digital process"])
+    mock_amount_offset: int = 0
+    page_slug: str | None = None
+    page_title: str | None = None
+    page_description: str | None = None
+    offers_endpoint_path: str = "/offers"
+    auth_header_name: str = "Authorization"
+    auth_type: Literal["bearer", "api_key_header"] = "bearer"
+    timeout_seconds: float = 8.0
+
+
+class LendingPartnerUpdate(BaseModel):
+    lender_name: str | None = None
+    lender_logo: str | None = None
+    api_url: str | None = None
+    api_key: str | None = None
+    webhook_url: str | None = None
+    enabled: bool | None = None
+    sort_order: int | None = None
+    required_fields: list[str] | None = None
+    mock_interest_rate: float | None = None
+    mock_tenure_months: int | None = None
+    mock_processing_fee: str | None = None
+    mock_features: list[str] | None = None
+    mock_amount_offset: int | None = None
+    page_slug: str | None = None
+    page_title: str | None = None
+    page_description: str | None = None
+    offers_endpoint_path: str | None = None
+    auth_header_name: str | None = None
+    auth_type: Literal["bearer", "api_key_header"] | None = None
+    timeout_seconds: float | None = None
+
+
+class LendingPartnerResponse(BaseModel):
+    id: int
+    partner_id: str
+    lender_name: str
+    lender_logo: str
+    api_url: str | None
+    api_key_masked: str
+    has_api_key: bool
+    webhook_url: str | None
+    enabled: bool
+    sort_order: int
+    required_fields: list[str]
+    mock_interest_rate: float
+    mock_tenure_months: int
+    mock_processing_fee: str
+    mock_features: list[str]
+    mock_amount_offset: int
+    page_slug: str | None
+    page_title: str | None
+    page_description: str | None
+    offers_endpoint_path: str | None
+    auth_header_name: str | None
+    auth_type: str | None
+    timeout_seconds: float
+    created_at: datetime
+    updated_at: datetime
