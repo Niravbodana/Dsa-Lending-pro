@@ -8,16 +8,17 @@ from typing import Any
 
 from app.services.cms_defaults import DEFAULT_SITE_CONFIG
 from app.services.cms_store import deep_merge, get_default_config
+from app.services.url_safety import is_safe_https_image_url
 
 PRESET_IMAGES = {
     "wedding": "https://images.unsplash.com/photo-1519741497674-611481863552?w=600&h=750&fit=crop",
     "home": "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&h=750&fit=crop",
     "business": "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=600&h=750&fit=crop",
-    "medical": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&h=750&fit=crop",
+    "medical": "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&h=750&fit=crop",
     "travel": "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&h=750&fit=crop",
     "family": "https://images.unsplash.com/photo-1511895426328-dc8714191300?w=600&h=750&fit=crop",
-    "professional": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&h=750&fit=crop&crop=faces",
-    "happy": "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&h=750&fit=crop",
+    "professional": "https://images.unsplash.com/photo-1463335361701-e90f4c5045d0?w=600&h=750&fit=crop&crop=faces",
+    "happy": "https://images.unsplash.com/photo-1511763508683-99dc7949e97f?w=600&h=750&fit=crop",
 }
 
 HELP_TEXT = """**Site Builder Commands** (type in English or Hinglish):
@@ -201,6 +202,8 @@ def process_cms_command(message: str, config: dict) -> tuple[dict, str, list[str
                 return updated, f"✅ Hero photo changed to **{key}** theme.", changes
         val = _extract_after(raw, [r"(?:photo|image)\s+(?:url\s+)?(?:to\s+)?(https?://\S+)$"])
         if val:
+            if not is_safe_https_image_url(val):
+                return updated, "❌ Image URL rejected — only approved HTTPS hosts are allowed.", changes
             updated["hero"]["image_url"] = val
             changes.append("hero.image_url")
             return updated, "✅ Hero image URL updated.", changes

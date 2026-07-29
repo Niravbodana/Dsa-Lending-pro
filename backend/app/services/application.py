@@ -1,6 +1,6 @@
 """Application helpers — ref generation, status updates, notifications, commission."""
 
-import random
+import secrets
 import string
 from datetime import datetime, timezone
 
@@ -29,7 +29,7 @@ STATUS_FLOW = [
 
 
 def generate_application_ref() -> str:
-    suffix = "".join(random.choices(string.digits, k=6))
+    suffix = "".join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(10))
     return f"NLR{suffix}"
 
 

@@ -1,9 +1,10 @@
 import math
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.deps.session import get_session_token
 from app.models import ApplicationStatusHistory, Lead, LoanApplication
 from app.schemas_application import (
     ApplicationDetailResponse,
@@ -11,8 +12,10 @@ from app.schemas_application import (
     DashboardProfile,
     EmiScheduleItem,
     StatusTimelineItem,
+    TrackLoanRequest,
 )
 from app.services.otp import get_lead_by_mobile, get_mobile_from_token
+from app.services.rate_limit import rate_limit
 
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 
@@ -25,7 +28,7 @@ def _auth(db: Session, token: str) -> str:
 
 
 @router.get("/profile", response_model=DashboardProfile)
-def get_profile(session_token: str, db: Session = Depends(get_db)):
+def get_profile(session_token: str = Depends(get_session_token), db: Session = Depends(get_db)):
     mobile = _auth(db, session_token)
     lead = get_lead_by_mobile(db, mobile)
     apps = (
@@ -48,7 +51,7 @@ def get_profile(session_token: str, db: Session = Depends(get_db)):
 
 
 @router.get("/applications", response_model=list[ApplicationResponse])
-def list_applications(session_token: str, db: Session = Depends(get_db)):
+def list_applications(session_token: str = Depends(get_session_token), db: Session = Depends(get_db)):
     mobile = _auth(db, session_token)
     lead = get_lead_by_mobile(db, mobile)
     if not lead:
@@ -63,7 +66,11 @@ def list_applications(session_token: str, db: Session = Depends(get_db)):
 
 
 @router.get("/applications/{app_id}", response_model=ApplicationDetailResponse)
-def get_application(app_id: int, session_token: str, db: Session = Depends(get_db)):
+def get_application(
+    app_id: int,
+    session_token: str = Depends(get_session_token),
+    db: Session = Depends(get_db),
+):
     mobile = _auth(db, session_token)
     lead = get_lead_by_mobile(db, mobile)
     app = db.query(LoanApplication).filter(LoanApplication.id == app_id).first()
@@ -86,7 +93,11 @@ def get_application(app_id: int, session_token: str, db: Session = Depends(get_d
 
 
 @router.get("/applications/{app_id}/emi-schedule", response_model=list[EmiScheduleItem])
-def get_emi_schedule(app_id: int, session_token: str, db: Session = Depends(get_db)):
+def get_emi_schedule(
+    app_id: int,
+    session_token: str = Depends(get_session_token),
+    db: Session = Depends(get_db),
+):
     mobile = _auth(db, session_token)
     lead = get_lead_by_mobile(db, mobile)
     app = db.query(LoanApplication).filter(LoanApplication.id == app_id).first()
@@ -117,10 +128,14 @@ def get_emi_schedule(app_id: int, session_token: str, db: Session = Depends(get_
     return schedule
 
 
-@router.get("/track/{application_ref}", response_model=ApplicationDetailResponse)
-def track_by_ref(application_ref: str, mobile: str, db: Session = Depends(get_db)):
-    """Public track — mobile + application ref, no session needed."""
-    app = db.query(LoanApplication).filter(LoanApplication.application_ref == application_ref.upper()).first()
+def _track_application(
+    db: Session, application_ref: str, mobile: str
+) -> ApplicationDetailResponse:
+    app = (
+        db.query(LoanApplication)
+        .filter(LoanApplication.application_ref == application_ref.upper())
+        .first()
+    )
     if not app:
         raise HTTPException(status_code=404, detail="Application not found")
 
@@ -141,3 +156,10 @@ def track_by_ref(application_ref: str, mobile: str, db: Session = Depends(get_db
         lead_name=lead.full_name,
         lead_mobile=lead.mobile,
     )
+
+
+@router.post("/track", response_model=ApplicationDetailResponse)
+def track_loan(payload: TrackLoanRequest, request: Request, db: Session = Depends(get_db)):
+    """Public track — mobile + application ref in POST body (not logged in URLs)."""
+    rate_limit(request, key="track-loan", max_hits=15, window_seconds=900)
+    return _track_application(db, payload.application_ref, payload.mobile)

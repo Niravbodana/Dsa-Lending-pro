@@ -124,6 +124,24 @@ class EmiScheduleItem(BaseModel):
     balance: int
 
 
+class TrackLoanRequest(BaseModel):
+    application_ref: str = Field(..., min_length=6, max_length=12)
+    mobile: str = Field(..., min_length=10, max_length=10)
+
+    @field_validator("mobile")
+    @classmethod
+    def digits_only(cls, v: str) -> str:
+        cleaned = v.strip()
+        if not cleaned.isdigit():
+            raise ValueError("Mobile must contain digits only")
+        return cleaned
+
+    @field_validator("application_ref")
+    @classmethod
+    def normalize_ref(cls, v: str) -> str:
+        return v.strip().upper()
+
+
 class DashboardProfile(BaseModel):
     mobile: str
     full_name: str | None

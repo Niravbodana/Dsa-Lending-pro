@@ -1,5 +1,9 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
+function sessionHeaders(token: string) {
+  return { Authorization: `Bearer ${token}` };
+}
+
 export type LoanOffer = {
   offer_id: string;
   lender_name: string;
@@ -89,9 +93,9 @@ export async function checkEligibility(data: {
 }
 
 export async function fetchOffers(sessionToken: string) {
-  const res = await fetch(
-    `${API_BASE}/api/leads/offers?session_token=${encodeURIComponent(sessionToken)}`
-  );
+  const res = await fetch(`${API_BASE}/api/leads/offers`, {
+    headers: sessionHeaders(sessionToken),
+  });
   if (!res.ok) throw new Error((await res.json()).detail || "Failed to fetch offers");
   return res.json() as Promise<{
     lead_id: number;
@@ -219,41 +223,43 @@ export type LoanApplication = {
 };
 
 export async function getDashboardProfile(token: string) {
-  const res = await fetch(
-    `${API_BASE}/api/dashboard/profile?session_token=${encodeURIComponent(token)}`
-  );
+  const res = await fetch(`${API_BASE}/api/dashboard/profile`, {
+    headers: sessionHeaders(token),
+  });
   if (!res.ok) throw new Error("Failed to load profile");
   return res.json();
 }
 
 export async function getApplications(token: string) {
-  const res = await fetch(
-    `${API_BASE}/api/dashboard/applications?session_token=${encodeURIComponent(token)}`
-  );
+  const res = await fetch(`${API_BASE}/api/dashboard/applications`, {
+    headers: sessionHeaders(token),
+  });
   if (!res.ok) throw new Error("Failed to load applications");
   return res.json() as Promise<LoanApplication[]>;
 }
 
 export async function getApplicationDetail(token: string, appId: number) {
-  const res = await fetch(
-    `${API_BASE}/api/dashboard/applications/${appId}?session_token=${encodeURIComponent(token)}`
-  );
+  const res = await fetch(`${API_BASE}/api/dashboard/applications/${appId}`, {
+    headers: sessionHeaders(token),
+  });
   if (!res.ok) throw new Error("Failed to load application");
   return res.json();
 }
 
 export async function trackApplication(ref: string, mobile: string) {
-  const res = await fetch(
-    `${API_BASE}/api/dashboard/track/${encodeURIComponent(ref)}?mobile=${mobile}`
-  );
+  const res = await fetch(`${API_BASE}/api/dashboard/track`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ application_ref: ref, mobile }),
+  });
   if (!res.ok) throw new Error((await res.json()).detail || "Not found");
   return res.json();
 }
 
 export async function getEmiSchedule(token: string, appId: number) {
-  const res = await fetch(
-    `${API_BASE}/api/dashboard/applications/${appId}/emi-schedule?session_token=${encodeURIComponent(token)}`
-  );
+  const res = await fetch(`${API_BASE}/api/dashboard/applications/${appId}/emi-schedule`, {
+    headers: sessionHeaders(token),
+  });
   if (!res.ok) throw new Error("Failed to load EMI schedule");
   return res.json();
 }

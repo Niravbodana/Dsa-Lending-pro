@@ -1,5 +1,4 @@
 import hashlib
-import random
 import secrets
 from datetime import datetime, timedelta, timezone
 
@@ -9,6 +8,7 @@ from app.config import settings
 from app.models import Lead, OtpSession, UserSession
 
 SESSION_HOURS = 24
+MAX_OTP_VERIFY_ATTEMPTS = 5
 
 
 def _hash_otp(otp: str) -> str:
@@ -16,7 +16,7 @@ def _hash_otp(otp: str) -> str:
 
 
 def generate_otp() -> str:
-    return f"{random.randint(0, 999999):06d}"
+    return f"{secrets.randbelow(1_000_000):06d}"
 
 
 def create_session_token(db: Session, mobile: str) -> str:
@@ -58,24 +58,11 @@ def send_otp(db: Session, mobile: str) -> tuple[str | None, int]:
     )
     db.commit()
 
-    dev_otp = otp if settings.mock_otp else None
+    dev_otp = otp if settings.mock_otp and not settings.is_production else None
     return dev_otp, settings.otp_expiry_seconds
 
 
 def verify_otp(db: Session, mobile: str, otp: str) -> bool:
-    if settings.mock_otp and otp.isdigit() and len(otp) == 6:
-        session = (
-            db.query(OtpSession)
-            .filter(OtpSession.mobile == mobile)
-            .order_by(OtpSession.created_at.desc())
-            .first()
-        )
-        if session:
-            session.verified = True
-            db.commit()
-        _ensure_lead(db, mobile)
-        return True
-
     session = (
         db.query(OtpSession)
         .filter(OtpSession.mobile == mobile, OtpSession.verified.is_(False))
@@ -92,6 +79,7 @@ def verify_otp(db: Session, mobile: str, otp: str) -> bool:
 
     if now > expires:
         return False
+
     if session.otp_hash != _hash_otp(otp):
         return False
 

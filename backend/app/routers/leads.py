@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.deps.session import get_session_token
 from app.models import ApplicationLog, Lead, LoanApplication
 from app.schemas import (
     EligibilityRequest,
@@ -119,7 +120,10 @@ def check_lead_eligibility(payload: EligibilityRequest, db: Session = Depends(ge
 
 
 @router.get("/offers", response_model=OffersResponse)
-def get_offers(session_token: str, db: Session = Depends(get_db)):
+def get_offers(
+    session_token: str = Depends(get_session_token),
+    db: Session = Depends(get_db),
+):
     mobile = _auth(db, session_token)
     lead = get_lead_by_mobile(db, mobile)
     if not lead or not lead.monthly_income:
