@@ -21,7 +21,7 @@ export function AdvancedSiteBuilder({ token }: { token: string }) {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      text: "🧠 **Site Builder Brain** ready!\n\nMain aapke liye website edit kar sakta hoon — photo, theme, headline, background. Pehle **preview** dikhaunga, pasand aaye to **Publish** karo.\n\nTry: `search photo wedding` | `change theme glass blue` | `set roi to 9.99%`",
+      text: "🧠 **Site Builder Brain** ready!\n\nAb aap **natural prompt** se edit kar sakte ho — jaise mujhse bolte ho:\n\n• \"wedding couple photo lagao aur glass blue theme karo\"\n• \"headline me Dream Big likho, roi 9.99% kar do\"\n• \"button text Apply Abhi karo\"\n\nPehle **preview**, phir **Publish**.",
     },
   ]);
   const [input, setInput] = useState("");
@@ -33,6 +33,8 @@ export function AdvancedSiteBuilder({ token }: { token: string }) {
     "set roi to 9.99%",
   ]);
   const [hasDraft, setHasDraft] = useState(false);
+  const [aiMode, setAiMode] = useState<string>("smart");
+  const [llmEnabled, setLlmEnabled] = useState(false);
   const [previewKey, setPreviewKey] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
   const previewUrl = `/preview?token=${encodeURIComponent(token)}`;
@@ -51,7 +53,11 @@ export function AdvancedSiteBuilder({ token }: { token: string }) {
     setMessages((m) => [...m, { role: "user", text }]);
     setLoading(true);
     try {
-      const res = await cmsAdminChat(token, text, SESSION_ID);
+      const history = messages.slice(-10).map((m) => ({
+        role: m.role,
+        content: m.text,
+      }));
+      const res = await cmsAdminChat(token, text, SESSION_ID, history);
       setMessages((m) => [
         ...m,
         {
@@ -63,6 +69,8 @@ export function AdvancedSiteBuilder({ token }: { token: string }) {
       ]);
       setSuggestions(res.suggestions || []);
       setHasDraft(res.has_draft_changes);
+      setAiMode(res.ai_mode || "smart");
+      setLlmEnabled(Boolean(res.llm_enabled));
       if (res.changes.length > 0 || res.published) refreshPreview();
     } catch {
       setMessages((m) => [
@@ -128,7 +136,18 @@ export function AdvancedSiteBuilder({ token }: { token: string }) {
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl glass-panel px-5 py-4">
         <div>
           <p className="text-lg font-black text-slate-900">🧠 Site Builder Brain</p>
-          <p className="text-xs text-slate-500">Preview → Publish workflow · Canva-style edits</p>
+          <p className="text-xs text-slate-500">
+            Prompt se edit · Preview → Publish
+            {llmEnabled ? (
+              <span className="ml-2 rounded-full bg-violet-100 px-2 py-0.5 font-bold text-violet-700">
+                AI Prompt ON
+              </span>
+            ) : (
+              <span className="ml-2 rounded-full bg-teal-100 px-2 py-0.5 font-bold text-teal-700">
+                Smart Prompt
+              </span>
+            )}
+          </p>
         </div>
         <div className="flex flex-wrap gap-2">
           {hasDraft && (
@@ -166,8 +185,10 @@ export function AdvancedSiteBuilder({ token }: { token: string }) {
         {/* Chat */}
         <div className="flex flex-col overflow-hidden rounded-2xl glass-panel">
           <div className="border-b border-white/60 bg-gradient-to-r from-slate-900 to-teal-900 px-5 py-3 text-white">
-            <p className="font-bold">AI Chat — bolo kya change karna hai</p>
-            <p className="text-xs text-teal-200">English / Hinglish · photo search · theme · text</p>
+            <p className="font-bold">AI Prompt Chat — jaise Cursor/ChatGPT ko bolte ho</p>
+            <p className="text-xs text-teal-200">
+              English / Hinglish · multi-edit ek message mein · mode: {aiMode}
+            </p>
           </div>
 
           <div className="flex-1 space-y-3 overflow-y-auto p-4" style={{ minHeight: 360, maxHeight: 480 }}>
@@ -218,7 +239,7 @@ export function AdvancedSiteBuilder({ token }: { token: string }) {
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder='e.g. "search photo wedding" / "theme glass blue" / paste image URL'
+                placeholder='e.g. "wedding photo lagao aur roi 9.99% kar do, glass blue theme"'
                 className="flex-1 rounded-xl border border-slate-200/80 bg-white/70 px-4 py-3 text-sm outline-none backdrop-blur focus:border-teal-500"
                 disabled={loading}
               />
@@ -277,12 +298,12 @@ export function AdvancedSiteBuilder({ token }: { token: string }) {
           <p className="font-bold text-slate-900">🎨 Quick edits (Canva-style)</p>
           <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
             {[
-              "change theme to glass blue",
-              "change photo to wedding",
+              "wedding photo lagao aur glass blue theme karo",
+              "headline Dream Big. Borrow Smart. karo",
+              "roi 9.99% kar do aur button Apply Abhi",
               "search photo indian couple",
-              "change button text to Apply Abhi",
-              "show testimonials section",
-              "set roi to 9.99%",
+              "premium look chahiye wedding feel ke saath",
+              "urgency bar dikhao: 500 log ne aaj apply kiya",
             ].map((cmd) => (
               <button
                 key={cmd}

@@ -26,6 +26,11 @@ class Settings(BaseSettings):
     partner_icici_api_key: str | None = None
     partner_bajaj_api_url: str | None = None
     partner_bajaj_api_key: str | None = None
+    # Site Builder AI — set OPENAI_API_KEY for full LLM prompt editing
+    openai_api_key: str | None = None
+    openai_base_url: str = "https://api.openai.com/v1"
+    cms_llm_model: str = "gpt-4o-mini"
+    cms_llm_enabled: bool = True
 
     @property
     def is_production(self) -> bool:

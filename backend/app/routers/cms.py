@@ -8,6 +8,7 @@ from app.models import SiteConfig
 from app.routers.admin import verify_admin
 from app.schemas_cms import CmsChatRequest, CmsChatResponse, SiteConfigResponse
 from app.services.cms_brain import generate_suggestions, process_brain_command
+from app.services.cms_llm import is_llm_available
 from app.services.cms_store import (
     CONFIG_ROW_ID,
     DRAFT_ROW_ID,
@@ -64,8 +65,9 @@ def admin_cms_chat(
     _: None = Depends(verify_admin),
 ):
     current = get_draft_config(db)
-    updated, reply, changes, suggestions, image_options = process_brain_command(
-        payload.message, current, session_id=payload.session_id
+    history = [{"role": h.role, "content": h.content} for h in payload.history]
+    updated, reply, changes, suggestions, image_options, ai_mode = process_brain_command(
+        payload.message, current, session_id=payload.session_id, history=history
     )
 
     published = False
@@ -94,6 +96,8 @@ def admin_cms_chat(
         image_options=image_options,
         has_draft_changes=has_unpublished_changes(db),
         published=published,
+        ai_mode=ai_mode,
+        llm_enabled=is_llm_available(),
     )
 
 

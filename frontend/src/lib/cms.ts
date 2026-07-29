@@ -164,14 +164,19 @@ function mergeConfig(raw: Partial<SiteConfig>): SiteConfig {
   };
 }
 
-export async function cmsAdminChat(token: string, message: string, sessionId = "default") {
+export async function cmsAdminChat(
+  token: string,
+  message: string,
+  sessionId = "default",
+  history: { role: "user" | "assistant"; content: string }[] = [],
+) {
   const res = await fetch(`${API_BASE}/api/cms/admin/chat`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ message, session_id: sessionId }),
+    body: JSON.stringify({ message, session_id: sessionId, history }),
   });
   if (!res.ok) throw new Error("CMS command failed");
   return res.json() as Promise<{
@@ -182,6 +187,8 @@ export async function cmsAdminChat(token: string, message: string, sessionId = "
     image_options: { url: string; label: string }[];
     has_draft_changes: boolean;
     published: boolean;
+    ai_mode: string;
+    llm_enabled: boolean;
   }>;
 }
 
