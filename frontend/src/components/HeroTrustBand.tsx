@@ -43,7 +43,7 @@ const FEATURES = [
 /** Reference: partners → stats card → bottom feature strip */
 export function HeroTrustBand() {
   return (
-    <section className="bg-white">
+    <section className="glass-strip">
       <div className="mx-auto max-w-7xl px-4 pb-6 pt-4">
         <p className="text-center text-sm font-medium text-slate-500">Trusted by 50,000+ customers</p>
 
@@ -61,7 +61,7 @@ export function HeroTrustBand() {
           </Link>
         </div>
 
-        <div className="mx-auto mt-8 max-w-6xl rounded-2xl border border-slate-100 bg-white px-4 py-8 shadow-[0_18px_48px_-24px_rgba(11,18,32,0.15)] md:px-8">
+        <div className="glass-panel mx-auto mt-8 max-w-6xl px-4 py-8 md:px-8">
           <div className="grid grid-cols-2 gap-6 md:grid-cols-5">
             {STATS.map((s) => (
               <div key={s.label} className="text-center">
@@ -81,7 +81,7 @@ export function HeroTrustBand() {
         </div>
       </div>
 
-      <div className="border-t border-slate-200 bg-slate-50">
+      <div className="glass-strip border-t-0">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-6 gap-y-2 px-4 py-4 text-xs font-semibold text-slate-600 md:gap-x-0 md:text-sm">
           {FEATURES.map((f, i) => (
             <span key={f.label} className="flex items-center gap-2 md:px-8">

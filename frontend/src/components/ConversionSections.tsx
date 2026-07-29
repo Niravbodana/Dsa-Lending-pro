@@ -12,7 +12,7 @@ export function DreamSection({ config }: { config: SiteConfig }) {
   if (!d.cards?.length) return null;
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white py-24">
+    <section className="relative overflow-hidden bg-gradient-to-b from-transparent to-white/30 py-24">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(13,148,136,0.08),transparent_50%)]" />
       <div className="relative mx-auto max-w-7xl px-4">
         <ScrollReveal variant="up" className="mx-auto max-w-3xl text-center">
@@ -28,7 +28,7 @@ export function DreamSection({ config }: { config: SiteConfig }) {
             <ScrollRevealAlternate key={card.title} index={i} delay={i * 100}>
               <Link
                 href="/apply"
-                className="group block overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-slate-100 transition hover:-translate-y-2 hover:shadow-2xl"
+                className="group block overflow-hidden glass-panel transition hover:-translate-y-2 hover:shadow-2xl"
               >
                 <div className="relative h-56 overflow-hidden">
                   <Image

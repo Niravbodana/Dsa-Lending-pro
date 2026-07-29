@@ -239,7 +239,7 @@ export function LifestyleShowcase() {
 
 export function LoanProductsStrip() {
   return (
-    <section className="bg-slate-50 py-20">
+    <section className="py-20">
       <div className="mx-auto max-w-7xl px-4">
         <ScrollReveal variant="up" className="text-center">
           <span className="rounded-full bg-teal-100 px-4 py-1 text-sm font-bold text-teal-700">
@@ -254,7 +254,7 @@ export function LoanProductsStrip() {
             <ScrollRevealAlternate key={c.title} index={i} delay={i * 100}>
               <Link
                 href={c.href}
-                className="group block overflow-hidden rounded-3xl bg-white shadow-lg transition hover:-translate-y-2 hover:shadow-2xl"
+                className="group block overflow-hidden rounded-3xl glass-panel transition hover:-translate-y-2 hover:shadow-2xl"
               >
                 <div className="relative h-44 overflow-hidden">
                   <Image
@@ -385,7 +385,7 @@ export function HowItWorks() {
   ];
 
   return (
-    <section id="how-it-works" className="bg-white py-24">
+    <section id="how-it-works" className="py-24">
       <div className="mx-auto max-w-7xl px-4">
         <ScrollReveal variant="up" className="text-center">
           <span className="rounded-full bg-teal-50 px-4 py-1 text-sm font-bold text-teal-600">SIMPLE PROCESS</span>

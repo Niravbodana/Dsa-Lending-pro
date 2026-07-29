@@ -12,7 +12,7 @@ export function PageShell({
   showWidgets?: boolean;
 }) {
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="premium-site-bg min-h-screen">
       <Header />
       {children}
       <Footer />

@@ -26,7 +26,7 @@ export function DynamicHero({ config }: Props) {
         sizes="100vw"
         className="object-cover object-[70%_center] sm:object-[center_right]"
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-white from-[32%] via-white/88 via-[48%] to-white/10 lg:from-[38%] lg:via-white/75 lg:to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-sky-50/95 from-[32%] via-white/85 via-[48%] to-white/15 lg:from-sky-50/90 lg:from-[38%] lg:via-white/70 lg:to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-t from-white/20 via-transparent to-transparent lg:hidden" />
 
       <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-8 px-4 py-10 lg:grid-cols-[1fr_0.85fr] lg:gap-10 lg:py-16">

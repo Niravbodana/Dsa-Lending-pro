@@ -18,7 +18,7 @@ export function HeroRoiCard({
 }: Props) {
   return (
     <div className={`w-[220px] ${className}`}>
-      <div className="rounded-2xl border border-white/80 bg-white/95 p-4 shadow-[0_20px_48px_-12px_rgba(0,0,0,0.22)] backdrop-blur-md">
+      <div className="glass-panel w-[220px] rounded-2xl p-4">
         <div
           className="mb-2.5 flex h-9 w-9 items-center justify-center rounded-xl"
           style={{ backgroundColor: REF.tealLight, color: REF.teal }}

@@ -28,10 +28,10 @@ export function Header() {
   }, [pathname]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-2.5 lg:gap-3 lg:py-3">
+    <header className="glass-header sticky top-0 z-50">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-2 lg:gap-3 lg:py-2.5">
         <Link href="/" onClick={goHome} aria-label="NeerCred — Go to homepage" className="shrink-0">
-          <NeerCredLogo className="h-[3.75rem] w-auto sm:h-[4.5rem]" />
+          <NeerCredLogo className="h-[4rem] sm:h-[4.5rem]" />
         </Link>
 
         <nav className="hidden items-center xl:flex" aria-label="Main navigation">
@@ -53,7 +53,7 @@ export function Header() {
         <div className="flex items-center gap-2">
           <Link
             href="/app"
-            className="hidden items-center gap-1.5 rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-400 md:inline-flex"
+            className="hidden items-center gap-1.5 rounded-full border border-white/70 bg-white/45 px-4 py-2 text-sm font-semibold text-slate-700 backdrop-blur-md transition hover:bg-white/65 md:inline-flex"
           >
             <IconSmartphone size={16} />
             Download App
@@ -77,7 +77,7 @@ export function Header() {
       </div>
 
       {menuOpen && (
-        <nav className="border-t border-slate-100 bg-white px-4 py-4 xl:hidden" aria-label="Mobile navigation">
+        <nav className="glass-panel border-t-0 border-x-0 !rounded-none px-4 py-4 xl:hidden" aria-label="Mobile navigation">
           <div className="flex flex-col gap-1">
             <Link href="/" onClick={goHome} className="rounded-lg px-3 py-2.5 text-sm font-semibold" style={{ color: REF.teal }}>
               Home

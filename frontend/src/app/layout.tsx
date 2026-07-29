@@ -32,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${poppins.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${poppins.variable} premium-site-bg antialiased`}>
         {children}
         <CookieConsent />
       </body>

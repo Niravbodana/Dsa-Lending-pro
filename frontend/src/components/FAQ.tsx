@@ -34,7 +34,7 @@ export function FAQ() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section id="faq" className="bg-slate-50 py-24">
+    <section id="faq" className="py-24">
       <div className="mx-auto max-w-3xl px-4">
         <ScrollReveal variant="up" className="text-center">
           <h2 className="text-4xl font-black text-slate-900">
@@ -45,7 +45,7 @@ export function FAQ() {
         <div className="mt-12 space-y-3">
           {faqs.map((faq, i) => (
             <ScrollRevealAlternate key={faq.q} index={i} delay={i * 60}>
-              <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+              <div className="glass-panel overflow-hidden">
                 <button
                   type="button"
                   onClick={() => setOpen(open === i ? null : i)}
