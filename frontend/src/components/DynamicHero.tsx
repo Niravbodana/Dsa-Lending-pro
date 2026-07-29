@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { HeroRoiCard } from "@/components/HeroPhotoCarousel";
 import { IconBolt, IconCheckCircle, IconClock, IconShield } from "@/components/icons";
@@ -17,14 +18,16 @@ export function DynamicHero({ config }: Props) {
 
   return (
     <section className="relative min-h-[540px] overflow-hidden lg:min-h-[600px]">
-      <div
-        className="absolute inset-0 bg-cover bg-[70%_center] bg-no-repeat sm:bg-[center_right]"
-        style={{ backgroundImage: `url('${HERO_IMAGE.src}')` }}
-        role="img"
-        aria-label={HERO_IMAGE.alt}
+      <Image
+        src={HERO_IMAGE.src}
+        alt={HERO_IMAGE.alt}
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover object-[70%_center] sm:object-[center_right]"
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-white from-[38%] via-white/92 via-[52%] to-white/25 lg:from-[42%] lg:via-white/80 lg:to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-t from-white/30 via-transparent to-white/20 lg:hidden" />
+      <div className="absolute inset-0 bg-gradient-to-r from-white from-[32%] via-white/88 via-[48%] to-white/10 lg:from-[38%] lg:via-white/75 lg:to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-white/20 via-transparent to-transparent lg:hidden" />
 
       <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-8 px-4 py-10 lg:grid-cols-[1fr_0.85fr] lg:gap-10 lg:py-16">
         <div>

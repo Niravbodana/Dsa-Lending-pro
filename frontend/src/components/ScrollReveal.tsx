@@ -19,10 +19,18 @@ export function ScrollReveal({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
+  const [animate, setAnimate] = useState(false);
 
   useEffect(() => {
+    setAnimate(true);
     const el = ref.current;
     if (!el) return;
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) {
+      setVisible(true);
+      return;
+    }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -31,11 +39,18 @@ export function ScrollReveal({
           observer.unobserve(el);
         }
       },
-      { threshold: 0.08, rootMargin: "0px 0px -8% 0px" }
+      { threshold: 0.05, rootMargin: "0px 0px 10% 0px" }
     );
 
     observer.observe(el);
-    return () => observer.disconnect();
+
+    // Fallback — never leave photos hidden if IntersectionObserver fails to fire
+    const fallback = window.setTimeout(() => setVisible(true), 1500);
+
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(fallback);
+    };
   }, []);
 
   const variantClass = {
@@ -49,7 +64,7 @@ export function ScrollReveal({
   return (
     <div
       ref={ref}
-      className={`reveal ${variantClass} ${visible ? "reveal-visible" : ""} ${className}`}
+      className={`reveal ${animate ? "reveal-animate" : ""} ${variantClass} ${visible ? "reveal-visible" : ""} ${className}`}
       style={{ transitionDelay: `${delay}ms`, transitionDuration: `${duration}ms` }}
     >
       {children}

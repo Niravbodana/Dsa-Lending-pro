@@ -10,9 +10,12 @@ ALLOWED_IMAGE_HOSTS = frozenset(
 
 
 def is_safe_https_image_url(url: str) -> bool:
-    """Allow only HTTPS image URLs from an approved host list."""
+    """Allow HTTPS image URLs from approved hosts, or local /images/ paths."""
+    cleaned = url.strip()
+    if cleaned.startswith("/images/"):
+        return True
     try:
-        parsed = urlparse(url.strip())
+        parsed = urlparse(cleaned)
     except ValueError:
         return False
     if parsed.scheme != "https":

@@ -11,14 +11,14 @@ from app.services.cms_store import deep_merge, get_default_config
 from app.services.url_safety import is_safe_https_image_url
 
 PRESET_IMAGES = {
-    "wedding": "https://images.unsplash.com/photo-1519741497674-611481863552?w=600&h=750&fit=crop",
-    "home": "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&h=750&fit=crop",
-    "business": "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=600&h=750&fit=crop",
-    "medical": "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&h=750&fit=crop",
-    "travel": "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&h=750&fit=crop",
-    "family": "https://images.unsplash.com/photo-1511895426328-dc8714191300?w=600&h=750&fit=crop",
-    "professional": "https://images.unsplash.com/photo-1463335361701-e90f4c5045d0?w=600&h=750&fit=crop&crop=faces",
-    "happy": "https://images.unsplash.com/photo-1511763508683-99dc7949e97f?w=600&h=750&fit=crop",
+    "wedding": "/images/site/1519741497674-611481863552-600x400.jpg",
+    "home": "/images/site/1560518883-ce09059eeffa-600x400.jpg",
+    "business": "/images/site/1551836022-d5d88e9218df-600x400.jpg",
+    "medical": "/images/site/1576091160550-2173dba999ef-600x400.jpg",
+    "travel": "/images/site/1488646953014-85cb44e25828-600x400.jpg",
+    "family": "/images/site/1511895426328-dc8714191300-900x600.jpg",
+    "professional": "/images/site/1463335361701-e90f4c5045d0-600x750.jpg",
+    "happy": "/images/site/1511763508683-99dc7949e97f-900x600.jpg",
 }
 
 HELP_TEXT = """**Site Builder Commands** (type in English or Hinglish):
