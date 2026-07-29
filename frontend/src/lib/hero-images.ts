@@ -1,6 +1,6 @@
 /** Single homepage hero image — Indian couple planning loan on tablet */
 export const HERO_IMAGE = {
-  src: "/hero-couple.jpg",
+  src: "/hero-indian-portrait.jpg",
   alt: "Indian couple in traditional attire checking loan offers on tablet at home",
 };
 
