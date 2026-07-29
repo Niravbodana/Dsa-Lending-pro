@@ -1,0 +1,31 @@
+<svg width="400" height="72" viewBox="0 0 400 72" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="NeerCred">
+  <defs>
+    <linearGradient id="hl-blue" x1="6" y1="6" x2="54" y2="54" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7DD3FC"/><stop offset="0.45" stop-color="#3B82F6"/><stop offset="1" stop-color="#1E40AF"/>
+    </linearGradient>
+    <linearGradient id="hl-gold" x1="34" y1="10" x2="58" y2="52" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FEF9C3"/><stop offset="0.4" stop-color="#F5D76E"/><stop offset="1" stop-color="#B45309"/>
+    </linearGradient>
+    <linearGradient id="hl-ring-b" x1="0" y1="30" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38BDF8"/><stop offset="1" stop-color="#1D4ED8"/>
+    </linearGradient>
+    <linearGradient id="hl-ring-g" x1="30" y1="30" x2="60" y2="30" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FDE68A"/><stop offset="1" stop-color="#CA8A04"/>
+    </linearGradient>
+    <linearGradient id="hl-cred" x1="72" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5EEAD4"/><stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(4, 6)">
+    <path d="M30 8 A22 22 0 0 0 30 52" stroke="url(#hl-ring-b)" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+    <path d="M30 8 A22 22 0 0 1 30 52" stroke="url(#hl-ring-g)" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+    <path d="M21 18 L21 42" stroke="url(#hl-blue)" stroke-width="5.5" stroke-linecap="round"/>
+    <path d="M21 18 L39 42" stroke="url(#hl-blue)" stroke-width="5.5" stroke-linecap="round"/>
+    <path d="M39 18 L39 42" stroke="url(#hl-gold)" stroke-width="5.5" stroke-linecap="round"/>
+    <path d="M30 5 L31.6 9.2 L36 9.2 L32.5 12 L33.8 16.2 L30 13.6 L26.2 16.2 L27.5 12 L24 9.2 L28.4 9.2 Z" fill="url(#hl-gold)"/>
+    <text x="68" y="36" dominant-baseline="middle" font-family="Poppins, system-ui, sans-serif" font-size="34" font-weight="800" letter-spacing="-0.5">
+      <tspan fill="#FFFFFF">Neer</tspan><tspan fill="url(#hl-cred)">Cred</tspan>
+    </text>
+  </g>
+  <text x="72" y="62" font-family="Poppins, system-ui, sans-serif" font-size="9" font-weight="700" fill="#E8C547" letter-spacing="3.6">DREAM BIG. BORROW SMART.</text>
+</svg>

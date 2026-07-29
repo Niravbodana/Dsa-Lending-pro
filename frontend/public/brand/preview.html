@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NeerCred Logo Kit Preview</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #f1f5f9; padding: 32px; }
+    h1 { font-size: 1.5rem; margin-bottom: 8px; color: #0b1220; }
+    p { color: #64748b; margin-bottom: 32px; font-size: 14px; }
+    .grid { display: grid; gap: 24px; max-width: 900px; }
+    .card { border-radius: 16px; padding: 32px; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+    .card.light { background: #fff; border: 1px solid #e2e8f0; }
+    .card.dark { background: #0b1220; }
+    .card.checker { background: repeating-conic-gradient(#e2e8f0 0% 25%, #fff 0% 50%) 50% / 20px 20px; }
+    .label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.6; }
+    .light .label { color: #64748b; }
+    .dark .label { color: #94a3b8; }
+    .checker .label { color: #64748b; }
+    img { max-width: 100%; height: auto; }
+    .wide img { width: 100%; max-width: 560px; }
+  </style>
+</head>
+<body>
+  <h1>NeerCred Logo Kit</h1>
+  <p>Transparent SVG — scales to any size. Checkerboard shows transparency.</p>
+  <div class="grid">
+    <div class="card checker">
+      <span class="label">Horizontal (header)</span>
+      <img src="neercred-horizontal.svg" alt="Horizontal" height="72" />
+    </div>
+    <div class="card checker wide">
+      <span class="label">Wide banner</span>
+      <img src="neercred-wide.svg" alt="Wide" />
+    </div>
+    <div class="card light">
+      <span class="label">Stacked</span>
+      <img src="neercred-stacked.svg" alt="Stacked" height="160" />
+    </div>
+    <div class="card light">
+      <span class="label">Wordmark only</span>
+      <img src="neercred-wordmark.svg" alt="Wordmark" height="56" />
+    </div>
+    <div class="card checker">
+      <span class="label">Icon only</span>
+      <img src="neercred-icon.svg" alt="Icon" height="80" />
+    </div>
+    <div class="card dark">
+      <span class="label">Horizontal light (dark bg)</span>
+      <img src="neercred-horizontal-light.svg" alt="Horizontal light" height="72" />
+    </div>
+    <div class="card dark">
+      <span class="label">Wordmark light</span>
+      <img src="neercred-wordmark-light.svg" alt="Wordmark light" height="56" />
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,11 @@
+<svg width="360" height="64" viewBox="0 0 360 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="NeerCred">
+  <defs>
+    <linearGradient id="w-cred" x1="0" y1="0" x2="280" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F766E"/><stop offset="0.5" stop-color="#14B8A6"/><stop offset="1" stop-color="#2DD4BF"/>
+    </linearGradient>
+  </defs>
+  <text x="0" y="36" font-family="Poppins, system-ui, sans-serif" font-size="42" font-weight="800" letter-spacing="-0.6">
+    <tspan fill="#0B1220">Neer</tspan><tspan fill="url(#w-cred)">Cred</tspan>
+  </text>
+  <text x="0" y="56" font-family="Poppins, system-ui, sans-serif" font-size="9.5" font-weight="700" fill="#0B1220" letter-spacing="4" opacity="0.88">DREAM BIG. BORROW SMART.</text>
+</svg>
