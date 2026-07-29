@@ -112,4 +112,7 @@ body {
     transform: none;
     transition: none;
   }
+  .hero-review-track {
+    animation: none;
+  }
 }
