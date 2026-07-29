@@ -201,4 +201,6 @@ DEFAULT_SITE_CONFIG: dict = {
             {"title": "Business", "rate": "12.49%", "image": "/images/site/1551836022-d5d88e9218df-600x400.jpg"},
         ],
     },
+    "element_styles": {},
+    "custom_blocks": [],
 }

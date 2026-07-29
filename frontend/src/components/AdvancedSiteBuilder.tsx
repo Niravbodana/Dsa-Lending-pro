@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { CanvaSiteEditor } from "@/components/visual-editor/CanvaSiteEditor";
 import {
   cmsAdminChat,
   cmsAdminDiscard,
@@ -36,6 +37,7 @@ export function AdvancedSiteBuilder({ token }: { token: string }) {
   const [aiMode, setAiMode] = useState<string>("smart");
   const [llmEnabled, setLlmEnabled] = useState(false);
   const [previewKey, setPreviewKey] = useState(0);
+  const [visualOpen, setVisualOpen] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const previewUrl = `/preview?token=${encodeURIComponent(token)}`;
 
@@ -132,6 +134,7 @@ export function AdvancedSiteBuilder({ token }: { token: string }) {
 
   return (
     <div className="space-y-4">
+      {visualOpen && <CanvaSiteEditor token={token} onClose={() => setVisualOpen(false)} />}
       {/* Toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl glass-panel px-5 py-4">
         <div>
@@ -156,6 +159,13 @@ export function AdvancedSiteBuilder({ token }: { token: string }) {
               Unpublished changes
             </span>
           )}
+          <button
+            type="button"
+            onClick={() => setVisualOpen(true)}
+            className="rounded-xl bg-violet-600 px-5 py-2 text-sm font-bold text-white shadow-lg hover:bg-violet-500"
+          >
+            ✏️ Visual Edit (Canva)
+          </button>
           <button
             type="button"
             onClick={() => void handleDiscard()}

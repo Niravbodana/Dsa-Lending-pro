@@ -15,6 +15,31 @@ export type TestimonialItem = {
 
 export type FaqItem = { q: string; a: string };
 
+export type CustomBlock = {
+  id: string;
+  text: string;
+  left: number;
+  top: number;
+  fontSize: string;
+  color: string;
+  fontWeight?: string;
+  backgroundColor?: string;
+};
+
+export type ElementStyles = Record<
+  string,
+  {
+    color?: string;
+    fontSize?: string;
+    fontWeight?: string;
+    backgroundColor?: string;
+    textAlign?: "left" | "center" | "right";
+    left?: number;
+    top?: number;
+    zIndex?: number;
+  }
+>;
+
 export type SiteConfig = {
   hero: {
     badge: string;
@@ -84,6 +109,8 @@ export type SiteConfig = {
     hero_background?: string;
   };
   sections: Record<string, boolean>;
+  element_styles?: ElementStyles;
+  custom_blocks?: CustomBlock[];
 };
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -284,6 +311,8 @@ export const FALLBACK_CONFIG: SiteConfig = {
     how_it_works: true,
     loan_products: true,
   },
+  element_styles: {},
+  custom_blocks: [],
 };
 
 export async function fetchSiteConfig(): Promise<SiteConfig> {
@@ -343,7 +372,22 @@ function mergeConfig(raw: Partial<SiteConfig>): SiteConfig {
     promo_strip: { ...FALLBACK_CONFIG.promo_strip, ...raw?.promo_strip },
     social_proof: { ...FALLBACK_CONFIG.social_proof, ...raw?.social_proof },
     sections: { ...FALLBACK_CONFIG.sections, ...raw?.sections },
+    element_styles: { ...FALLBACK_CONFIG.element_styles, ...raw?.element_styles },
+    custom_blocks: raw?.custom_blocks?.length ? raw.custom_blocks : FALLBACK_CONFIG.custom_blocks,
   };
+}
+
+export async function cmsAdminSaveDraft(token: string, config: SiteConfig) {
+  const res = await fetch(`${API_BASE}/api/cms/admin/draft`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ config }),
+  });
+  if (!res.ok) throw new Error("Save draft failed");
+  return res.json();
 }
 
 export async function cmsAdminChat(

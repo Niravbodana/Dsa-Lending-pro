@@ -15,6 +15,7 @@ import {
 } from "@/components/icons";
 import type { SiteConfig } from "@/lib/cms";
 import { REF } from "@/lib/reference-theme";
+import { EditableText } from "@/components/visual-editor/Editable";
 
 const PARTNERS = [
   { name: "HDFC Bank", logo: "HDFC" },
@@ -39,7 +40,9 @@ export function HeroTrustBand({ config }: { config: SiteConfig }) {
   return (
     <section className="glass-strip">
       <div className="mx-auto max-w-7xl px-4 pb-6 pt-4">
-        <p className="text-center text-sm font-medium text-slate-500">{tagline}</p>
+        <p className="text-center text-sm font-medium text-slate-500">
+          <EditableText path="trust_band.tagline">{tagline}</EditableText>
+        </p>
 
         <div className="mt-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 md:gap-x-8">
           {PARTNERS.map((p) => (

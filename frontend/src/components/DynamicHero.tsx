@@ -1,12 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { HeroRoiCard } from "@/components/HeroPhotoCarousel";
 import { IconBolt, IconCheckCircle, IconClock, IconShield } from "@/components/icons";
 import { HERO_IMAGE, REFERENCE_HERO } from "@/lib/hero-images";
 import { REF } from "@/lib/reference-theme";
 import type { SiteConfig } from "@/lib/cms";
+import { EditableText } from "@/components/visual-editor/Editable";
+import { useVisualEditor } from "@/lib/visual-editor/VisualEditorContext";
 
 const ICONS = { bolt: IconBolt, shield: IconShield, clock: IconClock };
 
@@ -26,6 +27,7 @@ function isRemote(src: string): boolean {
 
 export function DynamicHero({ config, heroOverlay }: Props) {
   const h = config.hero;
+  const ctx = useVisualEditor();
   const src = heroSrc(h.image_url || config.theme?.hero_background);
   const remote = isRemote(src);
 
@@ -45,7 +47,10 @@ export function DynamicHero({ config, heroOverlay }: Props) {
     : REFERENCE_HERO.features;
 
   return (
-    <section className="relative min-h-[540px] overflow-hidden lg:min-h-[600px]">
+    <section
+      className="relative min-h-[540px] overflow-hidden lg:min-h-[600px]"
+      onClick={() => ctx?.active && ctx.select("hero.image_url")}
+    >
       {remote ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={src} alt={HERO_IMAGE.alt} className="absolute inset-0 h-full w-full object-cover object-[70%_center] sm:object-[center_right]" />
@@ -74,23 +79,40 @@ export function DynamicHero({ config, heroOverlay }: Props) {
             style={{ borderColor: `${REF.teal}55`, backgroundColor: REF.tealLight, color: REF.tealDark }}
           >
             <IconCheckCircle size={14} style={{ color: REF.teal }} />
-            {badge}
+            <EditableText path="hero.badge" draggable>
+              {badge}
+            </EditableText>
           </div>
 
           <h1 className="mt-6 text-[2.4rem] font-extrabold leading-[1.1] tracking-tight md:text-[2.85rem] lg:text-[3.35rem]">
-            <span style={{ color: REF.navy }}>{headline1} </span>
-            <span style={{ color: REF.teal }}>{headlineHi}</span>
+            <EditableText path="hero.headline_line1" as="span" style={{ color: REF.navy }} draggable>
+              {headline1}{" "}
+            </EditableText>
+            <EditableText path="hero.headline_highlight" as="span" style={{ color: REF.teal }} draggable>
+              {headlineHi}
+            </EditableText>
           </h1>
 
-          {headlineSub && (
-            <p className="mt-3 text-lg font-bold md:text-xl" style={{ color: REF.navy }}>
+          {(headlineSub || ctx?.active) && (
+            <EditableText
+              path="hero.headline_sub"
+              as="p"
+              className="mt-3 text-lg font-bold md:text-xl"
+              style={{ color: REF.navy }}
+              draggable
+            >
               {headlineSub}
-            </p>
+            </EditableText>
           )}
 
-          <p className="mt-5 max-w-lg text-[15px] leading-relaxed md:text-base" style={{ color: REF.textMuted }}>
+          <EditableText
+            path="hero.description"
+            as="p"
+            className="mt-5 max-w-lg text-[15px] leading-relaxed md:text-base"
+            style={{ color: REF.textMuted }}
+          >
             {description}
-          </p>
+          </EditableText>
 
           <ul className="mt-7 space-y-3.5">
             {features.map((feature) => {
@@ -110,17 +132,15 @@ export function DynamicHero({ config, heroOverlay }: Props) {
           </ul>
 
           <div className="mt-9 flex flex-wrap items-center gap-4">
-            <Link
-              href="/apply"
-              className="inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-base font-bold text-white shadow-md transition hover:brightness-110"
+            <span
+              className="inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-base font-bold text-white shadow-md"
               style={{ backgroundColor: REF.teal, boxShadow: `0 10px 24px -8px ${REF.teal}66` }}
             >
-              {ctaPrimary}
+              <EditableText path="hero.cta_primary">{ctaPrimary}</EditableText>
               <span aria-hidden>→</span>
-            </Link>
-            <Link
-              href="/#how-it-works"
-              className="inline-flex items-center gap-2.5 rounded-full border-2 bg-white/90 px-7 py-3.5 text-base font-semibold backdrop-blur-sm transition hover:border-[#0F766E]"
+            </span>
+            <span
+              className="inline-flex items-center gap-2.5 rounded-full border-2 bg-white/90 px-7 py-3.5 text-base font-semibold backdrop-blur-sm"
               style={{ borderColor: "#CBD5E1", color: REF.navy }}
             >
               <span
@@ -129,8 +149,8 @@ export function DynamicHero({ config, heroOverlay }: Props) {
               >
                 ▶
               </span>
-              {ctaSecondary}
-            </Link>
+              <EditableText path="hero.cta_secondary">{ctaSecondary}</EditableText>
+            </span>
           </div>
         </div>
 
@@ -140,12 +160,20 @@ export function DynamicHero({ config, heroOverlay }: Props) {
               <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">
                 {h.approval_card_label || "Loan Disbursed"}
               </p>
-              <p className="text-2xl font-black text-teal-700">{h.approval_card_amount}</p>
+              <p className="text-2xl font-black text-teal-700">
+                <EditableText path="hero.approval_card_amount" draggable>
+                  {h.approval_card_amount}
+                </EditableText>
+              </p>
             </div>
           )}
           {h.testimonial_quote && (
             <div className="absolute right-0 top-4 max-w-[240px] glass-panel rounded-2xl p-4 text-xs leading-relaxed text-slate-600">
-              &ldquo;{h.testimonial_quote}&rdquo;
+              &ldquo;
+              <EditableText path="hero.testimonial_quote" draggable>
+                {h.testimonial_quote}
+              </EditableText>
+              &rdquo;
               {h.testimonial_author && (
                 <p className="mt-2 font-semibold text-slate-800">— {h.testimonial_author}</p>
               )}
@@ -155,6 +183,7 @@ export function DynamicHero({ config, heroOverlay }: Props) {
             <HeroRoiCard
               roiRate={h.roi_badge || REFERENCE_HERO.roiRate}
               roiLabel={h.roi_badge_label || REFERENCE_HERO.roiLabel}
+              roiPath="hero.roi_badge"
             />
           </div>
         </div>
@@ -164,6 +193,7 @@ export function DynamicHero({ config, heroOverlay }: Props) {
         <HeroRoiCard
           roiRate={h.roi_badge || REFERENCE_HERO.roiRate}
           roiLabel={h.roi_badge_label || REFERENCE_HERO.roiLabel}
+          roiPath="hero.roi_badge"
         />
       </div>
     </section>

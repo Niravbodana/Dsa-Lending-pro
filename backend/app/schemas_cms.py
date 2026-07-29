@@ -28,3 +28,7 @@ class SiteConfigResponse(BaseModel):
     config: dict
     updated_at: str | None = None
     is_draft: bool = False
+
+
+class SaveDraftRequest(BaseModel):
+    config: dict

@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import SiteConfig
 from app.routers.admin import verify_admin
-from app.schemas_cms import CmsChatRequest, CmsChatResponse, SiteConfigResponse
+from app.schemas_cms import CmsChatRequest, CmsChatResponse, SaveDraftRequest, SiteConfigResponse
 from app.services.cms_brain import generate_suggestions, process_brain_command
 from app.services.cms_llm import is_llm_available
 from app.services.cms_store import (
@@ -53,6 +53,21 @@ def admin_cms_status(db: Session = Depends(get_db), _: None = Depends(verify_adm
     draft = get_draft_config(db)
     return SiteConfigResponse(
         config=draft,
+        updated_at=_updated_at(db, DRAFT_ROW_ID),
+        is_draft=True,
+    )
+
+
+@router.put("/admin/draft", response_model=SiteConfigResponse)
+def admin_save_draft(
+    payload: SaveDraftRequest,
+    db: Session = Depends(get_db),
+    _: None = Depends(verify_admin),
+):
+    """Save full draft config — used by visual Canva-style editor."""
+    config = save_draft_config(db, payload.config)
+    return SiteConfigResponse(
+        config=config,
         updated_at=_updated_at(db, DRAFT_ROW_ID),
         is_draft=True,
     )

@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ScrollReveal, ScrollRevealAlternate } from "@/components/ScrollReveal";
 import type { SiteConfig } from "@/lib/cms";
+import { EditableText } from "@/components/visual-editor/Editable";
 
 export function DreamSection({ config }: { config: SiteConfig }) {
   if (!config.sections.dream_section) return null;
@@ -18,8 +19,12 @@ export function DreamSection({ config }: { config: SiteConfig }) {
           <span className="rounded-full bg-teal-100 px-4 py-1 text-sm font-bold text-teal-700">
             WHY NEER LOAN
           </span>
-          <h2 className="mt-4 text-4xl font-black text-slate-900 md:text-5xl">{d.title}</h2>
-          <p className="mt-4 text-lg text-slate-600">{d.subtitle}</p>
+          <h2 className="mt-4 text-4xl font-black text-slate-900 md:text-5xl">
+            <EditableText path="dream_section.title">{d.title}</EditableText>
+          </h2>
+          <EditableText path="dream_section.subtitle" as="p" className="mt-4 text-lg text-slate-600">
+            {d.subtitle}
+          </EditableText>
         </ScrollReveal>
 
         <div className="mt-16 grid gap-8 md:grid-cols-3">
@@ -78,11 +83,13 @@ export function EmotionalCtaBand({ config }: { config: SiteConfig }) {
       <div className="relative mx-auto max-w-4xl px-4 text-center text-white">
         <p className="text-sm font-semibold uppercase tracking-[0.2em] text-neercred-gold">{c.badge}</p>
         <h2 className="mt-4 text-4xl font-bold md:text-5xl">
-          {titleParts[0]}
+          <EditableText path="cta_band.title">{titleParts[0]}</EditableText>
           <span className="text-neercred-gold">{c.title_highlight}</span>
           {titleParts[1] || ""}
         </h2>
-        <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-300">{c.subtitle}</p>
+        <EditableText path="cta_band.subtitle" as="p" className="mx-auto mt-4 max-w-2xl text-lg text-slate-300">
+          {c.subtitle}
+        </EditableText>
         <div className="mt-10 flex flex-wrap justify-center gap-4">
           <Link
             href="/apply"
