@@ -1,42 +1,10 @@
-/**
- * Reference homepage hero — Indian couple / lifestyle (Unsplash).
- * First slide matches reference: couple at home with phone.
- */
-export type HeroSlide = {
-  id: string;
-  alt: string;
-  src: string;
+/** Single homepage hero image + reference copy */
+export const HERO_IMAGE = {
+  src: "https://images.unsplash.com/photo-1600880292203-4edc55e4f5c6?auto=format&w=960&h=1100&fit=crop&q=85",
+  alt: "Indian couple smiling and checking loan offers on smartphone at home",
 };
 
-export const HERO_CAROUSEL: HeroSlide[] = [
-  {
-    id: "couple-couch",
-    alt: "Indian couple smiling and checking loan offers on smartphone at home",
-    src: "https://images.unsplash.com/photo-1600880292203-4edc55e4f5c6?auto=format&w=960&h=1100&fit=crop&q=85",
-  },
-  {
-    id: "couple-festive",
-    alt: "Indian couple in traditional attire planning their dream loan",
-    src: "https://images.unsplash.com/photo-1609220136736-443aae489eca?auto=format&w=960&h=1100&fit=crop&q=85",
-  },
-  {
-    id: "couple-wedding",
-    alt: "Indian couple celebrating wedding plans together",
-    src: "https://images.unsplash.com/photo-1589562075704-900aab769b3f?auto=format&w=960&h=1100&fit=crop&q=85",
-  },
-  {
-    id: "family-indian",
-    alt: "Indian family achieving financial goals together",
-    src: "https://images.unsplash.com/photo-1511763508683-99dc7949e97f?auto=format&w=960&h=1100&fit=crop&q=85",
-  },
-  {
-    id: "mobile-india",
-    alt: "Indian customers using digital loan services on mobile",
-    src: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&w=960&h=1100&fit=crop&q=85",
-  },
-];
-
-export const HERO_PRIMARY_IMAGE = HERO_CAROUSEL[0].src;
+export const HERO_PRIMARY_IMAGE = HERO_IMAGE.src;
 
 /** Exact copy from reference mockup */
 export const REFERENCE_HERO = {

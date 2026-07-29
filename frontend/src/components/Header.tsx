@@ -32,7 +32,7 @@ export function Header() {
     <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-2.5 lg:gap-3 lg:py-3">
         <Link href="/" onClick={goHome} aria-label="NeerCred — Go to homepage" className="shrink-0">
-          <NeerCredLogo variant="header" className="h-[3.75rem] w-auto sm:h-16" />
+          <NeerCredLogo variant="header" className="h-[4.5rem] w-auto max-w-[230px] sm:h-[4.75rem]" />
         </Link>
 
         <nav className="hidden items-center xl:flex" aria-label="Main navigation">
