@@ -10,10 +10,9 @@ const navLinks = [
   { href: "/loans", label: "Loans" },
   { href: "/rates", label: "Rates" },
   { href: "/platform", label: "Platform" },
-  { href: "/about", label: "About" },
+  { href: "/about", label: "About Us" },
   { href: "/help", label: "Help" },
-  { href: "/track", label: "Track" },
-  { href: "/dashboard", label: "Dashboard" },
+  { href: "/track", label: "Track Loan" },
 ];
 
 export function Header() {
@@ -36,7 +35,7 @@ export function Header() {
           aria-label="NeerCred — Go to homepage"
           className="flex shrink-0 items-center"
         >
-          <NeerCredLogo size={64} className="h-14 w-auto sm:h-[4.25rem] lg:h-[4.75rem]" />
+          <NeerCredLogo size={52} className="h-12 w-auto sm:h-14 lg:h-[3.75rem]" />
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Main navigation">
