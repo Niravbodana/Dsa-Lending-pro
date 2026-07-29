@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { HeroPhotoCarousel } from "@/components/HeroPhotoCarousel";
+import { HeroRoiCard } from "@/components/HeroPhotoCarousel";
 import { IconBolt, IconCheckCircle, IconClock, IconShield } from "@/components/icons";
-import { REFERENCE_HERO } from "@/lib/hero-images";
+import { HERO_IMAGE, REFERENCE_HERO } from "@/lib/hero-images";
 import { REF } from "@/lib/reference-theme";
 import type { SiteConfig } from "@/lib/cms";
 
@@ -16,9 +16,18 @@ export function DynamicHero({ config }: Props) {
   const copy = REFERENCE_HERO;
 
   return (
-    <section className="overflow-hidden bg-white">
-      <div className="mx-auto grid max-w-7xl items-center gap-6 px-4 py-10 lg:grid-cols-[1fr_1.05fr] lg:gap-8 lg:py-14">
-        <div className="z-10">
+    <section className="relative min-h-[540px] overflow-hidden lg:min-h-[600px]">
+      <div
+        className="absolute inset-0 bg-cover bg-[70%_center] bg-no-repeat sm:bg-[center_right]"
+        style={{ backgroundImage: `url('${HERO_IMAGE.src}')` }}
+        role="img"
+        aria-label={HERO_IMAGE.alt}
+      />
+      <div className="absolute inset-0 bg-gradient-to-r from-white from-[38%] via-white/92 via-[52%] to-white/25 lg:from-[42%] lg:via-white/80 lg:to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-white/30 via-transparent to-white/20 lg:hidden" />
+
+      <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-8 px-4 py-10 lg:grid-cols-[1fr_0.85fr] lg:gap-10 lg:py-16">
+        <div>
           <div
             className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-[11px] font-bold uppercase tracking-wide"
             style={{ borderColor: `${REF.teal}55`, backgroundColor: REF.tealLight, color: REF.tealDark }}
@@ -64,7 +73,7 @@ export function DynamicHero({ config }: Props) {
             </Link>
             <Link
               href="/#how-it-works"
-              className="inline-flex items-center gap-2.5 rounded-full border-2 bg-white px-7 py-3.5 text-base font-semibold transition hover:border-[#0F766E]"
+              className="inline-flex items-center gap-2.5 rounded-full border-2 bg-white/90 px-7 py-3.5 text-base font-semibold backdrop-blur-sm transition hover:border-[#0F766E]"
               style={{ borderColor: "#CBD5E1", color: REF.navy }}
             >
               <span
@@ -78,13 +87,15 @@ export function DynamicHero({ config }: Props) {
           </div>
         </div>
 
-        <div className="relative flex justify-center lg:justify-end">
-          <div
-            className="pointer-events-none absolute -left-8 top-0 z-10 hidden h-full w-32 bg-gradient-to-r from-white to-transparent lg:block"
-            aria-hidden
-          />
-          <HeroPhotoCarousel roiRate={h.roi_badge || copy.roiRate} roiLabel={copy.roiLabel} />
+        <div className="relative hidden min-h-[280px] lg:block">
+          <div className="absolute bottom-8 right-0">
+            <HeroRoiCard roiRate={h.roi_badge || copy.roiRate} roiLabel={copy.roiLabel} />
+          </div>
         </div>
+      </div>
+
+      <div className="relative z-10 flex justify-end px-4 pb-8 lg:hidden">
+        <HeroRoiCard roiRate={h.roi_badge || copy.roiRate} roiLabel={copy.roiLabel} />
       </div>
     </section>
   );

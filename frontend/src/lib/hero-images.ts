@@ -1,7 +1,7 @@
-/** Single homepage hero image — local Indian borrower */
+/** AI-generated hero background — Indian wedding couple with tablet */
 export const HERO_IMAGE = {
-  src: "/hero-rahul-indore.jpg",
-  alt: "Rahul Das from Indore — NeerCred personal loan customer",
+  src: "/hero-wedding-couple.png",
+  alt: "Happy Indian couple in wedding attire checking loan offers on tablet",
 };
 
 export const HERO_TESTIMONIAL = {
