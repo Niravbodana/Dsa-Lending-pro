@@ -6,7 +6,7 @@ import { IconBolt, IconCheckCircle, IconClock, IconShield } from "@/components/i
 import { HERO_IMAGE, REFERENCE_HERO } from "@/lib/hero-images";
 import { REF } from "@/lib/reference-theme";
 import type { SiteConfig } from "@/lib/cms";
-import { EditableText } from "@/components/visual-editor/Editable";
+import { CmsField } from "@/components/cms/CmsField";
 import { useVisualEditor } from "@/lib/visual-editor/VisualEditorContext";
 
 const ICONS = { bolt: IconBolt, shield: IconShield, clock: IconClock };
@@ -79,22 +79,22 @@ export function DynamicHero({ config, heroOverlay }: Props) {
             style={{ borderColor: `${REF.teal}55`, backgroundColor: REF.tealLight, color: REF.tealDark }}
           >
             <IconCheckCircle size={14} style={{ color: REF.teal }} />
-            <EditableText path="hero.badge" draggable>
+            <CmsField path="hero.badge" draggable>
               {badge}
-            </EditableText>
+            </CmsField>
           </div>
 
           <h1 className="mt-6 text-[2.4rem] font-extrabold leading-[1.1] tracking-tight md:text-[2.85rem] lg:text-[3.35rem]">
-            <EditableText path="hero.headline_line1" as="span" style={{ color: REF.navy }} draggable>
+            <CmsField path="hero.headline_line1" as="span" style={{ color: REF.navy }} draggable>
               {headline1}{" "}
-            </EditableText>
-            <EditableText path="hero.headline_highlight" as="span" style={{ color: REF.teal }} draggable>
+            </CmsField>
+            <CmsField path="hero.headline_highlight" as="span" style={{ color: REF.teal }} draggable>
               {headlineHi}
-            </EditableText>
+            </CmsField>
           </h1>
 
           {(headlineSub || ctx?.active) && (
-            <EditableText
+            <CmsField
               path="hero.headline_sub"
               as="p"
               className="mt-3 text-lg font-bold md:text-xl"
@@ -102,17 +102,17 @@ export function DynamicHero({ config, heroOverlay }: Props) {
               draggable
             >
               {headlineSub}
-            </EditableText>
+            </CmsField>
           )}
 
-          <EditableText
+          <CmsField
             path="hero.description"
             as="p"
             className="mt-5 max-w-lg text-[15px] leading-relaxed md:text-base"
             style={{ color: REF.textMuted }}
           >
             {description}
-          </EditableText>
+          </CmsField>
 
           <ul className="mt-7 space-y-3.5">
             {features.map((feature) => {
@@ -136,7 +136,7 @@ export function DynamicHero({ config, heroOverlay }: Props) {
               className="inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-base font-bold text-white shadow-md"
               style={{ backgroundColor: REF.teal, boxShadow: `0 10px 24px -8px ${REF.teal}66` }}
             >
-              <EditableText path="hero.cta_primary">{ctaPrimary}</EditableText>
+              <CmsField path="hero.cta_primary">{ctaPrimary}</CmsField>
               <span aria-hidden>→</span>
             </span>
             <span
@@ -149,7 +149,7 @@ export function DynamicHero({ config, heroOverlay }: Props) {
               >
                 ▶
               </span>
-              <EditableText path="hero.cta_secondary">{ctaSecondary}</EditableText>
+              <CmsField path="hero.cta_secondary">{ctaSecondary}</CmsField>
             </span>
           </div>
         </div>
@@ -161,18 +161,18 @@ export function DynamicHero({ config, heroOverlay }: Props) {
                 {h.approval_card_label || "Loan Disbursed"}
               </p>
               <p className="text-2xl font-black text-teal-700">
-                <EditableText path="hero.approval_card_amount" draggable>
+                <CmsField path="hero.approval_card_amount" draggable>
                   {h.approval_card_amount}
-                </EditableText>
+                </CmsField>
               </p>
             </div>
           )}
           {h.testimonial_quote && (
             <div className="absolute right-0 top-4 max-w-[240px] glass-panel rounded-2xl p-4 text-xs leading-relaxed text-slate-600">
               &ldquo;
-              <EditableText path="hero.testimonial_quote" draggable>
+              <CmsField path="hero.testimonial_quote" draggable>
                 {h.testimonial_quote}
-              </EditableText>
+              </CmsField>
               &rdquo;
               {h.testimonial_author && (
                 <p className="mt-2 font-semibold text-slate-800">— {h.testimonial_author}</p>

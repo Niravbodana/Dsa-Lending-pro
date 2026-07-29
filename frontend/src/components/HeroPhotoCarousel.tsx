@@ -3,7 +3,7 @@
 import { REFERENCE_HERO } from "@/lib/hero-images";
 import { REF } from "@/lib/reference-theme";
 import { IconRupee } from "@/components/icons";
-import { EditableText } from "@/components/visual-editor/Editable";
+import { CmsField } from "@/components/cms/CmsField";
 
 type Props = {
   roiRate?: string;
@@ -30,9 +30,9 @@ export function HeroRoiCard({
         </div>
         <p className="text-[11px] font-medium text-slate-500">{roiLabel}</p>
         <p className="mt-0.5 text-[1.85rem] font-extrabold leading-none" style={{ color: REF.teal }}>
-          <EditableText path={roiPath} draggable>
+          <CmsField path={roiPath} draggable>
             {roiRate}
-          </EditableText>{" "}
+          </CmsField>{" "}
           <span className="text-lg font-bold">p.a.</span>
         </p>
         <p className="mt-1.5 text-xs font-medium text-slate-500">{REFERENCE_HERO.roiFooter}</p>

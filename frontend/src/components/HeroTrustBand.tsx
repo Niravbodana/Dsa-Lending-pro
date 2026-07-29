@@ -15,7 +15,7 @@ import {
 } from "@/components/icons";
 import type { SiteConfig } from "@/lib/cms";
 import { REF } from "@/lib/reference-theme";
-import { EditableText } from "@/components/visual-editor/Editable";
+import { CmsField } from "@/components/cms/CmsField";
 
 const PARTNERS = [
   { name: "HDFC Bank", logo: "HDFC" },
@@ -41,7 +41,9 @@ export function HeroTrustBand({ config }: { config: SiteConfig }) {
     <section className="glass-strip">
       <div className="mx-auto max-w-7xl px-4 pb-6 pt-4">
         <p className="text-center text-sm font-medium text-slate-500">
-          <EditableText path="trust_band.tagline">{tagline}</EditableText>
+          <CmsField path="trust_band.tagline" label="Trust tagline" group="Trust">
+            {tagline}
+          </CmsField>
         </p>
 
         <div className="mt-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 md:gap-x-8">
@@ -71,10 +73,23 @@ export function HeroTrustBand({ config }: { config: SiteConfig }) {
                     >
                       <Icon size={22} />
                     </span>
-                    <p className="mt-2.5 text-lg font-extrabold md:text-xl" style={{ color: REF.navy }}>
+                    <CmsField
+                      path={`stats.${i}.value`}
+                      label={`Stat ${i + 1} value`}
+                      group="Trust"
+                      className="mt-2.5 text-lg font-extrabold md:text-xl"
+                      style={{ color: REF.navy }}
+                    >
                       {s.value}
-                    </p>
-                    <p className="mt-0.5 text-xs text-slate-500">{s.label}</p>
+                    </CmsField>
+                    <CmsField
+                      path={`stats.${i}.label`}
+                      label={`Stat ${i + 1} label`}
+                      group="Trust"
+                      className="mt-0.5 text-xs text-slate-500"
+                    >
+                      {s.label}
+                    </CmsField>
                   </div>
                 );
               })}
@@ -91,7 +106,9 @@ export function HeroTrustBand({ config }: { config: SiteConfig }) {
               <span key={label} className="flex items-center gap-2 md:px-8">
                 {i > 0 && <span className="hidden h-4 w-px bg-slate-300 md:mr-8 md:inline" aria-hidden />}
                 <Icon size={15} style={{ color: REF.teal }} />
-                {label}
+                <CmsField path={`trust_band.features.${i}`} label={`Feature ${i + 1}`} group="Trust">
+                  {label}
+                </CmsField>
               </span>
             );
           })}

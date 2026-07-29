@@ -113,20 +113,20 @@ export function HomePage({ previewConfig, isPreview = false, visualEdit = false 
       <HeroTrustBand config={config} />
       {config.sections.metrics_ticker !== false && <MetricsTicker config={config} />}
       {config.sections.dream_section !== false && <DreamSection config={config} />}
-      <BusinessModelFlow />
+      <BusinessModelFlow config={config} />
       <LoanProductsStrip config={config} />
       <EmotionalCtaBand config={config} />
-      <LifestyleShowcase />
+      <LifestyleShowcase config={config} />
       <HowItWorks config={config} />
-      <PremiumFeaturesGrid />
+      <PremiumFeaturesGrid config={config} />
       {config.sections.emi_calculator !== false && <EmiCalculator />}
       {config.sections.testimonials !== false && <Testimonials config={config} />}
-      <PlatformCapabilities />
-      <TrustGallery />
-      <ReferBanner />
-      <AppDownloadBanner />
+      <PlatformCapabilities config={config} />
+      <TrustGallery config={config} />
+      <ReferBanner config={config} />
+      <AppDownloadBanner config={config} />
       {config.sections.faq !== false && <FAQ config={config} />}
-      <Footer />
+      <Footer config={config} />
         <LiveCustomBlocks blocks={config.custom_blocks} />
       </div>
       {!isPreview && !visualEdit && (

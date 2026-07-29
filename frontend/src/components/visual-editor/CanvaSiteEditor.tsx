@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { HomePage } from "@/components/HomePage";
 import { CustomBlocksLayer } from "@/components/visual-editor/CustomBlocksLayer";
+import { CmsDomEnhancer } from "@/components/cms/CmsDomEnhancer";
 import { EditorPropertiesPanel } from "@/components/visual-editor/EditorPropertiesPanel";
 import { VisualEditorProvider, useVisualEditor } from "@/lib/visual-editor/VisualEditorContext";
 import {
@@ -30,6 +31,7 @@ function EditorCanvas({ onBackgroundClick }: { onBackgroundClick: () => void }) 
       <div className="relative" onClick={(e) => e.stopPropagation()}>
         <HomePage previewConfig={ctx!.config} isPreview visualEdit />
         <CustomBlocksLayer />
+        <CmsDomEnhancer />
       </div>
     </div>
   );

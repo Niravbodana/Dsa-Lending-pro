@@ -75,3 +75,16 @@ Offer engine runs parallel queries to all 6 partners via `backend/app/services/o
 
 - `ADMIN_PASSWORD` in `backend/.env` (default: `admin123` for dev)
 - Production will need partner API keys, SMS gateway, etc.
+
+## Site Builder — auto-editable CMS (future-proof)
+
+New homepage content should use **`CmsField`** so Visual Editor + AI prompts pick it up automatically.
+
+```tsx
+import { CmsField } from "@/components/cms/CmsField";
+<CmsField path="my_section.headline" label="Headline" group="My Section" as="h2">Fallback</CmsField>
+```
+
+Or minimal HTML: `data-cms-path="my_section.headline"` (auto-discovered by DOM scanner).
+
+Add defaults in `backend/app/services/cms_defaults.py` — paths auto-sync to LLM + editor layers via `cms_path_discovery.py`.

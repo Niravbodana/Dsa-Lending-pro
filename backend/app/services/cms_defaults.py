@@ -201,6 +201,114 @@ DEFAULT_SITE_CONFIG: dict = {
             {"title": "Business", "rate": "12.49%", "image": "/images/site/1551836022-d5d88e9218df-600x400.jpg"},
         ],
     },
+    "business_model": {
+        "badge": "Business Model",
+        "title": "Personal Loan Marketplace",
+        "subtitle": "Connect customers with multiple lenders. Earn commission on every disbursal.",
+        "steps": [
+            {"step": "01", "title": "Customer Visits", "desc": "Discovers Neer Loan Solutions"},
+            {"step": "02", "title": "Basic Details", "desc": "OTP-verified profile capture"},
+            {"step": "03", "title": "Partner APIs", "desc": "Parallel lender offer engine"},
+            {"step": "04", "title": "Best Offers", "desc": "AI-ranked comparison UI"},
+            {"step": "05", "title": "Select & KYC", "desc": "Digital verification & eSign"},
+            {"step": "06", "title": "Disbursal", "desc": "Direct to customer account"},
+        ],
+    },
+    "platform": {
+        "badge": "Platform",
+        "title": "Enterprise-Grade Architecture",
+        "subtitle": "Six-phase product roadmap — from lead capture to admin analytics. Built for scale.",
+        "cta": "View Platform Details",
+        "phases": [
+            {
+                "phase": "Phase 1",
+                "title": "Lead Capture",
+                "items": ["OTP login", "PAN validation", "Consent & disclosure", "Lead database"],
+            },
+            {
+                "phase": "Phase 2",
+                "title": "Offer Engine",
+                "items": ["Partner API integration", "Parallel offer fetch", "Best-deal ranking", "Offer selection"],
+            },
+            {
+                "phase": "Phase 3",
+                "title": "KYC Flow",
+                "items": ["Aadhaar eKYC", "Bank penny drop", "Document upload", "Digital eSign"],
+            },
+            {
+                "phase": "Phase 4",
+                "title": "Processing",
+                "items": ["Status tracking", "Partner webhooks", "SMS notifications", "Disbursal alerts"],
+            },
+            {
+                "phase": "Phase 5",
+                "title": "Dashboard",
+                "items": ["User portal", "EMI schedule", "Neer AI assistant", "Agreement download"],
+            },
+            {
+                "phase": "Phase 6",
+                "title": "Admin & Scale",
+                "items": ["Lead funnel analytics", "Commission reports", "Fraud rules", "Role-based access"],
+            },
+        ],
+    },
+    "premium_features": {
+        "badge": "Differentiators",
+        "title": "Built Beyond Standard Marketplaces",
+        "items": [
+            {"title": "AI Offer Recommendations", "desc": "Neer AI ranks offers by your profile and repayment capacity."},
+            {"title": "Pre-Approved Offers", "desc": "Soft-pull eligibility signals for faster decisions."},
+            {"title": "Instant Approval Score", "desc": "Real-time probability engine before you apply."},
+            {"title": "Smart Lead Scoring", "desc": "ML-powered lead quality for partner lenders."},
+            {"title": "Fraud Detection", "desc": "Multi-layer verification and anomaly monitoring."},
+            {"title": "WhatsApp Tracking", "desc": "Status updates and support on WhatsApp."},
+        ],
+    },
+    "trust_gallery": {
+        "title": "Trusted by Thousands Across India",
+        "subtitle": "From Mumbai to Delhi — professionals, families, and entrepreneurs trust Neer Loan Solutions.",
+        "images": [
+            "/images/site/1463335361701-e90f4c5045d0-600x750.jpg",
+            "/images/site/1519741497674-611481863552-600x400.jpg",
+            "/images/site/1551836022-d5d88e9218df-600x400.jpg",
+            "/images/site/1576091160550-2173dba999ef-600x400.jpg",
+        ],
+    },
+    "lifestyle_showcase": {
+        "blocks": [
+            {
+                "title": "Home, Wedding, Dreams — All Possible",
+                "desc": "Neer Loan Solutions connects you with India's trusted banks and NBFCs. Compare offers, choose the best rate, and receive funds directly in your account.",
+                "image": "/images/site/1560518883-ce09059eeffa-600x400.jpg",
+                "cta": "Explore Loans",
+                "href": "/loans",
+            },
+            {
+                "title": "100% Digital. Zero Branch Visits.",
+                "desc": "OTP login, Aadhaar eKYC, bank verification, digital eSign — the entire process from your phone. Get approved from home.",
+                "image": "/images/site/1529156069898-49953e39b3ac-1920x600.jpg",
+                "cta": "Start Application",
+                "href": "/apply",
+            },
+        ],
+    },
+    "app_download": {
+        "badge": "Mobile App — Coming Soon",
+        "title": "Neer Loan App — Loans in Your Pocket",
+        "subtitle": "Track applications, compare offers, EMI calculator — all in one premium app. Launching Q3 2026.",
+        "cta": "Join Waitlist →",
+        "image": "/images/site/1529156069898-49953e39b3ac-1920x600.jpg",
+    },
+    "refer_banner": {
+        "title": "Refer & Earn",
+        "subtitle": "Earn rewards on every successful referral disbursal",
+        "cta": "View Program",
+        "image": "/images/site/1463335361701-e90f4c5045d0-600x750.jpg",
+    },
+    "footer": {
+        "description": "India's premium personal loan marketplace. Compare offers from 15+ regulated partner banks and NBFCs.",
+        "legal_note": "Licensed marketplace · Regulated partners only",
+    },
     "element_styles": {},
     "custom_blocks": [],
 }

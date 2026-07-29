@@ -2,8 +2,12 @@ import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { NeerCredLogo } from "@/components/NeerCredLogo";
 import { MadeInIndiaStrip } from "@/components/MadeInIndiaStrip";
+import { CmsField } from "@/components/cms/CmsField";
+import type { SiteConfig } from "@/lib/cms";
 
-export function Footer() {
+export function Footer({ config }: { config?: SiteConfig }) {
+  const section = config?.footer;
+
   return (
     <footer className="border-t border-slate-800 bg-slate-950 text-slate-400">
       <div className="mx-auto max-w-7xl px-4 py-16">
@@ -13,7 +17,10 @@ export function Footer() {
             <p className="mt-3 text-sm leading-relaxed">
               <span className="font-medium text-neercred-gold">{BRAND.tagline}</span>
               {" · "}
-              India&apos;s premium personal loan marketplace. Compare offers from 15+ regulated partner banks and NBFCs.
+              <CmsField path="footer.description" group="Footer">
+                {section?.description ||
+                  "India's premium personal loan marketplace. Compare offers from 15+ regulated partner banks and NBFCs."}
+              </CmsField>
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
               <Link href="/apply" className="rounded-lg bg-gradient-to-r from-neercred-gold to-amber-500 px-4 py-2 text-xs font-bold text-neercred-navy hover:brightness-110">
@@ -68,7 +75,9 @@ export function Footer() {
 
         <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-slate-800 pt-8 text-xs">
           <p>© 2026 {BRAND.name}. {BRAND.appName}™ — {BRAND.logoTagline}. {BRAND.rbiNote}.</p>
-          <p className="text-slate-500">Licensed marketplace · Regulated partners only</p>
+          <CmsField path="footer.legal_note" as="p" className="text-slate-500" group="Footer">
+            {section?.legal_note || "Licensed marketplace · Regulated partners only"}
+          </CmsField>
         </div>
       </div>
       <MadeInIndiaStrip />

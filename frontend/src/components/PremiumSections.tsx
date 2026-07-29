@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ScrollReveal, ScrollRevealAlternate } from "@/components/ScrollReveal";
+import { CmsField } from "@/components/cms/CmsField";
 import {
   IconCpu,
   IconShield,
@@ -9,84 +10,71 @@ import {
   IconCheck,
   IconArrowRight,
 } from "@/components/icons";
+import type { SiteConfig } from "@/lib/cms";
 
-const flowSteps = [
-  { step: "01", title: "Customer Visits", desc: "Discovers Neer Loan Solutions" },
-  { step: "02", title: "Basic Details", desc: "OTP-verified profile capture" },
-  { step: "03", title: "Partner APIs", desc: "Parallel lender offer engine" },
-  { step: "04", title: "Best Offers", desc: "AI-ranked comparison UI" },
-  { step: "05", title: "Select & KYC", desc: "Digital verification & eSign" },
-  { step: "06", title: "Disbursal", desc: "Direct to customer account" },
-];
+const PHASE_ICONS = [IconTarget, IconChart, IconShield, IconBolt, IconCpu, IconChart];
 
-const capabilities = [
-  {
-    phase: "Phase 1",
-    title: "Lead Capture",
-    items: ["OTP login", "PAN validation", "Consent & disclosure", "Lead database"],
-    icon: IconTarget,
-  },
-  {
-    phase: "Phase 2",
-    title: "Offer Engine",
-    items: ["Partner API integration", "Parallel offer fetch", "Best-deal ranking", "Offer selection"],
-    icon: IconChart,
-  },
-  {
-    phase: "Phase 3",
-    title: "KYC Flow",
-    items: ["Aadhaar eKYC", "Bank penny drop", "Document upload", "Digital eSign"],
-    icon: IconShield,
-  },
-  {
-    phase: "Phase 4",
-    title: "Processing",
-    items: ["Status tracking", "Partner webhooks", "SMS notifications", "Disbursal alerts"],
-    icon: IconBolt,
-  },
-  {
-    phase: "Phase 5",
-    title: "Dashboard",
-    items: ["User portal", "EMI schedule", "Neer AI assistant", "Agreement download"],
-    icon: IconCpu,
-  },
-  {
-    phase: "Phase 6",
-    title: "Admin & Scale",
-    items: ["Lead funnel analytics", "Commission reports", "Fraud rules", "Role-based access"],
-    icon: IconChart,
-  },
-];
+export function BusinessModelFlow({ config }: { config: SiteConfig }) {
+  const section = config.business_model;
+  const steps = section.steps?.length ? section.steps : [];
 
-const premiumFeatures = [
-  { title: "AI Offer Recommendations", desc: "Neer AI ranks offers by your profile and repayment capacity." },
-  { title: "Pre-Approved Offers", desc: "Soft-pull eligibility signals for faster decisions." },
-  { title: "Instant Approval Score", desc: "Real-time probability engine before you apply." },
-  { title: "Smart Lead Scoring", desc: "ML-powered lead quality for partner lenders." },
-  { title: "Fraud Detection", desc: "Multi-layer verification and anomaly monitoring." },
-  { title: "WhatsApp Tracking", desc: "Status updates and support on WhatsApp." },
-];
-
-export function BusinessModelFlow() {
   return (
     <section className="border-y border-slate-200 bg-white py-20">
       <div className="mx-auto max-w-7xl px-4">
         <ScrollReveal variant="up" className="text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-teal-600">Business Model</p>
-          <h2 className="mt-3 text-3xl font-black text-slate-900 md:text-4xl">
-            Personal Loan Marketplace
-          </h2>
-          <p className="mx-auto mt-3 max-w-2xl text-slate-500">
-            Connect customers with multiple lenders. Earn commission on every disbursal.
-          </p>
+          <CmsField
+            path="business_model.badge"
+            as="p"
+            className="text-xs font-bold uppercase tracking-[0.2em] text-teal-600"
+            group="Business Model"
+          >
+            {section.badge}
+          </CmsField>
+          <CmsField
+            path="business_model.title"
+            as="h2"
+            className="mt-3 text-3xl font-black text-slate-900 md:text-4xl"
+            group="Business Model"
+          >
+            {section.title}
+          </CmsField>
+          <CmsField
+            path="business_model.subtitle"
+            as="p"
+            className="mx-auto mt-3 max-w-2xl text-slate-500"
+            group="Business Model"
+          >
+            {section.subtitle}
+          </CmsField>
         </ScrollReveal>
         <div className="mt-14 grid gap-4 md:grid-cols-3 lg:grid-cols-6">
-          {flowSteps.map((s, i) => (
+          {steps.map((s, i) => (
             <ScrollRevealAlternate key={s.step} index={i} delay={i * 80}>
               <div className="relative rounded-2xl border border-slate-100 bg-slate-50 p-5 transition hover:border-teal-200 hover:shadow-lg">
-                <span className="text-xs font-bold text-teal-600">{s.step}</span>
-                <h3 className="mt-2 font-bold text-slate-900">{s.title}</h3>
-                <p className="mt-1 text-xs leading-relaxed text-slate-500">{s.desc}</p>
+                <CmsField
+                  path={`business_model.steps.${i}.step`}
+                  as="span"
+                  className="text-xs font-bold text-teal-600"
+                  group="Business Model"
+                >
+                  {s.step}
+                </CmsField>
+                <CmsField
+                  path={`business_model.steps.${i}.title`}
+                  as="h3"
+                  className="mt-2 font-bold text-slate-900"
+                  group="Business Model"
+                >
+                  {s.title}
+                </CmsField>
+                <CmsField
+                  path={`business_model.steps.${i}.desc`}
+                  as="p"
+                  className="mt-1 text-xs leading-relaxed text-slate-500"
+                  group="Business Model"
+                >
+                  {s.desc}
+                </CmsField>
               </div>
             </ScrollRevealAlternate>
           ))}
@@ -96,72 +84,140 @@ export function BusinessModelFlow() {
   );
 }
 
-export function PlatformCapabilities() {
+export function PlatformCapabilities({ config }: { config: SiteConfig }) {
+  const section = config.platform;
+  const phases = section.phases?.length ? section.phases : [];
+
   return (
     <section className="bg-slate-950 py-24 text-white">
       <div className="mx-auto max-w-7xl px-4">
         <ScrollReveal variant="up" className="flex flex-wrap items-end justify-between gap-6">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-400">Platform</p>
-            <h2 className="mt-3 text-3xl font-black md:text-4xl">Enterprise-Grade Architecture</h2>
-            <p className="mt-3 max-w-xl text-slate-400">
-              Six-phase product roadmap — from lead capture to admin analytics. Built for scale.
-            </p>
+            <CmsField
+              path="platform.badge"
+              as="p"
+              className="text-xs font-bold uppercase tracking-[0.2em] text-amber-400"
+              group="Platform"
+            >
+              {section.badge}
+            </CmsField>
+            <CmsField
+              path="platform.title"
+              as="h2"
+              className="mt-3 text-3xl font-black md:text-4xl"
+              group="Platform"
+            >
+              {section.title}
+            </CmsField>
+            <CmsField
+              path="platform.subtitle"
+              as="p"
+              className="mt-3 max-w-xl text-slate-400"
+              group="Platform"
+            >
+              {section.subtitle}
+            </CmsField>
           </div>
           <Link
             href="/platform"
             className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-6 py-3 text-sm font-semibold transition hover:bg-white/10"
           >
-            View Platform Details <IconArrowRight size={16} />
+            <CmsField path="platform.cta" group="Platform">
+              {section.cta}
+            </CmsField>{" "}
+            <IconArrowRight size={16} />
           </Link>
         </ScrollReveal>
         <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {capabilities.map((c, i) => (
-            <ScrollRevealAlternate key={c.phase} index={i} delay={i * 80}>
-              <div className="h-full rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-500/20 text-teal-300">
-                    <c.icon size={20} />
+          {phases.map((c, i) => {
+            const Icon = PHASE_ICONS[i % PHASE_ICONS.length];
+            return (
+              <ScrollRevealAlternate key={c.phase} index={i} delay={i * 80}>
+                <div className="h-full rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-500/20 text-teal-300">
+                      <Icon size={20} />
+                    </div>
+                    <div>
+                      <CmsField
+                        path={`platform.phases.${i}.phase`}
+                        as="p"
+                        className="text-xs font-bold text-amber-400"
+                        group="Platform"
+                      >
+                        {c.phase}
+                      </CmsField>
+                      <CmsField path={`platform.phases.${i}.title`} as="h3" className="font-bold" group="Platform">
+                        {c.title}
+                      </CmsField>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs font-bold text-amber-400">{c.phase}</p>
-                    <h3 className="font-bold">{c.title}</h3>
-                  </div>
+                  <ul className="mt-4 space-y-2">
+                    {c.items.map((item, j) => (
+                      <li key={item} className="flex items-center gap-2 text-sm text-slate-400">
+                        <IconCheck size={14} className="shrink-0 text-teal-400" />
+                        <CmsField path={`platform.phases.${i}.items.${j}`} group="Platform">
+                          {item}
+                        </CmsField>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <ul className="mt-4 space-y-2">
-                  {c.items.map((item) => (
-                    <li key={item} className="flex items-center gap-2 text-sm text-slate-400">
-                      <IconCheck size={14} className="shrink-0 text-teal-400" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </ScrollRevealAlternate>
-          ))}
+              </ScrollRevealAlternate>
+            );
+          })}
         </div>
       </div>
     </section>
   );
 }
 
-export function PremiumFeaturesGrid() {
+export function PremiumFeaturesGrid({ config }: { config: SiteConfig }) {
+  const section = config.premium_features;
+  const items = section.items?.length ? section.items : [];
+
   return (
     <section className="bg-gradient-to-b from-white to-slate-50 py-24">
       <div className="mx-auto max-w-7xl px-4">
         <ScrollReveal variant="up" className="text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-teal-600">Differentiators</p>
-          <h2 className="mt-3 text-3xl font-black text-slate-900 md:text-4xl">
-            Built Beyond Standard Marketplaces
-          </h2>
+          <CmsField
+            path="premium_features.badge"
+            as="p"
+            className="text-xs font-bold uppercase tracking-[0.2em] text-teal-600"
+            group="Premium Features"
+          >
+            {section.badge}
+          </CmsField>
+          <CmsField
+            path="premium_features.title"
+            as="h2"
+            className="mt-3 text-3xl font-black text-slate-900 md:text-4xl"
+            group="Premium Features"
+          >
+            {section.title}
+          </CmsField>
         </ScrollReveal>
         <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {premiumFeatures.map((f, i) => (
+          {items.map((f, i) => (
             <ScrollRevealAlternate key={f.title} index={i} delay={i * 70}>
               <div className="h-full rounded-2xl border border-slate-100 bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
                 <div className="h-1 w-12 rounded-full bg-gradient-to-r from-teal-500 to-amber-400" />
-                <h3 className="mt-5 text-lg font-bold text-slate-900">{f.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-slate-500">{f.desc}</p>
+                <CmsField
+                  path={`premium_features.items.${i}.title`}
+                  as="h3"
+                  className="mt-5 text-lg font-bold text-slate-900"
+                  group="Premium Features"
+                >
+                  {f.title}
+                </CmsField>
+                <CmsField
+                  path={`premium_features.items.${i}.desc`}
+                  as="p"
+                  className="mt-2 text-sm leading-relaxed text-slate-500"
+                  group="Premium Features"
+                >
+                  {f.desc}
+                </CmsField>
               </div>
             </ScrollRevealAlternate>
           ))}
@@ -171,7 +227,7 @@ export function PremiumFeaturesGrid() {
   );
 }
 
-export function MetricsTicker({ config }: { config: import("@/lib/cms").SiteConfig }) {
+export function MetricsTicker({ config }: { config: SiteConfig }) {
   if (config.sections?.metrics_ticker === false) return null;
   const metrics = config.metrics_ticker?.length ? config.metrics_ticker : [];
 
@@ -183,8 +239,21 @@ export function MetricsTicker({ config }: { config: import("@/lib/cms").SiteConf
         {metrics.map((m, i) => (
           <ScrollRevealAlternate key={m.label} index={i} delay={i * 50}>
             <div className="text-center">
-              <p className="text-2xl font-bold text-neercred-gold">{m.value}</p>
-              <p className="mt-0.5 text-[11px] uppercase tracking-widest text-slate-400">{m.label}</p>
+              <CmsField
+                path={`metrics_ticker.${i}.value`}
+                className="text-2xl font-bold text-neercred-gold"
+                group="Metrics"
+              >
+                {m.value}
+              </CmsField>
+              <CmsField
+                path={`metrics_ticker.${i}.label`}
+                as="p"
+                className="mt-0.5 text-[11px] uppercase tracking-widest text-slate-400"
+                group="Metrics"
+              >
+                {m.label}
+              </CmsField>
             </div>
           </ScrollRevealAlternate>
         ))}

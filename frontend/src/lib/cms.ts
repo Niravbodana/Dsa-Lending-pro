@@ -100,6 +100,49 @@ export type SiteConfig = {
     title: string;
     cards: { title: string; rate: string; image: string }[];
   };
+  business_model: {
+    badge: string;
+    title: string;
+    subtitle: string;
+    steps: { step: string; title: string; desc: string }[];
+  };
+  platform: {
+    badge: string;
+    title: string;
+    subtitle: string;
+    cta: string;
+    phases: { phase: string; title: string; items: string[] }[];
+  };
+  premium_features: {
+    badge: string;
+    title: string;
+    items: { title: string; desc: string }[];
+  };
+  trust_gallery: {
+    title: string;
+    subtitle: string;
+    images: string[];
+  };
+  lifestyle_showcase: {
+    blocks: { title: string; desc: string; image: string; cta: string; href: string }[];
+  };
+  app_download: {
+    badge: string;
+    title: string;
+    subtitle: string;
+    cta: string;
+    image: string;
+  };
+  refer_banner: {
+    title: string;
+    subtitle: string;
+    cta: string;
+    image: string;
+  };
+  footer: {
+    description: string;
+    legal_note: string;
+  };
   theme: {
     accent: string;
     hero_style: string;
@@ -290,6 +333,85 @@ export const FALLBACK_CONFIG: SiteConfig = {
       { title: "Business", rate: "12.49%", image: INDIAN_IMAGES.loans.business },
     ],
   },
+  business_model: {
+    badge: "Business Model",
+    title: "Personal Loan Marketplace",
+    subtitle: "Connect customers with multiple lenders. Earn commission on every disbursal.",
+    steps: [
+      { step: "01", title: "Customer Visits", desc: "Discovers Neer Loan Solutions" },
+      { step: "02", title: "Basic Details", desc: "OTP-verified profile capture" },
+      { step: "03", title: "Partner APIs", desc: "Parallel lender offer engine" },
+      { step: "04", title: "Best Offers", desc: "AI-ranked comparison UI" },
+      { step: "05", title: "Select & KYC", desc: "Digital verification & eSign" },
+      { step: "06", title: "Disbursal", desc: "Direct to customer account" },
+    ],
+  },
+  platform: {
+    badge: "Platform",
+    title: "Enterprise-Grade Architecture",
+    subtitle: "Six-phase product roadmap — from lead capture to admin analytics. Built for scale.",
+    cta: "View Platform Details",
+    phases: [
+      { phase: "Phase 1", title: "Lead Capture", items: ["OTP login", "PAN validation", "Consent & disclosure", "Lead database"] },
+      { phase: "Phase 2", title: "Offer Engine", items: ["Partner API integration", "Parallel offer fetch", "Best-deal ranking", "Offer selection"] },
+      { phase: "Phase 3", title: "KYC Flow", items: ["Aadhaar eKYC", "Bank penny drop", "Document upload", "Digital eSign"] },
+      { phase: "Phase 4", title: "Processing", items: ["Status tracking", "Partner webhooks", "SMS notifications", "Disbursal alerts"] },
+      { phase: "Phase 5", title: "Dashboard", items: ["User portal", "EMI schedule", "Neer AI assistant", "Agreement download"] },
+      { phase: "Phase 6", title: "Admin & Scale", items: ["Lead funnel analytics", "Commission reports", "Fraud rules", "Role-based access"] },
+    ],
+  },
+  premium_features: {
+    badge: "Differentiators",
+    title: "Built Beyond Standard Marketplaces",
+    items: [
+      { title: "AI Offer Recommendations", desc: "Neer AI ranks offers by your profile and repayment capacity." },
+      { title: "Pre-Approved Offers", desc: "Soft-pull eligibility signals for faster decisions." },
+      { title: "Instant Approval Score", desc: "Real-time probability engine before you apply." },
+      { title: "Smart Lead Scoring", desc: "ML-powered lead quality for partner lenders." },
+      { title: "Fraud Detection", desc: "Multi-layer verification and anomaly monitoring." },
+      { title: "WhatsApp Tracking", desc: "Status updates and support on WhatsApp." },
+    ],
+  },
+  trust_gallery: {
+    title: "Trusted by Thousands Across India",
+    subtitle: "From Mumbai to Delhi — professionals, families, and entrepreneurs trust Neer Loan Solutions.",
+    images: [...INDIAN_IMAGES.trust],
+  },
+  lifestyle_showcase: {
+    blocks: [
+      {
+        title: "Home, Wedding, Dreams — All Possible",
+        desc: "Neer Loan Solutions connects you with India's trusted banks and NBFCs. Compare offers, choose the best rate, and receive funds directly in your account.",
+        image: INDIAN_IMAGES.lifestyle.familyHome,
+        cta: "Explore Loans",
+        href: "/loans",
+      },
+      {
+        title: "100% Digital. Zero Branch Visits.",
+        desc: "OTP login, Aadhaar eKYC, bank verification, digital eSign — the entire process from your phone. Get approved from home.",
+        image: INDIAN_IMAGES.lifestyle.mobileIndia,
+        cta: "Start Application",
+        href: "/apply",
+      },
+    ],
+  },
+  app_download: {
+    badge: "Mobile App — Coming Soon",
+    title: "Neer Loan App — Loans in Your Pocket",
+    subtitle: "Track applications, compare offers, EMI calculator — all in one premium app. Launching Q3 2026.",
+    cta: "Join Waitlist →",
+    image: INDIAN_IMAGES.misc.appBanner,
+  },
+  refer_banner: {
+    title: "Refer & Earn",
+    subtitle: "Earn rewards on every successful referral disbursal",
+    cta: "View Program",
+    image: INDIAN_IMAGES.misc.referThumb,
+  },
+  footer: {
+    description: "India's premium personal loan marketplace. Compare offers from 15+ regulated partner banks and NBFCs.",
+    legal_note: "Licensed marketplace · Regulated partners only",
+  },
   theme: {
     accent: "teal",
     hero_style: "premium",
@@ -335,6 +457,10 @@ export async function fetchPreviewConfig(token: string): Promise<SiteConfig> {
   return mergeConfig(data.config);
 }
 
+export function mergeConfigFromApi(raw: Partial<SiteConfig>): SiteConfig {
+  return mergeConfig(raw);
+}
+
 function mergeConfig(raw: Partial<SiteConfig>): SiteConfig {
   return {
     ...FALLBACK_CONFIG,
@@ -366,6 +492,36 @@ function mergeConfig(raw: Partial<SiteConfig>): SiteConfig {
       ...raw?.loan_products,
       cards: raw?.loan_products?.cards?.length ? raw.loan_products.cards : FALLBACK_CONFIG.loan_products.cards,
     },
+    business_model: {
+      ...FALLBACK_CONFIG.business_model,
+      ...raw?.business_model,
+      steps: raw?.business_model?.steps?.length ? raw.business_model.steps : FALLBACK_CONFIG.business_model.steps,
+    },
+    platform: {
+      ...FALLBACK_CONFIG.platform,
+      ...raw?.platform,
+      phases: raw?.platform?.phases?.length ? raw.platform.phases : FALLBACK_CONFIG.platform.phases,
+    },
+    premium_features: {
+      ...FALLBACK_CONFIG.premium_features,
+      ...raw?.premium_features,
+      items: raw?.premium_features?.items?.length ? raw.premium_features.items : FALLBACK_CONFIG.premium_features.items,
+    },
+    trust_gallery: {
+      ...FALLBACK_CONFIG.trust_gallery,
+      ...raw?.trust_gallery,
+      images: raw?.trust_gallery?.images?.length ? raw.trust_gallery.images : FALLBACK_CONFIG.trust_gallery.images,
+    },
+    lifestyle_showcase: {
+      ...FALLBACK_CONFIG.lifestyle_showcase,
+      ...raw?.lifestyle_showcase,
+      blocks: raw?.lifestyle_showcase?.blocks?.length
+        ? raw.lifestyle_showcase.blocks
+        : FALLBACK_CONFIG.lifestyle_showcase.blocks,
+    },
+    app_download: { ...FALLBACK_CONFIG.app_download, ...raw?.app_download },
+    refer_banner: { ...FALLBACK_CONFIG.refer_banner, ...raw?.refer_banner },
+    footer: { ...FALLBACK_CONFIG.footer, ...raw?.footer },
     stats: raw?.stats?.length ? raw.stats : FALLBACK_CONFIG.stats,
     metrics_ticker: raw?.metrics_ticker?.length ? raw.metrics_ticker : FALLBACK_CONFIG.metrics_ticker,
     urgency_bar: { ...FALLBACK_CONFIG.urgency_bar, ...raw?.urgency_bar },

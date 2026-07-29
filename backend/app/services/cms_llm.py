@@ -10,6 +10,8 @@ from typing import Any
 import httpx
 
 from app.config import settings
+from app.services.cms_path_discovery import paths_for_llm_prompt
+from app.services.cms_defaults import DEFAULT_SITE_CONFIG
 from app.services.cms_store import deep_merge
 from app.services.url_safety import is_safe_https_image_url
 
@@ -78,7 +80,16 @@ Respond with ONLY valid JSON:
 
 If user asks a question without edits, patch=null and answer in reply.
 If unsure, make reasonable creative choices for a premium Indian loan site.
+
+All editable dot-paths (auto-discovered — new CMS fields appear here automatically):
+{{CMS_PATHS}}
 """
+
+
+def _system_prompt(config: dict | None = None) -> str:
+    base = DEFAULT_SITE_CONFIG if config is None else config
+    paths = paths_for_llm_prompt(base)
+    return SYSTEM_PROMPT.replace("{{CMS_PATHS}}", paths)
 
 
 def is_llm_available() -> bool:
@@ -148,7 +159,7 @@ def process_llm_prompt(
     if not is_llm_available():
         return None
 
-    messages: list[dict[str, str]] = [{"role": "system", "content": SYSTEM_PROMPT}]
+    messages: list[dict[str, str]] = [{"role": "system", "content": _system_prompt(config)}]
     if history:
         for item in history[-8:]:
             role = item.get("role", "user")
