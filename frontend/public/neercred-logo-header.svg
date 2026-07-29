@@ -1,4 +1,4 @@
-<svg width="240" height="68" viewBox="0 0 240 68" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="NeerCred — Dream Big. Borrow Smart.">
+<svg width="248" height="72" viewBox="0 0 248 72" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="NeerCred — Dream Big. Borrow Smart.">
   <defs>
     <linearGradient id="hdr-blue" x1="8" y1="8" x2="36" y2="52" gradientUnits="userSpaceOnUse">
       <stop stop-color="#22D3EE"/>
@@ -18,8 +18,12 @@
       <stop stop-color="#F5D76E"/>
       <stop offset="1" stop-color="#C9A227"/>
     </linearGradient>
+    <linearGradient id="hdr-cred" x1="68" y1="0" x2="180" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F766E"/>
+      <stop offset="1" stop-color="#14B8A6"/>
+    </linearGradient>
   </defs>
-  <g transform="translate(2, 6) scale(0.78)">
+  <g transform="translate(2, 8) scale(0.8)">
     <path d="M48 14 A34 34 0 0 0 48 82" stroke="url(#hdr-ring-blue)" stroke-width="2.8" fill="none" stroke-linecap="round"/>
     <path d="M48 14 A34 34 0 0 1 48 82" stroke="url(#hdr-ring-gold)" stroke-width="2.8" fill="none" stroke-linecap="round"/>
     <path d="M34 30 L34 66" stroke="url(#hdr-blue)" stroke-width="7.5" stroke-linecap="round"/>
@@ -27,8 +31,8 @@
     <path d="M62 30 L62 66" stroke="url(#hdr-gold)" stroke-width="7.5" stroke-linecap="round"/>
     <path d="M48 9.5 L49.8 13.8 L54.4 13.8 L50.8 16.6 L52.2 21 L48 18.4 L43.8 21 L45.2 16.6 L41.6 13.8 L46.2 13.8 Z" fill="url(#hdr-gold)"/>
   </g>
-  <text x="62" y="32" font-family="Poppins, system-ui, sans-serif" font-size="27" font-weight="700" letter-spacing="-0.3">
-    <tspan fill="#004B4D">Neer</tspan><tspan fill="#2DB2A2">Cred</tspan>
+  <text x="64" y="34" font-family="Poppins, system-ui, sans-serif" font-size="28" font-weight="700" letter-spacing="-0.3">
+    <tspan fill="#0B1220">Neer</tspan><tspan fill="url(#hdr-cred)">Cred</tspan>
   </text>
-  <text x="62" y="50" font-family="Poppins, system-ui, sans-serif" font-size="7.8" font-weight="600" fill="#5C6B73" letter-spacing="2.6">DREAM BIG. BORROW SMART.</text>
+  <text x="64" y="52" font-family="Poppins, system-ui, sans-serif" font-size="8" font-weight="600" fill="#64748B" letter-spacing="2.8">DREAM BIG. BORROW SMART.</text>
 </svg>
