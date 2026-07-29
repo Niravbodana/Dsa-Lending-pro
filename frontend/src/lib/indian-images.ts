@@ -1,4 +1,5 @@
-import { HERO_PRIMARY_IMAGE, HERO_REVIEWS } from "@/lib/hero-reviews";
+import { HERO_PRIMARY_IMAGE } from "@/lib/hero-images";
+import { HERO_REVIEWS } from "@/lib/hero-reviews";
 
 /**
  * Curated Indian lifestyle imagery — natural portraits, families, cities, celebrations.

@@ -27,18 +27,18 @@ export function Header() {
   }, [pathname]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200/90 bg-white/98 shadow-sm backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2.5 sm:py-3">
+    <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/98 backdrop-blur-md">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3">
         <Link
           href="/"
           onClick={goHome}
           aria-label="NeerCred — Go to homepage"
           className="flex shrink-0 items-center"
         >
-          <NeerCredLogo size={52} className="h-12 w-auto sm:h-14 lg:h-[3.75rem]" />
+          <NeerCredLogo variant="header" className="h-14 w-auto sm:h-[3.75rem]" />
         </Link>
 
-        <nav className="hidden items-center gap-1 lg:flex" aria-label="Main navigation">
+        <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Main navigation">
           {navLinks.map((link) => {
             const active = pathname === link.href;
             return (
@@ -47,36 +47,27 @@ export function Header() {
                 href={link.href}
                 className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${
                   active
-                    ? "bg-teal-50 text-neercred-teal"
-                    : "text-slate-700 hover:bg-slate-50 hover:text-neercred-teal"
+                    ? "text-[#00796B]"
+                    : "text-slate-700 hover:text-[#00796B]"
                 }`}
               >
                 {link.label}
               </Link>
             );
           })}
-          <Link
-            href="/compliance"
-            className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${
-              pathname === "/compliance"
-                ? "bg-teal-50 text-neercred-teal"
-                : "text-slate-700 hover:bg-slate-50 hover:text-neercred-teal"
-            }`}
-          >
-            Compliance
-          </Link>
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
           <Link
             href="/app"
-            className="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-slate-600 transition hover:text-neercred-teal md:flex"
+            className="hidden items-center gap-2 rounded-full border border-slate-300 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-white md:inline-flex"
           >
-            <IconSmartphone size={14} /> App
+            <IconSmartphone size={16} />
+            Download App
           </Link>
           <Link
             href="/apply"
-            className="rounded-full bg-neercred-cta px-5 py-2.5 text-sm font-bold text-white shadow-neercred transition hover:brightness-110"
+            className="rounded-full bg-[#00796B] px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#00695C]"
           >
             Apply Now
           </Link>
@@ -97,20 +88,22 @@ export function Header() {
             <Link
               href="/"
               onClick={goHome}
-              className="rounded-lg px-3 py-2.5 text-sm font-semibold text-neercred-teal hover:bg-slate-50"
+              className="rounded-lg px-3 py-2.5 text-sm font-semibold text-[#00796B] hover:bg-slate-50"
             >
               Home
             </Link>
-            {[...navLinks, { href: "/compliance", label: "Compliance" }, { href: "/security", label: "Security" }].map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-neercred-teal"
-                onClick={() => setMenuOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {[...navLinks, { href: "/app", label: "Download App" }, { href: "/compliance", label: "Compliance" }].map(
+              (link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-[#00796B]"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {link.label}
+                </Link>
+              ),
+            )}
           </div>
         </nav>
       )}

@@ -11,7 +11,6 @@ import {
 } from "@/components/ConversionSections";
 import {
   HowItWorks,
-  Partners,
   LoanProductsStrip,
   LifestyleShowcase,
   TrustGallery,
@@ -22,7 +21,6 @@ import {
   BusinessModelFlow,
   PlatformCapabilities,
   PremiumFeaturesGrid,
-  MetricsTicker,
 } from "@/components/PremiumSections";
 import { Footer } from "@/components/Footer";
 import { EmiCalculator } from "@/components/EmiCalculator";
@@ -55,7 +53,6 @@ export function HomePage() {
       <Header />
       <DynamicHero config={config} />
       <HeroTrustBand />
-      {config.sections.metrics_ticker !== false && <MetricsTicker />}
       <DreamSection config={config} />
       <BusinessModelFlow />
       <LoanProductsStrip />
@@ -67,7 +64,6 @@ export function HomePage() {
       {config.sections.testimonials !== false && <Testimonials />}
       <PlatformCapabilities />
       <TrustGallery />
-      <Partners />
       <ReferBanner />
       <AppDownloadBanner />
       <FAQ />
