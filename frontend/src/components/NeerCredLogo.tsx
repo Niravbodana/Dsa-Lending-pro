@@ -1,4 +1,5 @@
 import { BRAND } from "@/lib/brand";
+import { NeerCredLogoSvg } from "@/components/NeerCredLogoSvg";
 
 type NeerCredLogoProps = {
   /** Use light-text version on dark backgrounds (footer, dashboard) */
@@ -7,20 +8,16 @@ type NeerCredLogoProps = {
   className?: string;
 };
 
-/** Single official lockup — /brand/neercred-horizontal.svg (transparent) */
-const LOGO = "/brand/neercred-horizontal.svg";
-const LOGO_DARK = "/brand/neercred-horizontal-light.svg";
-
+/** Official transparent lockup — inline SVG (no white box, Poppins renders correctly) */
 export function NeerCredLogo({ dark = false, size = 76, className = "" }: NeerCredLogoProps) {
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={dark ? LOGO_DARK : LOGO}
-      alt={`${BRAND.appName} — ${BRAND.logoTagline}`}
-      className={`h-auto w-auto bg-transparent object-contain object-left ${className}`}
+    <NeerCredLogoSvg
+      variant={dark ? "dark" : "light"}
+      className={`block h-auto w-auto bg-transparent ${className}`}
       style={className ? undefined : { height: size, width: "auto" }}
+      aria-label={`${BRAND.appName} — ${BRAND.logoTagline}`}
     />
   );
 }
 
-export const NEERCRED_LOGO_SRC = LOGO;
+export const NEERCRED_LOGO_SRC = "/brand/neercred-horizontal.svg";
