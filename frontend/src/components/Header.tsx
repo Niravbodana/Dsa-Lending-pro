@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { BRAND } from "@/lib/brand";
+import { usePathname } from "next/navigation";
+import { useState, useCallback } from "react";
+import { NeerCredLogo } from "@/components/NeerCredLogo";
 import { IconMenu, IconX, IconSmartphone } from "@/components/icons";
 
 const navLinks = [
@@ -17,35 +18,52 @@ const navLinks = [
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  const goHome = useCallback(() => {
+    setMenuOpen(false);
+    if (pathname === "/") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [pathname]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/95 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5">
-        <Link href="/" className="flex items-center gap-3" onClick={() => setMenuOpen(false)}>
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-slate-900 to-teal-800 text-sm font-black tracking-tight text-white shadow-lg">
-            NL
-          </div>
-          <div>
-            <p className="text-base font-extrabold tracking-tight text-slate-900">
-              Neer <span className="text-teal-700">Loan</span>
-            </p>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-400">
-              {BRAND.tagline}
-            </p>
-          </div>
+    <header className="sticky top-0 z-50 border-b border-slate-200/90 bg-white/98 shadow-sm backdrop-blur-xl">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2.5 sm:py-3">
+        <Link
+          href="/"
+          onClick={goHome}
+          aria-label="NeerCred — Go to homepage"
+          className="flex shrink-0 items-center"
+        >
+          <NeerCredLogo size={64} className="h-14 w-auto sm:h-[4.25rem] lg:h-[4.75rem]" />
         </Link>
 
-        <nav className="hidden items-center gap-5 xl:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-sm font-medium text-slate-600 transition hover:text-teal-700"
-            >
-              {link.label}
-            </Link>
-          ))}
-          <Link href="/compliance" className="text-sm font-medium text-slate-600 transition hover:text-teal-700">
+        <nav className="hidden items-center gap-1 lg:flex" aria-label="Main navigation">
+          {navLinks.map((link) => {
+            const active = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${
+                  active
+                    ? "bg-teal-50 text-neercred-teal"
+                    : "text-slate-700 hover:bg-slate-50 hover:text-neercred-teal"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+          <Link
+            href="/compliance"
+            className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${
+              pathname === "/compliance"
+                ? "bg-teal-50 text-neercred-teal"
+                : "text-slate-700 hover:bg-slate-50 hover:text-neercred-teal"
+            }`}
+          >
             Compliance
           </Link>
         </nav>
@@ -53,19 +71,19 @@ export function Header() {
         <div className="flex items-center gap-2 sm:gap-3">
           <Link
             href="/app"
-            className="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-slate-500 hover:text-teal-700 md:flex"
+            className="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-slate-600 transition hover:text-neercred-teal md:flex"
           >
             <IconSmartphone size={14} /> App
           </Link>
           <Link
             href="/apply"
-            className="rounded-full bg-slate-900 px-4 py-2.5 text-sm font-bold text-white shadow-lg transition hover:bg-slate-800 sm:px-5"
+            className="rounded-full bg-neercred-cta px-5 py-2.5 text-sm font-bold text-white shadow-neercred transition hover:brightness-110"
           >
             Apply Now
           </Link>
           <button
             type="button"
-            className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 xl:hidden"
+            className="rounded-lg p-2 text-slate-700 hover:bg-slate-100 lg:hidden"
             aria-label="Toggle menu"
             onClick={() => setMenuOpen((open) => !open)}
           >
@@ -75,13 +93,20 @@ export function Header() {
       </div>
 
       {menuOpen && (
-        <nav className="border-t border-slate-100 bg-white px-4 py-4 xl:hidden">
+        <nav className="border-t border-slate-100 bg-white px-4 py-4 lg:hidden" aria-label="Mobile navigation">
           <div className="flex flex-col gap-1">
-            {[...navLinks, { href: "/compliance", label: "Compliance" }, { href: "/security", label: "Security" }, { href: "/refer", label: "Refer & Earn" }].map((link) => (
+            <Link
+              href="/"
+              onClick={goHome}
+              className="rounded-lg px-3 py-2.5 text-sm font-semibold text-neercred-teal hover:bg-slate-50"
+            >
+              Home
+            </Link>
+            {[...navLinks, { href: "/compliance", label: "Compliance" }, { href: "/security", label: "Security" }].map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-neercred-teal"
                 onClick={() => setMenuOpen(false)}
               >
                 {link.label}

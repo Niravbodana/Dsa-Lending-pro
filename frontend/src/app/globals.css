@@ -4,10 +4,14 @@
 
 :root {
   --background: #f8fafc;
-  --foreground: #0f172a;
-  --primary: #0d9488;
-  --primary-dark: #0f766e;
-  --gold: #f59e0b;
+  --foreground: #0b1220;
+  --neercred-navy: #0b1220;
+  --neercred-teal: #0f766e;
+  --neercred-cyan: #0891b2;
+  --neercred-gold: #d4a017;
+  --neercred-logo-bay: #fefefe;
+  --primary: #0f766e;
+  --primary-dark: #0b1220;
 }
 
 html {
@@ -22,16 +26,31 @@ body {
 
 @layer utilities {
   .gradient-hero {
-    background: linear-gradient(135deg, #0c4a6e 0%, #0f766e 35%, #0d9488 65%, #0891b2 100%);
+    background: linear-gradient(135deg, #0b1220 0%, #0f766e 40%, #0d9488 70%, #0891b2 100%);
   }
   .gradient-gold {
-    background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+    background: linear-gradient(135deg, #fde68a 0%, #d4a017 100%);
   }
   .glass-card {
-    @apply bg-white/95 backdrop-blur-xl border border-white/60 shadow-2xl;
+    @apply border border-white/70 bg-white/95 shadow-neercred backdrop-blur-xl;
+  }
+  .neercred-card {
+    @apply rounded-2xl border border-teal-100/80 bg-neercred-card shadow-neercred;
+  }
+  .neercred-card-dark {
+    @apply rounded-2xl bg-white/5 backdrop-blur-sm;
+  }
+  .neercred-btn {
+    @apply rounded-xl bg-neercred-cta font-bold text-white shadow-neercred transition hover:brightness-110;
   }
   .text-gradient-gold {
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    background: linear-gradient(135deg, #fde68a, #d4a017);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .text-gradient-neercred {
+    background: linear-gradient(135deg, #0f766e, #0891b2);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -39,16 +58,8 @@ body {
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }
-  .animate-pulse-slow {
-    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
   .premium-section-dark {
-    @apply bg-slate-950 text-white;
-  }
-  .image-parallax {
-    background-attachment: fixed;
-    background-position: center;
-    background-size: cover;
+    @apply bg-neercred-navy text-white;
   }
 }
 
@@ -57,23 +68,25 @@ body {
   50% { transform: translateY(-12px); }
 }
 
-/* Scroll reveal animations */
 .reveal {
   opacity: 0;
-  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: opacity, transform;
+  transition:
+    opacity 1s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 1s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform, filter;
 }
 
-.reveal-up { transform: translateY(48px); }
-.reveal-left { transform: translateX(-48px); }
-.reveal-right { transform: translateX(48px); }
-.reveal-scale { transform: scale(0.92); }
-.reveal-fade { transform: none; }
+.reveal-up { transform: translateY(72px); filter: blur(4px); }
+.reveal-left { transform: translateX(-80px); filter: blur(3px); }
+.reveal-right { transform: translateX(80px); filter: blur(3px); }
+.reveal-scale { transform: scale(0.9); filter: blur(2px); }
+.reveal-fade { transform: none; filter: blur(6px); }
 
 .reveal-visible {
   opacity: 1;
   transform: translate(0) scale(1);
+  filter: blur(0);
 }
 
 @media (prefers-reduced-motion: reduce) {

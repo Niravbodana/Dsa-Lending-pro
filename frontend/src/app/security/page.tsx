@@ -2,6 +2,7 @@ import Link from "next/link";
 import { PageShell } from "@/components/PageShell";
 import { InnerHero } from "@/components/InnerHero";
 import { BRAND } from "@/lib/brand";
+import { INDIAN_IMAGES } from "@/lib/indian-images";
 import { IconLock, IconShield, IconCheck } from "@/components/icons";
 
 export const metadata = { title: `Security | ${BRAND.name}` };
@@ -22,7 +23,7 @@ export default function SecurityPage() {
         badge="SECURITY"
         title="Bank-Grade Security"
         subtitle="Your financial data deserves enterprise-level protection at every step."
-        image="https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1920&h=600&fit=crop"
+        image={INDIAN_IMAGES.pages.security}
       />
       <div className="mx-auto max-w-4xl px-4 py-16">
         <div className="grid gap-6 md:grid-cols-2">

@@ -3,6 +3,7 @@ import Image from "next/image";
 import { PageShell } from "@/components/PageShell";
 import { InnerHero } from "@/components/InnerHero";
 import { BRAND } from "@/lib/brand";
+import { INDIAN_IMAGES } from "@/lib/indian-images";
 
 export const metadata = { title: `Loan Products | ${BRAND.name}` };
 
@@ -14,7 +15,7 @@ const products = [
     rate: "10.99% onwards",
     desc: "For any personal need — no questions asked.",
     features: ["Instant eligibility", "No collateral", "Flexible tenure"],
-    image: "https://images.unsplash.com/photo-1554224311-0fb870a1d0ef?w=600&h=360&fit=crop",
+    image: INDIAN_IMAGES.loans.personal,
   },
   {
     slug: "medical",
@@ -23,7 +24,7 @@ const products = [
     rate: "11.49% onwards",
     desc: "Medical emergency? Same-day approval possible.",
     features: ["Fast disbursal", "Minimal docs", "Priority processing"],
-    image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&h=360&fit=crop",
+    image: INDIAN_IMAGES.loans.medical,
   },
   {
     slug: "wedding",
@@ -32,7 +33,7 @@ const products = [
     rate: "11.99% onwards",
     desc: "Make your dream wedding stress-free on budget.",
     features: ["High loan amount", "Long tenure", "Special rates"],
-    image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=600&h=360&fit=crop",
+    image: INDIAN_IMAGES.loans.wedding,
   },
   {
     slug: "business",
@@ -41,7 +42,7 @@ const products = [
     rate: "12.49% onwards",
     desc: "Grow your business with working capital financing.",
     features: ["Self-employed friendly", "Quick approval", "No property needed"],
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=360&fit=crop",
+    image: INDIAN_IMAGES.loans.business,
   },
   {
     slug: "education",
@@ -50,7 +51,7 @@ const products = [
     rate: "11.25% onwards",
     desc: "Fund your education goals with flexible repayment.",
     features: ["Student friendly", "Moratorium option", "Low EMI"],
-    image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&h=360&fit=crop",
+    image: INDIAN_IMAGES.loans.education,
   },
   {
     slug: "travel",
@@ -59,7 +60,7 @@ const products = [
     rate: "12.99% onwards",
     desc: "Your dream vacation — now possible with easy EMIs.",
     features: ["Quick process", "No advance", "Digital only"],
-    image: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&h=360&fit=crop",
+    image: INDIAN_IMAGES.loans.travel,
   },
 ];
 
@@ -71,7 +72,7 @@ export default function LoansPage() {
         title="All Loan Types, One Platform"
         subtitle="Every loan type on one platform — compare offers and choose the best."
         cta={{ label: "Check Eligibility →", href: "/apply" }}
-        image="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920&h=600&fit=crop"
+        image={INDIAN_IMAGES.pages.loansBanner}
       />
       <div className="mx-auto max-w-6xl px-4 py-16">
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">

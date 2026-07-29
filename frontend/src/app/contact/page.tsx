@@ -2,6 +2,7 @@ import Link from "next/link";
 import { PageShell } from "@/components/PageShell";
 import { InnerHero } from "@/components/InnerHero";
 import { BRAND } from "@/lib/brand";
+import { INDIAN_IMAGES } from "@/lib/indian-images";
 
 export const metadata = { title: `Contact Us | ${BRAND.name}` };
 
@@ -12,7 +13,7 @@ export default function ContactPage() {
         badge="CONTACT"
         title="Get in Touch"
         subtitle="Have a question? We're here — call, email, or WhatsApp us."
-        image="https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=1920&h=600&fit=crop"
+        image={INDIAN_IMAGES.pages.contact}
       />
       <div className="mx-auto max-w-4xl px-4 py-16">
         <div className="grid gap-8 md:grid-cols-2">

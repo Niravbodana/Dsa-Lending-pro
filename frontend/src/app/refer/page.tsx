@@ -1,6 +1,7 @@
 import { PageShell } from "@/components/PageShell";
 import { InnerHero } from "@/components/InnerHero";
 import { BRAND } from "@/lib/brand";
+import { INDIAN_IMAGES } from "@/lib/indian-images";
 
 export const metadata = { title: `Refer & Earn | ${BRAND.name}` };
 
@@ -19,7 +20,7 @@ export default function ReferPage() {
         title="Refer Friends, Earn ₹2,000"
         subtitle="Earn ₹2,000 for every successful disbursal when you refer friends to Neer Loan Solutions."
         cta={{ label: "Start Referring →", href: "/apply" }}
-        image="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&h=600&fit=crop"
+        image={INDIAN_IMAGES.pages.refer}
       />
       <div className="mx-auto max-w-4xl px-4 py-16">
         <div className="grid gap-6 md:grid-cols-2">

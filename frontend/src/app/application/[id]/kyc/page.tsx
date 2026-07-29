@@ -3,7 +3,11 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { NeerCredLogo } from "@/components/NeerCredLogo";
+import { INDIAN_IMAGES } from "@/lib/indian-images";
 import {
   aadhaarSendOtp,
   aadhaarVerify,
@@ -129,17 +133,28 @@ export default function KycPage() {
   const stepIndex = step === "aadhaar_otp" ? 0 : steps.indexOf(step as typeof steps[number]);
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <>
       <Header />
-      <div className="mx-auto max-w-2xl px-4 py-10">
-        <div className="mb-6 text-center">
-          <span className="rounded-full bg-teal-100 px-4 py-1 text-sm font-bold text-teal-700">
-            Phase 3 — KYC & eSign
-          </span>
-          {appRef && (
-            <p className="mt-2 font-mono text-sm text-slate-500">Ref: {appRef}</p>
-          )}
+      <main className="min-h-screen bg-slate-50">
+        <div className="relative overflow-hidden bg-neercred-navy py-8 text-white">
+          <Image
+            src={INDIAN_IMAGES.howItWorks.form}
+            alt=""
+            fill
+            className="object-cover opacity-20"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-neercred-navy/95 to-neercred-teal/80" />
+          <div className="relative mx-auto flex max-w-2xl flex-col items-center gap-4 px-4 text-center sm:flex-row sm:text-left">
+            <NeerCredLogo dark size={48} className="h-10 w-auto shrink-0" />
+            <div>
+              <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold">Phase 3 — KYC &amp; eSign</span>
+              {appRef && <p className="mt-2 font-mono text-sm text-teal-200">Ref: {appRef}</p>}
+              <p className="mt-1 text-sm text-slate-300">Secure Aadhaar, bank verification &amp; digital signing</p>
+            </div>
+          </div>
         </div>
+
+      <div className="mx-auto max-w-2xl px-4 py-10">
 
         <div className="mb-8 flex justify-between">
           {["Aadhaar", "Bank", "eSign", "Submit", "Done"].map((label, i) => (
@@ -323,6 +338,8 @@ export default function KycPage() {
           )}
         </div>
       </div>
-    </main>
+      </main>
+      <Footer />
+    </>
   );
 }

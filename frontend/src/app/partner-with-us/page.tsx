@@ -1,6 +1,7 @@
 import { PageShell } from "@/components/PageShell";
 import { InnerHero } from "@/components/InnerHero";
 import { BRAND } from "@/lib/brand";
+import { INDIAN_IMAGES } from "@/lib/indian-images";
 
 export const metadata = { title: `Partner With Us | ${BRAND.name}` };
 
@@ -19,6 +20,7 @@ export default function PartnerPage() {
         title="Partner With Neer Loan Solutions"
         subtitle="Banks, NBFCs, and DSA agents — grow together with Neer Loan Solutions."
         cta={{ label: "Contact Partnership Team →", href: "/contact" }}
+        image={INDIAN_IMAGES.pages.partner}
       />
       <div className="mx-auto max-w-5xl px-4 py-16">
         <div className="grid gap-6 md:grid-cols-2">

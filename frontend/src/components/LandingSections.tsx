@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ScrollReveal } from "@/components/ScrollReveal";
+import { ScrollReveal, ScrollRevealAlternate } from "@/components/ScrollReveal";
 import {
   IconRupee,
   IconChart,
@@ -12,6 +12,7 @@ import {
   IconBank,
   IconStar,
 } from "@/components/icons";
+import { INDIAN_IMAGES } from "@/lib/indian-images";
 
 const stats = [
   { value: "₹5L+", label: "Max Loan", Icon: IconRupee },
@@ -30,25 +31,25 @@ const loanCards = [
   {
     title: "Personal",
     href: "/loans",
-    image: "https://images.unsplash.com/photo-1554224311-0fb870a1d0ef?w=600&h=400&fit=crop",
+    image: INDIAN_IMAGES.loans.personal,
     rate: "10.99%",
   },
   {
     title: "Medical",
     href: "/loans",
-    image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&h=400&fit=crop",
+    image: INDIAN_IMAGES.loans.medical,
     rate: "11.49%",
   },
   {
     title: "Wedding",
     href: "/loans",
-    image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=600&h=400&fit=crop",
+    image: INDIAN_IMAGES.loans.wedding,
     rate: "11.99%",
   },
   {
     title: "Business",
     href: "/loans",
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop",
+    image: INDIAN_IMAGES.loans.business,
     rate: "12.49%",
   },
 ];
@@ -57,14 +58,14 @@ const lifestyleBlocks = [
   {
     title: "Home, Wedding, Dreams — All Possible",
     desc: "Neer Loan Solutions connects you with India's trusted banks and NBFCs. Compare offers, choose the best rate, and receive funds directly in your account.",
-    image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=900&h=600&fit=crop",
+    image: INDIAN_IMAGES.lifestyle.familyHome,
     cta: "Explore Loans",
     href: "/loans",
   },
   {
     title: "100% Digital. Zero Branch Visits.",
     desc: "OTP login, Aadhaar eKYC, bank verification, digital eSign — the entire process from your phone. Get approved from home.",
-    image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=900&h=600&fit=crop",
+    image: INDIAN_IMAGES.lifestyle.mobileIndia,
     cta: "Start Application",
     href: "/apply",
     reverse: true,
@@ -114,7 +115,7 @@ export function Hero() {
               href="/apply"
               className="rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 px-8 py-4 text-lg font-extrabold text-slate-900 shadow-2xl shadow-amber-500/30 transition hover:scale-[1.02]"
             >
-              Apply Now — Free
+              Apply Now
             </Link>
             <Link
               href="/rates"
@@ -142,7 +143,7 @@ export function Hero() {
             <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-amber-400/20 to-teal-400/20 blur-2xl" />
             <div className="relative overflow-hidden rounded-[2rem] border-4 border-white/20 shadow-2xl">
               <Image
-                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&h=750&fit=crop&crop=faces"
+                src={INDIAN_IMAGES.hero.customer}
                 alt="Neer Loan Solutions customer"
                 width={600}
                 height={750}
@@ -151,7 +152,7 @@ export function Hero() {
               />
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-900/95 via-slate-900/70 to-transparent p-6">
                 <p className="text-lg font-bold text-white">
-                  &ldquo;₹4.2 lakh approved in 3 minutes.&rdquo;
+                  &ldquo;Clear terms, smooth KYC, and timely disbursal.&rdquo;
                 </p>
                 <p className="mt-1 flex items-center gap-2 text-sm text-teal-200">
                   — Priya Sharma, Mumbai
@@ -169,8 +170,8 @@ export function Hero() {
                   <IconCheckCircle size={20} />
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-slate-500">Just Approved</p>
-                  <p className="text-lg font-black text-emerald-600">₹3,50,000</p>
+                  <p className="text-xs font-medium text-slate-500">Loan Disbursed</p>
+                  <p className="text-lg font-bold text-neercred-navy">₹3,50,000</p>
                 </div>
               </div>
             </div>
@@ -250,7 +251,7 @@ export function LoanProductsStrip() {
         </ScrollReveal>
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {loanCards.map((c, i) => (
-            <ScrollReveal key={c.title} variant="up" delay={i * 100}>
+            <ScrollRevealAlternate key={c.title} index={i} delay={i * 100}>
               <Link
                 href={c.href}
                 className="group block overflow-hidden rounded-3xl bg-white shadow-lg transition hover:-translate-y-2 hover:shadow-2xl"
@@ -270,7 +271,7 @@ export function LoanProductsStrip() {
                   <span className="text-sm font-bold text-teal-600">Apply →</span>
                 </div>
               </Link>
-            </ScrollReveal>
+            </ScrollRevealAlternate>
           ))}
         </div>
         <ScrollReveal variant="fade" className="mt-10 text-center">
@@ -284,20 +285,14 @@ export function LoanProductsStrip() {
 }
 
 export function TrustGallery() {
-  const images = [
-    "https://images.unsplash.com/photo-1521737711862-ece3fdac9ca2?w=400&h=300&fit=crop",
-    "https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?w=400&h=300&fit=crop",
-    "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=400&h=300&fit=crop",
-    "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=400&h=300&fit=crop",
-  ];
+  const images = INDIAN_IMAGES.trust;
 
   return (
     <section className="relative overflow-hidden bg-slate-950 py-24 text-white">
       <div
         className="image-parallax absolute inset-0 opacity-20"
         style={{
-          backgroundImage:
-            "url(https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&h=600&fit=crop)",
+          backgroundImage: `url(${INDIAN_IMAGES.pages.trustBg})`,
         }}
       />
       <div className="relative mx-auto max-w-7xl px-4">
@@ -327,7 +322,7 @@ export function AppDownloadBanner() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-r from-slate-900 to-teal-900 py-16 text-white">
       <Image
-        src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&h=400&fit=crop"
+        src={INDIAN_IMAGES.misc.appBanner}
         alt=""
         fill
         className="object-cover opacity-20"
@@ -355,25 +350,25 @@ export function AppDownloadBanner() {
 
 export function ReferBanner() {
   return (
-    <section className="relative overflow-hidden bg-amber-50 py-14">
+    <section className="relative overflow-hidden border-y border-neercred-gold/20 bg-gradient-to-r from-neercred-navy to-neercred-teal py-16 text-white">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-6 px-4">
         <ScrollReveal variant="left" className="flex items-center gap-6">
-          <div className="relative hidden h-24 w-24 overflow-hidden rounded-2xl sm:block">
+          <div className="relative hidden h-24 w-24 overflow-hidden rounded-2xl ring-2 ring-white/20 sm:block">
             <Image
-              src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&h=200&fit=crop"
-              alt="Friends referring"
+              src={INDIAN_IMAGES.misc.referThumb}
+              alt="Referral program"
               fill
               className="object-cover"
             />
           </div>
           <div>
-            <p className="text-2xl font-black text-amber-900">Refer &amp; Earn ₹2,000</p>
-            <p className="text-amber-700">Refer friends and earn on every successful disbursal</p>
+            <p className="text-2xl font-bold">Refer &amp; Earn</p>
+            <p className="text-slate-300">Earn rewards on every successful referral disbursal</p>
           </div>
         </ScrollReveal>
         <ScrollReveal variant="right">
-          <Link href="/refer" className="rounded-xl bg-amber-500 px-8 py-4 font-bold text-slate-900 shadow-lg">
-            Refer Now →
+          <Link href="/refer" className="rounded-xl bg-gradient-to-r from-neercred-gold to-amber-500 px-8 py-4 font-bold text-neercred-navy shadow-lg transition hover:brightness-110">
+            View Program
           </Link>
         </ScrollReveal>
       </div>
@@ -383,10 +378,10 @@ export function ReferBanner() {
 
 export function HowItWorks() {
   const steps = [
-    { num: "01", title: "Verify Mobile", desc: "Secure OTP login — 30 seconds", image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400&h=260&fit=crop" },
-    { num: "02", title: "Enter Details", desc: "PAN, income, city — simple form", image: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=400&h=260&fit=crop" },
-    { num: "03", title: "Compare Offers", desc: "Choose the best rate from 15+ lenders", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=260&fit=crop" },
-    { num: "04", title: "Money in Account", desc: "Direct disbursal from partner bank", image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400&h=260&fit=crop" },
+    { num: "01", title: "Verify Mobile", desc: "Secure OTP login — 30 seconds", image: INDIAN_IMAGES.howItWorks.mobile },
+    { num: "02", title: "Enter Details", desc: "PAN, income, city — simple form", image: INDIAN_IMAGES.howItWorks.form },
+    { num: "03", title: "Compare Offers", desc: "Choose the best rate from 15+ lenders", image: INDIAN_IMAGES.howItWorks.compare },
+    { num: "04", title: "Money in Account", desc: "Direct disbursal from partner bank", image: INDIAN_IMAGES.howItWorks.disbursal },
   ];
 
   return (
@@ -400,7 +395,7 @@ export function HowItWorks() {
         </ScrollReveal>
         <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
           {steps.map((step, i) => (
-            <ScrollReveal key={step.num} variant="up" delay={i * 100}>
+            <ScrollRevealAlternate key={step.num} index={i} delay={i * 100}>
               <div className="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-lg transition hover:-translate-y-2 hover:shadow-2xl">
                 <div className="relative h-36">
                   <Image src={step.image} alt={step.title} fill className="object-cover" />
@@ -415,7 +410,7 @@ export function HowItWorks() {
                   <p className="mt-2 text-slate-500">{step.desc}</p>
                 </div>
               </div>
-            </ScrollReveal>
+            </ScrollRevealAlternate>
           ))}
         </div>
       </div>
