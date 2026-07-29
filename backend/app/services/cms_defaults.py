@@ -70,6 +70,10 @@ DEFAULT_SITE_CONFIG: dict = {
     "theme": {
         "accent": "teal",
         "hero_style": "premium",
+        "background": "glass-blue",
+        "hero_overlay": "sky-glass",
+        "glass_intensity": "high",
+        "hero_background": "/hero-wedding-couple.png",
     },
     "sections": {
         "urgency_bar": False,

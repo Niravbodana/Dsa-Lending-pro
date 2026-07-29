@@ -5,14 +5,17 @@ from urllib.parse import urlparse
 ALLOWED_IMAGE_HOSTS = frozenset(
     {
         "images.unsplash.com",
+        "images.pexels.com",
+        "cdn.pixabay.com",
+        "images.unsplash.com",
     }
 )
 
 
 def is_safe_https_image_url(url: str) -> bool:
-    """Allow HTTPS image URLs from approved hosts, or local /images/ paths."""
+    """Allow HTTPS image URLs from approved hosts, or local /images/ and /hero paths."""
     cleaned = url.strip()
-    if cleaned.startswith("/images/"):
+    if cleaned.startswith("/images/") or cleaned.startswith("/hero"):
         return True
     try:
         parsed = urlparse(cleaned)

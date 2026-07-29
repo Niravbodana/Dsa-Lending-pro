@@ -18,7 +18,7 @@ import {
   Lead,
   updateBug,
 } from "@/lib/api";
-import { SiteBuilderChat } from "@/components/SiteBuilderChat";
+import { AdvancedSiteBuilder } from "@/components/AdvancedSiteBuilder";
 
 type Tab = "dashboard" | "leads" | "applications" | "consents" | "sitebuilder" | "bugs";
 
@@ -443,7 +443,7 @@ export default function AdminPage() {
         )}
 
         {tab === "sitebuilder" && token && (
-          <SiteBuilderChat token={token} />
+          <AdvancedSiteBuilder token={token} />
         )}
 
         {/* Bugs */}

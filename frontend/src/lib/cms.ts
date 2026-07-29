@@ -27,7 +27,14 @@ export type SiteConfig = {
     subtitle: string;
     cards: { title: string; desc: string; image: string; cta: string }[];
   };
-  theme: { accent: string; hero_style: string };
+  theme: {
+    accent: string;
+    hero_style: string;
+    background?: string;
+    hero_overlay?: string;
+    glass_intensity?: string;
+    hero_background?: string;
+  };
   sections: Record<string, boolean>;
 };
 
@@ -98,7 +105,14 @@ export const FALLBACK_CONFIG: SiteConfig = {
       },
     ],
   },
-  theme: { accent: "teal", hero_style: "premium" },
+  theme: {
+    accent: "teal",
+    hero_style: "premium",
+    background: "glass-blue",
+    hero_overlay: "sky-glass",
+    glass_intensity: "high",
+    hero_background: "/hero-wedding-couple.png",
+  },
   sections: {
     urgency_bar: false,
     promo_strip: false,
@@ -115,38 +129,91 @@ export async function fetchSiteConfig(): Promise<SiteConfig> {
     const res = await fetch(`${API_BASE}/api/cms/config`, { cache: "no-store" });
     if (!res.ok) return FALLBACK_CONFIG;
     const data = await res.json();
-    const merged: SiteConfig = {
-      ...FALLBACK_CONFIG,
-      ...data.config,
-      hero: { ...FALLBACK_CONFIG.hero, ...data.config?.hero },
-      sections: {
-        ...FALLBACK_CONFIG.sections,
-        ...data.config?.sections,
-        urgency_bar: false,
-        promo_strip: false,
-        social_proof: false,
-      },
-      urgency_bar: { enabled: false, text: "", emoji: "" },
-      promo_strip: { enabled: false, text: "", highlight: "" },
-      social_proof: { enabled: false, viewers_base: 0, label: "" },
-    };
-    return merged;
+    return mergeConfig(data.config);
   } catch {
     return FALLBACK_CONFIG;
   }
 }
 
-export async function cmsAdminChat(token: string, message: string) {
+export async function fetchPreviewConfig(token: string): Promise<SiteConfig> {
+  const res = await fetch(`${API_BASE}/api/cms/preview?token=${encodeURIComponent(token)}`, {
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error("Preview load failed");
+  const data = await res.json();
+  return mergeConfig(data.config);
+}
+
+function mergeConfig(raw: Partial<SiteConfig>): SiteConfig {
+  return {
+    ...FALLBACK_CONFIG,
+    ...raw,
+    hero: { ...FALLBACK_CONFIG.hero, ...raw?.hero },
+    theme: { ...FALLBACK_CONFIG.theme, ...raw?.theme },
+    dream_section: { ...FALLBACK_CONFIG.dream_section, ...raw?.dream_section },
+    sections: {
+      ...FALLBACK_CONFIG.sections,
+      ...raw?.sections,
+      urgency_bar: false,
+      promo_strip: false,
+      social_proof: false,
+    },
+    urgency_bar: { enabled: false, text: "", emoji: "" },
+    promo_strip: { enabled: false, text: "", highlight: "" },
+    social_proof: { enabled: false, viewers_base: 0, label: "" },
+  };
+}
+
+export async function cmsAdminChat(token: string, message: string, sessionId = "default") {
   const res = await fetch(`${API_BASE}/api/cms/admin/chat`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ message }),
+    body: JSON.stringify({ message, session_id: sessionId }),
   });
   if (!res.ok) throw new Error("CMS command failed");
-  return res.json() as Promise<{ reply: string; changes: string[]; config: SiteConfig }>;
+  return res.json() as Promise<{
+    reply: string;
+    changes: string[];
+    config: SiteConfig;
+    suggestions: string[];
+    image_options: { url: string; label: string }[];
+    has_draft_changes: boolean;
+    published: boolean;
+  }>;
+}
+
+export async function cmsAdminPublish(token: string) {
+  const res = await fetch(`${API_BASE}/api/cms/admin/publish`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Publish failed");
+  return res.json();
+}
+
+export async function cmsAdminDiscard(token: string) {
+  const res = await fetch(`${API_BASE}/api/cms/admin/discard`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Discard failed");
+  return res.json();
+}
+
+export async function cmsAdminStatus(token: string) {
+  const res = await fetch(`${API_BASE}/api/cms/admin/status`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error("Status failed");
+  return res.json() as Promise<{ config: SiteConfig; has_draft_changes?: boolean }>;
+}
+
+export async function cmsAdminChatLegacy(token: string, message: string) {
+  return cmsAdminChat(token, message);
 }
 
 export async function cmsAdminReset(token: string) {

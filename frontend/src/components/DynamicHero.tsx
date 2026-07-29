@@ -10,23 +10,60 @@ import type { SiteConfig } from "@/lib/cms";
 
 const ICONS = { bolt: IconBolt, shield: IconShield, clock: IconClock };
 
-type Props = { config: SiteConfig };
+type Props = {
+  config: SiteConfig;
+  heroOverlay?: string;
+};
 
-export function DynamicHero({ config }: Props) {
+function heroSrc(url: string | undefined): string {
+  if (url && url.trim()) return url;
+  return HERO_IMAGE.src;
+}
+
+function isRemote(src: string): boolean {
+  return src.startsWith("http://") || src.startsWith("https://");
+}
+
+export function DynamicHero({ config, heroOverlay }: Props) {
   const h = config.hero;
-  const copy = REFERENCE_HERO;
+  const src = heroSrc(h.image_url || config.theme?.hero_background);
+  const remote = isRemote(src);
+
+  const headline1 = h.headline_line1 || REFERENCE_HERO.headlineLine1;
+  const headlineHi = h.headline_highlight || REFERENCE_HERO.headlineHighlight;
+  const description = h.description || REFERENCE_HERO.description;
+  const badge = h.badge || REFERENCE_HERO.badge;
+  const ctaPrimary = h.cta_primary || REFERENCE_HERO.ctaPrimary;
+  const ctaSecondary = h.cta_secondary || REFERENCE_HERO.ctaSecondary;
+
+  const features = h.bullet_points?.length
+    ? h.bullet_points.slice(0, 3).map((text, i) => ({
+        text,
+        icon: (["bolt", "shield", "clock"] as const)[i] || ("bolt" as const),
+      }))
+    : REFERENCE_HERO.features;
 
   return (
     <section className="relative min-h-[540px] overflow-hidden lg:min-h-[600px]">
-      <Image
-        src={HERO_IMAGE.src}
-        alt={HERO_IMAGE.alt}
-        fill
-        priority
-        sizes="100vw"
-        className="object-cover object-[70%_center] sm:object-[center_right]"
+      {remote ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={src} alt={HERO_IMAGE.alt} className="absolute inset-0 h-full w-full object-cover object-[70%_center] sm:object-[center_right]" />
+      ) : (
+        <Image
+          src={src}
+          alt={HERO_IMAGE.alt}
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-[70%_center] sm:object-[center_right]"
+        />
+      )}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: heroOverlay || "var(--hero-overlay, linear-gradient(to right, rgba(224,242,254,0.95) 32%, rgba(255,255,255,0.85) 48%, rgba(255,255,255,0.15) 100%))",
+        }}
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-sky-50/95 from-[32%] via-white/85 via-[48%] to-white/15 lg:from-sky-50/90 lg:from-[38%] lg:via-white/70 lg:to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-t from-white/20 via-transparent to-transparent lg:hidden" />
 
       <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-8 px-4 py-10 lg:grid-cols-[1fr_0.85fr] lg:gap-10 lg:py-16">
@@ -36,21 +73,21 @@ export function DynamicHero({ config }: Props) {
             style={{ borderColor: `${REF.teal}55`, backgroundColor: REF.tealLight, color: REF.tealDark }}
           >
             <IconCheckCircle size={14} style={{ color: REF.teal }} />
-            {copy.badge}
+            {badge}
           </div>
 
           <h1 className="mt-6 text-[2.4rem] font-extrabold leading-[1.1] tracking-tight md:text-[2.85rem] lg:text-[3.35rem]">
-            <span style={{ color: REF.navy }}>{copy.headlineLine1}</span>{" "}
-            <span style={{ color: REF.teal }}>{copy.headlineHighlight}</span>
+            <span style={{ color: REF.navy }}>{headline1} </span>
+            <span style={{ color: REF.teal }}>{headlineHi}</span>
           </h1>
 
           <p className="mt-5 max-w-lg text-[15px] leading-relaxed md:text-base" style={{ color: REF.textMuted }}>
-            {copy.description}
+            {description}
           </p>
 
           <ul className="mt-7 space-y-3.5">
-            {copy.features.map((feature) => {
-              const Icon = ICONS[feature.icon];
+            {features.map((feature) => {
+              const Icon = ICONS[feature.icon as keyof typeof ICONS] || IconBolt;
               return (
                 <li key={feature.text} className="flex items-center gap-3 text-sm font-semibold md:text-[15px]">
                   <span
@@ -71,7 +108,7 @@ export function DynamicHero({ config }: Props) {
               className="inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-base font-bold text-white shadow-md transition hover:brightness-110"
               style={{ backgroundColor: REF.teal, boxShadow: `0 10px 24px -8px ${REF.teal}66` }}
             >
-              {copy.ctaPrimary}
+              {ctaPrimary}
               <span aria-hidden>→</span>
             </Link>
             <Link
@@ -85,20 +122,20 @@ export function DynamicHero({ config }: Props) {
               >
                 ▶
               </span>
-              {copy.ctaSecondary}
+              {ctaSecondary}
             </Link>
           </div>
         </div>
 
         <div className="relative hidden min-h-[280px] lg:block">
           <div className="absolute bottom-8 right-0">
-            <HeroRoiCard roiRate={h.roi_badge || copy.roiRate} roiLabel={copy.roiLabel} />
+            <HeroRoiCard roiRate={h.roi_badge || REFERENCE_HERO.roiRate} roiLabel={REFERENCE_HERO.roiLabel} />
           </div>
         </div>
       </div>
 
       <div className="relative z-10 flex justify-end px-4 pb-8 lg:hidden">
-        <HeroRoiCard roiRate={h.roi_badge || copy.roiRate} roiLabel={copy.roiLabel} />
+        <HeroRoiCard roiRate={h.roi_badge || REFERENCE_HERO.roiRate} roiLabel={REFERENCE_HERO.roiLabel} />
       </div>
     </section>
   );
