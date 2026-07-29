@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.database import get_db
-from app.models import AdminSession, BugReport, Lead, LoanApplication, UserConsent
+from app.models import AdminSession, BugReport, Lead, LendingPartner, LoanApplication, UserConsent
 from app.schemas_admin import (
     AdminLoginRequest,
     AdminLoginResponse,
@@ -21,9 +21,16 @@ from app.schemas_admin import (
     BugReportUpdate,
     LeadAdminResponse,
     LeadStatusUpdate,
+    LendingPartnerCreate,
+    LendingPartnerResponse,
+    LendingPartnerUpdate,
+    PartnerFieldCatalogItem,
 )
 from app.schemas_consent import ConsentRecordResponse
 from app.services.application import update_application_status
+from app.services.partner_fields import FIELD_CATALOG
+from app.services.partner_secrets import encrypt_api_key
+from app.services.partner_store import partner_admin_dict
 from app.services.rate_limit import rate_limit
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -263,3 +270,105 @@ def list_consents(
     if mobile:
         q = q.filter(UserConsent.mobile == mobile)
     return q.limit(min(limit, 500)).all()
+
+
+@router.get("/partners/field-catalog", response_model=list[PartnerFieldCatalogItem])
+def partner_field_catalog(_: None = Depends(verify_admin)):
+    return [
+        PartnerFieldCatalogItem(key=key, label=meta["label"], step=meta["step"], type=meta["type"])
+        for key, meta in FIELD_CATALOG.items()
+    ]
+
+
+@router.get("/partners", response_model=list[LendingPartnerResponse])
+def list_partners(db: Session = Depends(get_db), _: None = Depends(verify_admin)):
+    rows = db.query(LendingPartner).order_by(LendingPartner.sort_order.asc()).all()
+    return [LendingPartnerResponse(**partner_admin_dict(row)) for row in rows]
+
+
+@router.post("/partners", response_model=LendingPartnerResponse)
+def create_partner(
+    payload: LendingPartnerCreate,
+    db: Session = Depends(get_db),
+    _: None = Depends(verify_admin),
+):
+    import json
+
+    if db.query(LendingPartner).filter(LendingPartner.partner_id == payload.partner_id).first():
+        raise HTTPException(status_code=400, detail="Partner ID already exists")
+
+    row = LendingPartner(
+        partner_id=payload.partner_id,
+        lender_name=payload.lender_name,
+        lender_logo=payload.lender_logo.upper(),
+        api_url=payload.api_url,
+        api_key_encrypted=encrypt_api_key(payload.api_key) if payload.api_key else None,
+        webhook_url=payload.webhook_url,
+        enabled=payload.enabled,
+        sort_order=payload.sort_order,
+        required_fields_json=json.dumps(payload.required_fields),
+        mock_interest_rate=payload.mock_interest_rate,
+        mock_tenure_months=payload.mock_tenure_months,
+        mock_processing_fee=payload.mock_processing_fee,
+        mock_features_json=json.dumps(payload.mock_features),
+        mock_amount_offset=payload.mock_amount_offset,
+        page_slug=payload.page_slug or payload.partner_id,
+        page_title=payload.page_title or f"{payload.lender_name} Personal Loans",
+        page_description=payload.page_description,
+        offers_endpoint_path=payload.offers_endpoint_path,
+        auth_header_name=payload.auth_header_name,
+        auth_type=payload.auth_type,
+        timeout_seconds=payload.timeout_seconds,
+    )
+    db.add(row)
+    db.commit()
+    db.refresh(row)
+    return LendingPartnerResponse(**partner_admin_dict(row))
+
+
+@router.patch("/partners/{partner_db_id}", response_model=LendingPartnerResponse)
+def update_partner(
+    partner_db_id: int,
+    payload: LendingPartnerUpdate,
+    db: Session = Depends(get_db),
+    _: None = Depends(verify_admin),
+):
+    import json
+
+    row = db.query(LendingPartner).filter(LendingPartner.id == partner_db_id).first()
+    if not row:
+        raise HTTPException(status_code=404, detail="Partner not found")
+
+    data = payload.model_dump(exclude_unset=True)
+    if "api_key" in data:
+        api_key = data.pop("api_key")
+        if api_key:
+            row.api_key_encrypted = encrypt_api_key(api_key)
+    if "required_fields" in data:
+        row.required_fields_json = json.dumps(data.pop("required_fields"))
+    if "mock_features" in data:
+        row.mock_features_json = json.dumps(data.pop("mock_features"))
+
+    for key, value in data.items():
+        if key == "lender_logo" and value:
+            setattr(row, key, value.upper())
+        else:
+            setattr(row, key, value)
+
+    db.commit()
+    db.refresh(row)
+    return LendingPartnerResponse(**partner_admin_dict(row))
+
+
+@router.delete("/partners/{partner_db_id}")
+def delete_partner(
+    partner_db_id: int,
+    db: Session = Depends(get_db),
+    _: None = Depends(verify_admin),
+):
+    row = db.query(LendingPartner).filter(LendingPartner.id == partner_db_id).first()
+    if not row:
+        raise HTTPException(status_code=404, detail="Partner not found")
+    db.delete(row)
+    db.commit()
+    return {"message": "Partner deleted"}

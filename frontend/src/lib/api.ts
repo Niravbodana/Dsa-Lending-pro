@@ -57,6 +57,10 @@ export async function submitDetails(data: {
   monthly_income: number;
   employment_type: "salaried" | "self_employed" | "business";
   city: string;
+  date_of_birth?: string;
+  email?: string;
+  pincode?: string;
+  gender?: "male" | "female" | "other";
   consents: {
     dpdp_data_processing: boolean;
     privacy_policy: boolean;
@@ -460,4 +464,113 @@ export async function getAdminConsents(token: string, params?: { lead_id?: numbe
   });
   if (!res.ok) throw new Error("Failed to fetch consents");
   return res.json() as Promise<ConsentRecord[]>;
+}
+
+// --- Required fields (partner-driven apply flow) ---
+export type RequiredField = { key: string; label: string; step: string; type: string };
+
+export async function getRequiredFields() {
+  const res = await fetch(`${API_BASE}/api/leads/required-fields`);
+  if (!res.ok) throw new Error("Failed to load required fields");
+  return res.json() as Promise<{ fields: RequiredField[]; partners_count: number }>;
+}
+
+// --- Lending partners (admin) ---
+export type PartnerFieldCatalogItem = RequiredField;
+
+export type AdminPartner = {
+  id: number;
+  partner_id: string;
+  lender_name: string;
+  lender_logo: string;
+  api_url: string | null;
+  api_key_masked: string;
+  has_api_key: boolean;
+  webhook_url: string | null;
+  enabled: boolean;
+  sort_order: number;
+  required_fields: string[];
+  mock_interest_rate: number;
+  mock_tenure_months: number;
+  mock_processing_fee: string;
+  mock_features: string[];
+  mock_amount_offset: number;
+  page_slug: string | null;
+  page_title: string | null;
+  page_description: string | null;
+  offers_endpoint_path: string | null;
+  auth_header_name: string | null;
+  auth_type: string | null;
+  timeout_seconds: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type PublicPartner = {
+  partner_id: string;
+  lender_name: string;
+  lender_logo: string;
+  page_slug: string;
+  page_title: string | null;
+  page_description: string | null;
+  mock_interest_rate: number;
+  mock_tenure_months: number;
+  mock_processing_fee: string;
+  mock_features: string[];
+  required_fields: { key: string; label: string; step: string }[];
+};
+
+export async function getPartnerFieldCatalog(token: string) {
+  const res = await fetch(`${API_BASE}/api/admin/partners/field-catalog`, {
+    headers: adminHeaders(token),
+  });
+  if (!res.ok) throw new Error("Failed to load field catalog");
+  return res.json() as Promise<PartnerFieldCatalogItem[]>;
+}
+
+export async function getAdminPartners(token: string) {
+  const res = await fetch(`${API_BASE}/api/admin/partners`, { headers: adminHeaders(token) });
+  if (!res.ok) throw new Error("Failed to fetch partners");
+  return res.json() as Promise<AdminPartner[]>;
+}
+
+export async function createAdminPartner(token: string, data: Record<string, unknown>) {
+  const res = await fetch(`${API_BASE}/api/admin/partners`, {
+    method: "POST",
+    headers: adminHeaders(token),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error((await res.json()).detail || "Failed to create partner");
+  return res.json() as Promise<AdminPartner>;
+}
+
+export async function updateAdminPartner(token: string, id: number, data: Record<string, unknown>) {
+  const res = await fetch(`${API_BASE}/api/admin/partners/${id}`, {
+    method: "PATCH",
+    headers: adminHeaders(token),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error((await res.json()).detail || "Failed to update partner");
+  return res.json() as Promise<AdminPartner>;
+}
+
+export async function deleteAdminPartner(token: string, id: number) {
+  const res = await fetch(`${API_BASE}/api/admin/partners/${id}`, {
+    method: "DELETE",
+    headers: adminHeaders(token),
+  });
+  if (!res.ok) throw new Error("Failed to delete partner");
+  return res.json();
+}
+
+export async function getPublicPartners() {
+  const res = await fetch(`${API_BASE}/api/partners`);
+  if (!res.ok) throw new Error("Failed to load partners");
+  return res.json() as Promise<PublicPartner[]>;
+}
+
+export async function getPublicPartner(slug: string) {
+  const res = await fetch(`${API_BASE}/api/partners/${encodeURIComponent(slug)}`);
+  if (!res.ok) throw new Error("Partner not found");
+  return res.json() as Promise<PublicPartner>;
 }

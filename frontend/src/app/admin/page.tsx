@@ -19,8 +19,9 @@ import {
   updateBug,
 } from "@/lib/api";
 import { SiteBuilderChat } from "@/components/SiteBuilderChat";
+import { PartnerAdminPanel } from "@/components/PartnerAdminPanel";
 
-type Tab = "dashboard" | "leads" | "applications" | "consents" | "sitebuilder" | "bugs";
+type Tab = "dashboard" | "leads" | "applications" | "consents" | "sitebuilder" | "bugs" | "partners";
 
 const statusColors: Record<string, string> = {
   open: "bg-red-100 text-red-700",
@@ -182,6 +183,7 @@ export default function AdminPage() {
               { id: "consents" as Tab, label: "Legal Consents" },
               { id: "sitebuilder" as Tab, label: "Site Builder AI" },
               { id: "bugs" as Tab, label: "Bug Fixer" },
+              { id: "partners" as Tab, label: "🏦 Lending Partners" },
             ]
           ).map((item) => (
             <button
@@ -215,6 +217,8 @@ export default function AdminPage() {
                 ? "Legal Consents"
                 : tab === "sitebuilder"
                   ? "Site Builder AI"
+                  : tab === "partners"
+                    ? "Lending Partners"
                   : tab}
           </h1>
           <button
@@ -444,6 +448,10 @@ export default function AdminPage() {
 
         {tab === "sitebuilder" && token && (
           <SiteBuilderChat token={token} />
+        )}
+
+        {tab === "partners" && token && (
+          <PartnerAdminPanel token={token} />
         )}
 
         {/* Bugs */}

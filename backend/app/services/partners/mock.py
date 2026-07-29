@@ -1,19 +1,9 @@
-"""Mock partner adapters — replace with real HTTP calls when API keys are set."""
+"""Mock partner adapters — uses admin-configured mock profile when API is not set."""
 
 import random
 from typing import Literal
 
-from app.services.partners.base import PartnerAdapter, PartnerConfig, PartnerOfferRaw
-
-
-def _approval_chance(monthly_income: float, loan_amount: int) -> Literal["high", "medium", "low"]:
-    ratio = loan_amount / max(monthly_income, 1)
-    if ratio <= 8:
-        return "high"
-    if ratio <= 15:
-        return "medium"
-    return "low"
-
+from app.services.partners.base import PartnerAdapter, PartnerOfferRaw
 
 PARTNER_PROFILES = [
     {
@@ -79,26 +69,33 @@ PARTNER_PROFILES = [
 ]
 
 
+def _approval_chance(monthly_income: float, loan_amount: int) -> Literal["high", "medium", "low"]:
+    ratio = loan_amount / max(monthly_income or 1, 1)
+    if ratio <= 8:
+        return "high"
+    if ratio <= 15:
+        return "medium"
+    return "low"
+
+
 class MockPartnerAdapter(PartnerAdapter):
-    async def fetch_offers(
-        self,
-        monthly_income: float,
-        employment_type: str,
-        city: str,
-        pan: str,
-        max_loan_amount: int,
-    ) -> list[PartnerOfferRaw]:
-        profile = next(
-            (p for p in PARTNER_PROFILES if p["partner_id"] == self.config.partner_id),
-            None,
-        )
+    async def fetch_offers(self, lead_data: dict) -> list[PartnerOfferRaw]:
+        profile = self.config.mock_profile
+        if not profile:
+            profile = next(
+                (p for p in PARTNER_PROFILES if p["partner_id"] == self.config.partner_id),
+                None,
+            )
         if not profile:
             return []
 
-        loan_amount = max(max_loan_amount - profile["amount_offset"], 50000)
+        monthly_income = float(lead_data.get("monthly_income") or 0)
+        max_loan_amount = int(lead_data.get("max_loan_amount") or 100000)
+        pan = str(lead_data.get("pan") or "0000")
+
+        loan_amount = max(max_loan_amount - int(profile.get("amount_offset", 0)), 50000)
         chance = _approval_chance(monthly_income, loan_amount)
 
-        # Simulate occasional rejection
         if chance == "low" and random.random() < 0.3:
             return []
 
@@ -108,10 +105,10 @@ class MockPartnerAdapter(PartnerAdapter):
                 lender_name=profile["lender_name"],
                 lender_logo=profile["lender_logo"],
                 loan_amount=loan_amount,
-                interest_rate=profile["interest_rate"],
-                tenure_months=profile["tenure_months"],
-                processing_fee=profile["processing_fee"],
-                features=profile["features"],
+                interest_rate=float(profile["interest_rate"]),
+                tenure_months=int(profile["tenure_months"]),
+                processing_fee=str(profile.get("processing_fee", "2%")),
+                features=list(profile.get("features", [])),
                 approval_chance=chance,
             )
         ]

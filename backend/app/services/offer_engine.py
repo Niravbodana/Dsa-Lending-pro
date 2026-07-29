@@ -3,13 +3,15 @@
 import asyncio
 import math
 import time
-from typing import Literal
 
-from app.config import settings
+from sqlalchemy.orm import Session
+
+from app.models import Lead
 from app.schemas import LoanOffer
+from app.services.partner_store import get_enabled_partner_configs, lead_to_api_payload
 from app.services.partners.base import PartnerAdapter, PartnerConfig
 from app.services.partners.http import HttpPartnerAdapter
-from app.services.partners.mock import MockPartnerAdapter, PARTNER_PROFILES
+from app.services.partners.mock import MockPartnerAdapter
 
 
 def _calculate_emi(principal: int, annual_rate: float, tenure_months: int) -> int:
@@ -21,28 +23,6 @@ def _calculate_emi(principal: int, annual_rate: float, tenure_months: int) -> in
     return math.ceil(emi)
 
 
-def _get_partner_configs() -> list[PartnerConfig]:
-    configs = []
-    partner_api_map = {
-        "hdfc": (settings.partner_hdfc_api_url, settings.partner_hdfc_api_key),
-        "icici": (settings.partner_icici_api_url, settings.partner_icici_api_key),
-        "bajaj": (settings.partner_bajaj_api_url, settings.partner_bajaj_api_key),
-    }
-    for profile in PARTNER_PROFILES:
-        api_url, api_key = partner_api_map.get(profile["partner_id"], (None, None))
-        configs.append(
-            PartnerConfig(
-                partner_id=profile["partner_id"],
-                lender_name=profile["lender_name"],
-                lender_logo=profile["lender_logo"],
-                api_url=api_url,
-                api_key=api_key,
-                enabled=True,
-            )
-        )
-    return configs
-
-
 def _create_adapter(config: PartnerConfig) -> PartnerAdapter:
     if config.api_url and config.api_key:
         return HttpPartnerAdapter(config)
@@ -51,18 +31,12 @@ def _create_adapter(config: PartnerConfig) -> PartnerAdapter:
 
 async def _fetch_from_partner(
     adapter: PartnerAdapter,
-    monthly_income: float,
-    employment_type: str,
-    city: str,
-    pan: str,
-    max_loan_amount: int,
+    lead_data: dict,
 ) -> tuple[list[LoanOffer], int, str]:
     start = time.time()
     source = "api" if isinstance(adapter, HttpPartnerAdapter) else "mock"
     try:
-        raw_offers = await adapter.fetch_offers(
-            monthly_income, employment_type, city, pan, max_loan_amount
-        )
+        raw_offers = await adapter.fetch_offers(lead_data)
         elapsed_ms = int((time.time() - start) * 1000)
         offers = []
         for raw in raw_offers:
@@ -89,19 +63,19 @@ async def _fetch_from_partner(
 
 
 async def fetch_all_partner_offers(
-    monthly_income: float,
-    employment_type: str,
-    city: str,
-    pan: str,
-    max_loan_amount: int,
+    db: Session,
+    lead: Lead,
 ) -> tuple[list[LoanOffer], int, int]:
-    configs = [c for c in _get_partner_configs() if c.enabled]
+    lead_data = lead_to_api_payload(lead)
+    if not lead_data.get("max_loan_amount"):
+        mult = 20 if (lead.employment_type or "salaried") == "salaried" else 15
+        income = float(lead.monthly_income or 0)
+        lead_data["max_loan_amount"] = min(int(income * mult), 500000)
+
+    configs = get_enabled_partner_configs(db)
     adapters = [_create_adapter(c) for c in configs]
 
-    tasks = [
-        _fetch_from_partner(a, monthly_income, employment_type, city, pan, max_loan_amount)
-        for a in adapters
-    ]
+    tasks = [_fetch_from_partner(a, lead_data) for a in adapters]
     results = await asyncio.gather(*tasks)
 
     all_offers: list[LoanOffer] = []
@@ -111,7 +85,6 @@ async def fetch_all_partner_offers(
             responded += 1
             all_offers.extend(offers)
 
-    # Sort by interest rate, mark best deal
     all_offers.sort(key=lambda o: (o.interest_rate, -o.loan_amount))
     if all_offers:
         best = all_offers[0]
@@ -120,20 +93,5 @@ async def fetch_all_partner_offers(
     return all_offers, len(configs), responded
 
 
-def fetch_partner_offers_sync(
-    monthly_income: float,
-    employment_type: str,
-    city: str,
-    pan: str = "XXXXX0000X",
-    max_loan_amount: int | None = None,
-) -> tuple[list[LoanOffer], int, int]:
-    """Sync wrapper for use in FastAPI sync endpoints."""
-    if max_loan_amount is None:
-        mult = 20 if employment_type == "salaried" else 15
-        max_loan_amount = min(int(monthly_income * mult), 500000)
-
-    return asyncio.run(
-        fetch_all_partner_offers(
-            monthly_income, employment_type, city, pan, max_loan_amount
-        )
-    )
+def fetch_partner_offers_sync(db: Session, lead: Lead) -> tuple[list[LoanOffer], int, int]:
+    return asyncio.run(fetch_all_partner_offers(db, lead))

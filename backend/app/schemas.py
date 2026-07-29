@@ -44,6 +44,10 @@ class LeadDetailsRequest(BaseModel):
     monthly_income: float = Field(..., gt=0)
     employment_type: Literal["salaried", "self_employed", "business"]
     city: str = Field(..., min_length=2, max_length=80)
+    date_of_birth: str | None = Field(None, pattern=r"^\d{4}-\d{2}-\d{2}$")
+    email: str | None = Field(None, max_length=120)
+    pincode: str | None = Field(None, min_length=6, max_length=6, pattern=r"^\d{6}$")
+    gender: Literal["male", "female", "other"] | None = None
     consents: LeadConsentsInput
     page_url: str | None = None
 
@@ -69,6 +73,10 @@ class LeadResponse(BaseModel):
     monthly_income: float | None
     employment_type: str | None
     city: str | None
+    date_of_birth: str | None = None
+    email: str | None = None
+    pincode: str | None = None
+    gender: str | None = None
     status: str
     created_at: datetime
 
@@ -148,3 +156,15 @@ class SelectOfferResponse(BaseModel):
     application_id: int
     application_ref: str
     next_step: str
+
+
+class RequiredFieldInfo(BaseModel):
+    key: str
+    label: str
+    step: str
+    type: str
+
+
+class RequiredFieldsResponse(BaseModel):
+    fields: list[RequiredFieldInfo]
+    partners_count: int

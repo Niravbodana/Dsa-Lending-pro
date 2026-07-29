@@ -11,9 +11,13 @@ from app.schemas import (
     LeadDetailsRequest,
     LeadResponse,
     OffersResponse,
+    RequiredFieldInfo,
+    RequiredFieldsResponse,
     SelectOfferRequest,
     SelectOfferResponse,
 )
+from app.services.partner_fields import FIELD_CATALOG
+from app.services.partner_store import get_union_required_fields
 from app.services.application import add_status_history, generate_application_ref, send_notification
 from app.services.consent import record_consent, record_consent_bundle, log_consent_event
 from app.services.eligibility import EligibilityInput, check_eligibility
@@ -44,6 +48,10 @@ def save_lead_details(
     lead.monthly_income = payload.monthly_income
     lead.employment_type = payload.employment_type
     lead.city = payload.city
+    lead.date_of_birth = payload.date_of_birth
+    lead.email = payload.email
+    lead.pincode = payload.pincode
+    lead.gender = payload.gender
     lead.status = "details_submitted"
 
     c = payload.consents
@@ -134,13 +142,7 @@ def get_offers(
 
     max_loan = lead.max_loan_amount or min(int(lead.monthly_income * 20), 500000)
 
-    offers, queried, responded = fetch_partner_offers_sync(
-        monthly_income=lead.monthly_income,
-        employment_type=lead.employment_type or "salaried",
-        city=lead.city or "Mumbai",
-        pan=lead.pan or "XXXXX0000X",
-        max_loan_amount=max_loan,
-    )
+    offers, queried, responded = fetch_partner_offers_sync(db, lead)
 
     if not offers:
         raise HTTPException(status_code=404, detail="No offers available from partners")
@@ -240,3 +242,22 @@ def select_offer(payload: SelectOfferRequest, request: Request, db: Session = De
         application_ref=app_ref,
         next_step="/application/{id}/kyc",
     )
+
+
+@router.get("/required-fields", response_model=RequiredFieldsResponse)
+def get_required_fields(db: Session = Depends(get_db)):
+    keys = get_union_required_fields(db)
+    fields = [
+        RequiredFieldInfo(
+            key=key,
+            label=FIELD_CATALOG[key]["label"],
+            step=FIELD_CATALOG[key]["step"],
+            type=FIELD_CATALOG[key]["type"],
+        )
+        for key in keys
+        if key in FIELD_CATALOG
+    ]
+    from app.models import LendingPartner
+
+    count = db.query(LendingPartner).filter(LendingPartner.enabled.is_(True)).count()
+    return RequiredFieldsResponse(fields=fields, partners_count=count)

@@ -16,6 +16,10 @@ class Lead(Base):
     monthly_income: Mapped[float | None] = mapped_column(Float, nullable=True)
     employment_type: Mapped[str | None] = mapped_column(String(50), nullable=True)
     city: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    date_of_birth: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    email: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    pincode: Mapped[str | None] = mapped_column(String(6), nullable=True)
+    gender: Mapped[str | None] = mapped_column(String(20), nullable=True)
     loan_purpose: Mapped[str | None] = mapped_column(String(30), nullable=True)
     existing_emi: Mapped[float | None] = mapped_column(Float, nullable=True, default=0)
     eligibility_score: Mapped[int | None] = mapped_column(Integer, nullable=True)
@@ -160,6 +164,37 @@ class SiteConfig(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     config_json: Mapped[str] = mapped_column(Text)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+
+class LendingPartner(Base):
+    __tablename__ = "lending_partners"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    partner_id: Mapped[str] = mapped_column(String(50), unique=True, index=True)
+    lender_name: Mapped[str] = mapped_column(String(120))
+    lender_logo: Mapped[str] = mapped_column(String(40))
+    api_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    api_key_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
+    webhook_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    sort_order: Mapped[int] = mapped_column(Integer, default=0)
+    required_fields_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    mock_interest_rate: Mapped[float] = mapped_column(Float, default=12.99)
+    mock_tenure_months: Mapped[int] = mapped_column(Integer, default=36)
+    mock_processing_fee: Mapped[str] = mapped_column(String(40), default="2%")
+    mock_features_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    mock_amount_offset: Mapped[int] = mapped_column(Integer, default=0)
+    page_slug: Mapped[str | None] = mapped_column(String(80), nullable=True, index=True)
+    page_title: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    page_description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    offers_endpoint_path: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    auth_header_name: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    auth_type: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    timeout_seconds: Mapped[float] = mapped_column(Float, default=8.0)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
