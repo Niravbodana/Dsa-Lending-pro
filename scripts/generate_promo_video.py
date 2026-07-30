@@ -318,8 +318,13 @@ def paste_photo_card(
         draw_premium_frame(draw, card_box, accent, radius=48)
 
 
-def overlay_center_logo(base: Image.Image, logo_path: Path, width: int = 440, y: int | None = None) -> Image.Image:
-    """Place NeerCred logo prominently in screen center."""
+def paste_transparent_logo(
+    base: Image.Image,
+    logo_path: Path,
+    width: int = 420,
+    y: int = 175,
+) -> Image.Image:
+    """Premium transparent logo — no box, no border, soft glow only."""
     logo = Image.open(logo_path).convert("RGBA")
     bbox = logo.getbbox()
     if bbox:
@@ -328,30 +333,44 @@ def overlay_center_logo(base: Image.Image, logo_path: Path, width: int = 440, y:
     nw, nh = int(logo.width * scale), int(logo.height * scale)
     logo = logo.resize((nw, nh), Image.Resampling.LANCZOS)
 
-    pad_x, pad_y = 36, 22
-    pill_w, pill_h = nw + pad_x * 2, nh + pad_y * 2
-    pill = Image.new("RGBA", (pill_w, pill_h), (0, 0, 0, 0))
-    pdraw = ImageDraw.Draw(pill)
-    pdraw.rounded_rectangle([0, 0, pill_w - 1, pill_h - 1], radius=22, fill=(255, 255, 255, 235))
-    pdraw.rounded_rectangle([2, 2, pill_w - 3, pill_h - 3], radius=20, outline=(*hex_to_rgb(BRAND["gold"]), 200), width=2)
-    pill.paste(logo, (pad_x, pad_y), logo)
-
+    px = (W - nw) // 2
+    py = y
     base_rgba = base.convert("RGBA")
-    px = (W - pill_w) // 2
-    py = (H - pill_h) // 2 - 40 if y is None else y
-    base_rgba.paste(pill, (px, py), pill)
+
+    # Subtle gold ambient glow (premium, not a box)
+    glow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    gdraw = ImageDraw.Draw(glow)
+    cx, cy = W // 2, py + nh // 2
+    for r in range(140, 0, -5):
+        a = int(22 * (1 - r / 140))
+        gdraw.ellipse([cx - r, cy - r // 2, cx + r, cy + r // 2], fill=(*hex_to_rgb(BRAND["gold"]), a))
+    base_rgba = Image.alpha_composite(base_rgba, glow)
+
+    # Soft drop shadow
+    sa = logo.split()[3]
+    shadow_alpha = sa.point(lambda p: int(p * 0.35))
+    shadow_img = Image.new("RGBA", (nw, nh), (0, 0, 0, 255))
+    shadow_img.putalpha(shadow_alpha)
+    shadow_img = shadow_img.filter(ImageFilter.GaussianBlur(6))
+    base_rgba.paste(shadow_img, (px + 3, py + 5), shadow_img)
+
+    base_rgba.paste(logo, (px, py), logo)
     return base_rgba.convert("RGB")
+
+
+def logo_top_y(scene: dict) -> int:
+    """Place logo just below step badge, or top for hook."""
+    return 178 if scene.get("step") else 100
 
 
 def render_step5_fullbleed(
     base: Image.Image,
     photo_path: Path,
-    logo_path: Path,
     headline: str,
     sub: str,
 ) -> Image.Image:
-    """Step 5 — full-bleed photo, zero borders, logo center."""
-    y1, y2 = 200, 1480
+    """Step 5 — full-bleed photo below logo, zero borders."""
+    y1, y2 = 300, 1480
     ph = y2 - y1
     photo = cover_crop(Image.open(photo_path), W, ph)
 
@@ -381,24 +400,23 @@ def render_step5_fullbleed(
         overlay.text(((W - sw) // 2, ty), line, fill=(*hex_to_rgb(BRAND["mint"]), 255), font=sub_font)
         ty += 34
 
-    img = overlay_center_logo(base_rgba.convert("RGB"), logo_path, width=460, y=720)
-    return img
+    return base_rgba.convert("RGB")
 
 
 def render_premium_close(img: Image.Image, logo_path: Path, accent: str) -> Image.Image:
-    """Last scene — extra large centered logo."""
+    """Last scene — huge transparent logo, premium glow, no box."""
     gold = hex_to_rgb(BRAND["gold"])
     teal = hex_to_rgb(BRAND["teal"])
     base = img.convert("RGBA")
 
     spot = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     sd = ImageDraw.Draw(spot)
-    for r in range(700, 0, -6):
-        a = int(50 * max(0, 1 - r / 700))
-        sd.ellipse([W // 2 - r, H // 2 - 100 - r // 2, W // 2 + r, H // 2 - 100 + r // 2], fill=(*gold, a // 3))
-    for r in range(560, 0, -6):
-        a = int(36 * max(0, 1 - r / 560))
-        sd.ellipse([W // 2 - r, H // 2 - 80 - r // 2, W // 2 + r, H // 2 - 80 + r // 2], fill=(*teal, a // 2))
+    for r in range(760, 0, -6):
+        a = int(55 * max(0, 1 - r / 760))
+        sd.ellipse([W // 2 - r, H // 2 - 120 - r // 2, W // 2 + r, H // 2 - 120 + r // 2], fill=(*gold, a // 3))
+    for r in range(600, 0, -6):
+        a = int(40 * max(0, 1 - r / 600))
+        sd.ellipse([W // 2 - r, H // 2 - 100 - r // 2, W // 2 + r, H // 2 - 100 + r // 2], fill=(*teal, a // 2))
     base = Image.alpha_composite(base, spot)
 
     logo = Image.open(logo_path).convert("RGBA")
@@ -406,46 +424,27 @@ def render_premium_close(img: Image.Image, logo_path: Path, accent: str) -> Imag
     if bbox:
         logo = logo.crop(bbox)
 
-    target_w = 1040
+    target_w = 1060
     scale = target_w / logo.width
     nw, nh = int(logo.width * scale), int(logo.height * scale)
     logo = logo.resize((nw, nh), Image.Resampling.LANCZOS)
 
-    pad_x, pad_y = 50, 40
-    pill_w, pill_h = nw + pad_x * 2, nh + pad_y * 2
-    pill = Image.new("RGBA", (pill_w, pill_h), (0, 0, 0, 0))
-    pdraw = ImageDraw.Draw(pill)
-    for y in range(pill_h):
-        t = y / pill_h
-        c = int(254 - t * 5)
-        pdraw.line([(0, y), (pill_w, y)], fill=(c, c, min(255, c + 1), 255))
-    mask = Image.new("L", (pill_w, pill_h), 0)
-    ImageDraw.Draw(mask).rounded_rectangle([0, 0, pill_w - 1, pill_h - 1], radius=38, fill=255)
-    pill.putalpha(mask)
-    shine = Image.new("RGBA", (pill_w, pill_h), (0, 0, 0, 0))
-    ImageDraw.Draw(shine).rounded_rectangle([24, 10, pill_w - 24, 58], radius=26, fill=(255, 255, 255, 75))
-    pill = Image.alpha_composite(pill, shine)
-    draw_premium_frame(ImageDraw.Draw(pill), (4, 4, pill_w - 5, pill_h - 5), accent, radius=36)
-    pill.paste(logo, (pad_x, pad_y), logo)
-
-    px, py = (W - pill_w) // 2, 480
-    shadow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    sdraw = ImageDraw.Draw(shadow)
-    for i in range(35, 0, -1):
-        sdraw.rounded_rectangle(
-            [px - 6, py + i + 10, px + pill_w + 6, py + pill_h + i + 10],
-            radius=40, fill=(0, 0, 0, 7),
-        )
-    base = Image.alpha_composite(base, shadow)
-    base.paste(pill, (px, py), pill)
+    px, py = (W - nw) // 2, 520
+    sa = logo.split()[3]
+    shadow_alpha = sa.point(lambda p: int(p * 0.4))
+    shadow_img = Image.new("RGBA", (nw, nh), (0, 0, 0, 255))
+    shadow_img.putalpha(shadow_alpha)
+    shadow_img = shadow_img.filter(ImageFilter.GaussianBlur(10))
+    base.paste(shadow_img, (px + 4, py + 8), shadow_img)
+    base.paste(logo, (px, py), logo)
 
     draw = ImageDraw.Draw(base)
     rbi = "RBI LSP Registered Platform"
     rbi_font = load_font(34, bold=True)
     rw = draw.textlength(rbi, font=rbi_font)
-    ry = py + pill_h + 48
-    draw.line([px + 30, ry + 20, W // 2 - rw // 2 - 16, ry + 20], fill=(*gold, 180), width=2)
-    draw.line([W // 2 + rw // 2 + 16, ry + 20, px + pill_w - 30, ry + 20], fill=(*gold, 180), width=2)
+    ry = py + nh + 56
+    draw.line([120, ry + 20, W // 2 - rw // 2 - 18, ry + 20], fill=(*gold, 180), width=2)
+    draw.line([W // 2 + rw // 2 + 18, ry + 20, W - 120, ry + 20], fill=(*gold, 180), width=2)
     draw.text(((W - rw) / 2, ry), rbi, fill=gold, font=rbi_font)
 
     return base.convert("RGB")
@@ -472,14 +471,18 @@ def render_scene(
         draw.rounded_rectangle([px, py, px + tw + 80, py + 58], radius=29, fill=hex_to_rgb(BRAND[accent]))
         draw.text((px + 40, py + 10), label, fill=hex_to_rgb(BRAND["white"]), font=pill_font)
 
-    card = (90, 360, 990, 1380)
+    card = (90, 380, 990, 1400)
+
+    # Transparent logo below step badge (all scenes except close)
+    if not scene.get("brand_close") and center_logo_path and center_logo_path.exists():
+        img = paste_transparent_logo(img, center_logo_path, width=400, y=logo_top_y(scene))
 
     if scene.get("brand_close") and logo_path and logo_path.exists():
         img = render_premium_close(img, logo_path, accent)
         draw = ImageDraw.Draw(img)
-    elif scene.get("no_border") and photo_path and photo_path.exists() and center_logo_path:
+    elif scene.get("no_border") and photo_path and photo_path.exists():
         img = render_step5_fullbleed(
-            img, photo_path, center_logo_path,
+            img, photo_path,
             scene.get("headline", ""), scene.get("sub", ""),
         )
         draw = ImageDraw.Draw(img)
@@ -490,8 +493,6 @@ def render_scene(
             sub=scene.get("sub", ""),
             no_border=False,
         )
-        if center_logo_path and center_logo_path.exists():
-            img = overlay_center_logo(img, center_logo_path, width=400, y=780)
         draw = ImageDraw.Draw(img)
 
     draw_footer_bar(draw, accent)
@@ -552,6 +553,35 @@ async def synth_vo(scene: dict, out_path: Path) -> float:
     return float(json.loads(probe.stdout)["format"]["duration"])
 
 
+def _rasterize_transparent_logo(path: Path, svg: str, vp: str) -> None:
+    """Render SVG then remove white background for true transparency."""
+    w, h = map(int, vp.split(","))
+    html = OUT / f"render-{path.stem}.html"
+    tmp = path.with_suffix(".tmp.png")
+    html.write_text(
+        f"""<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+*{{margin:0;padding:0}}body{{width:{w}px;height:{h}px;background:#FFFFFF;
+display:flex;align-items:center;justify-content:center}}svg{{width:95%;height:auto}}</style></head>
+<body>{svg}</body></html>"""
+    )
+    run([
+        "npx", "playwright", "screenshot", "--browser", "chromium",
+        f"file://{html.resolve()}", str(tmp), f"--viewport-size={w},{h}",
+    ], cwd=ROOT / "frontend")
+    img = Image.open(tmp).convert("RGBA")
+    px = img.load()
+    for y in range(img.height):
+        for x in range(img.width):
+            r, g, b, a = px[x, y]
+            if r > 248 and g > 248 and b > 248:
+                px[x, y] = (r, g, b, 0)
+    bbox = img.getbbox()
+    if bbox:
+        img = img.crop(bbox)
+    img.save(path)
+    tmp.unlink(missing_ok=True)
+
+
 def ensure_logo() -> tuple[Path, Path]:
     """Return (center_logo, close_logo). Center = one line; close = with tagline, bigger."""
     center_logo = SCENES_DIR / "neercred-logo-center.png"
@@ -584,7 +614,7 @@ def ensure_logo() -> tuple[Path, Path]:
     <path d="M48 9.5 L49.8 13.8 L54.4 13.8 L50.8 16.6 L52.2 21 L48 18.4 L43.8 21 L45.2 16.6 L41.6 13.8 L46.2 13.8 Z" fill="url(#c-gold)"/>
   </g>
   <text x="108" y="58" font-family="Poppins, system-ui, sans-serif" font-size="48" font-weight="700" letter-spacing="-0.5">
-    <tspan fill="#0B1220">Neer</tspan><tspan fill="url(#c-cred)">Cred</tspan>
+    <tspan fill="#F8FAFC">Neer</tspan><tspan fill="url(#c-cred)">Cred</tspan>
   </text>
 </svg>"""
 
@@ -615,27 +645,16 @@ def ensure_logo() -> tuple[Path, Path]:
     <path d="M48 9.5 L49.8 13.8 L54.4 13.8 L50.8 16.6 L52.2 21 L48 18.4 L43.8 21 L45.2 16.6 L41.6 13.8 L46.2 13.8 Z" fill="url(#x-gold)"/>
   </g>
   <text x="128" y="72" font-family="Poppins, system-ui, sans-serif" font-size="62" font-weight="700" letter-spacing="-0.5">
-    <tspan fill="#0B1220">Neer</tspan><tspan fill="url(#x-cred)">Cred</tspan>
+    <tspan fill="#F8FAFC">Neer</tspan><tspan fill="url(#x-cred)">Cred</tspan>
   </text>
-  <text x="128" y="118" font-family="Poppins, system-ui, sans-serif" font-size="18" font-weight="600" fill="#64748B" letter-spacing="3.5">DREAM BIG. BORROW SMART.</text>
+  <text x="128" y="118" font-family="Poppins, system-ui, sans-serif" font-size="18" font-weight="600" fill="#94A3B8" letter-spacing="3.5">DREAM BIG. BORROW SMART.</text>
 </svg>"""
 
     for path, svg, vp in [
         (center_logo, center_svg, "1200,200"),
         (close_logo, close_svg, "1400,340"),
     ]:
-        html = OUT / f"render-{path.stem}.html"
-        html.write_text(
-            f"""<!DOCTYPE html><html><head><meta charset="utf-8"><style>
-*{{margin:0;padding:0}}body{{width:{vp.split(',')[0]}px;height:{vp.split(',')[1]}px;background:#FFFFFF;
-display:flex;align-items:center;justify-content:center}}svg{{width:95%;height:auto}}</style></head>
-<body>{svg}</body></html>"""
-        )
-        w, h = vp.split(",")
-        run([
-            "npx", "playwright", "screenshot", "--browser", "chromium",
-            f"file://{html}", str(path), f"--viewport-size={w},{h}",
-        ], cwd=ROOT / "frontend")
+        _rasterize_transparent_logo(path, svg, vp)
     return center_logo, close_logo
 
 
@@ -698,7 +717,7 @@ async def main() -> None:
     for d in (SCENES_DIR, AUDIO_DIR, FRAMES_DIR, AI_DIR):
         d.mkdir(parents=True, exist_ok=True)
 
-    logo_center, logo_close = ensure_logo()
+    logo_center, logo_close = await asyncio.to_thread(ensure_logo)
 
     vo_durations: list[float] = []
     for i, scene in enumerate(SCENES):
