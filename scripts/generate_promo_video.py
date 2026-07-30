@@ -318,86 +318,145 @@ def paste_photo_card(
         draw_premium_frame(draw, card_box, accent, radius=48)
 
 
+def overlay_center_logo(base: Image.Image, logo_path: Path, width: int = 440, y: int | None = None) -> Image.Image:
+    """Place NeerCred logo prominently in screen center."""
+    logo = Image.open(logo_path).convert("RGBA")
+    bbox = logo.getbbox()
+    if bbox:
+        logo = logo.crop(bbox)
+    scale = width / logo.width
+    nw, nh = int(logo.width * scale), int(logo.height * scale)
+    logo = logo.resize((nw, nh), Image.Resampling.LANCZOS)
+
+    pad_x, pad_y = 36, 22
+    pill_w, pill_h = nw + pad_x * 2, nh + pad_y * 2
+    pill = Image.new("RGBA", (pill_w, pill_h), (0, 0, 0, 0))
+    pdraw = ImageDraw.Draw(pill)
+    pdraw.rounded_rectangle([0, 0, pill_w - 1, pill_h - 1], radius=22, fill=(255, 255, 255, 235))
+    pdraw.rounded_rectangle([2, 2, pill_w - 3, pill_h - 3], radius=20, outline=(*hex_to_rgb(BRAND["gold"]), 200), width=2)
+    pill.paste(logo, (pad_x, pad_y), logo)
+
+    base_rgba = base.convert("RGBA")
+    px = (W - pill_w) // 2
+    py = (H - pill_h) // 2 - 40 if y is None else y
+    base_rgba.paste(pill, (px, py), pill)
+    return base_rgba.convert("RGB")
+
+
+def render_step5_fullbleed(
+    base: Image.Image,
+    photo_path: Path,
+    logo_path: Path,
+    headline: str,
+    sub: str,
+) -> Image.Image:
+    """Step 5 — full-bleed photo, zero borders, logo center."""
+    y1, y2 = 200, 1480
+    ph = y2 - y1
+    photo = cover_crop(Image.open(photo_path), W, ph)
+
+    base_rgba = base.convert("RGBA")
+    base_rgba.paste(photo, (0, y1))
+
+    vignette = Image.new("RGBA", (W, ph), (0, 0, 0, 0))
+    vdraw = ImageDraw.Draw(vignette)
+    for i in range(280):
+        a = int(200 * (i / 280) ** 1.3)
+        vdraw.rectangle([0, ph - 280 + i, W, ph - 280 + i + 1], fill=(0, 0, 0, a))
+    base_rgba.paste(Image.alpha_composite(
+        base_rgba.crop((0, y1, W, y2)).convert("RGBA"), vignette
+    ), (0, y1))
+
+    overlay = ImageDraw.Draw(base_rgba)
+    inner_w = W - 80
+    title_font = fit_font_size(headline, inner_w, 58, 42, bold=True)
+    sub_font = fit_font_size(sub, inner_w, 34, 26) if sub else load_font(26)
+    ty = y2 - 130
+    for line in wrap_text_lines(headline, title_font, inner_w):
+        lw = overlay.textlength(line, font=title_font)
+        overlay.text(((W - lw) // 2, ty), line, fill=(255, 255, 255, 255), font=title_font)
+        ty += 56
+    for line in wrap_text_lines(sub, sub_font, inner_w):
+        sw = overlay.textlength(line, font=sub_font)
+        overlay.text(((W - sw) // 2, ty), line, fill=(*hex_to_rgb(BRAND["mint"]), 255), font=sub_font)
+        ty += 34
+
+    img = overlay_center_logo(base_rgba.convert("RGB"), logo_path, width=460, y=720)
+    return img
+
+
 def render_premium_close(img: Image.Image, logo_path: Path, accent: str) -> Image.Image:
-    """Premium closing frame — big logo + tagline on card."""
+    """Last scene — extra large centered logo."""
     gold = hex_to_rgb(BRAND["gold"])
     teal = hex_to_rgb(BRAND["teal"])
     base = img.convert("RGBA")
 
     spot = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     sd = ImageDraw.Draw(spot)
-    for r in range(620, 0, -6):
-        a = int(42 * max(0, 1 - r / 620))
-        sd.ellipse([W // 2 - r, 700 - r // 2, W // 2 + r, 700 + r // 2], fill=(*gold, a // 3))
-    for r in range(480, 0, -6):
-        a = int(30 * max(0, 1 - r / 480))
-        sd.ellipse([W // 2 - r, 720 - r // 2, W // 2 + r, 720 + r // 2], fill=(*teal, a // 2))
+    for r in range(700, 0, -6):
+        a = int(50 * max(0, 1 - r / 700))
+        sd.ellipse([W // 2 - r, H // 2 - 100 - r // 2, W // 2 + r, H // 2 - 100 + r // 2], fill=(*gold, a // 3))
+    for r in range(560, 0, -6):
+        a = int(36 * max(0, 1 - r / 560))
+        sd.ellipse([W // 2 - r, H // 2 - 80 - r // 2, W // 2 + r, H // 2 - 80 + r // 2], fill=(*teal, a // 2))
     base = Image.alpha_composite(base, spot)
-
-    rings = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    rd = ImageDraw.Draw(rings)
-    for r, alpha in [(420, 28), (500, 18), (580, 12)]:
-        rd.ellipse([W // 2 - r, 720 - r, W // 2 + r, 720 + r], outline=(*gold, alpha), width=1)
-    base = Image.alpha_composite(base, rings)
 
     logo = Image.open(logo_path).convert("RGBA")
     bbox = logo.getbbox()
     if bbox:
         logo = logo.crop(bbox)
 
-    card_w, card_h = 1000, 340
-    card_x, card_y = (W - card_w) // 2, 600
-
-    shadow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    sdraw = ImageDraw.Draw(shadow)
-    for i in range(30, 0, -1):
-        sdraw.rounded_rectangle(
-            [card_x - 8, card_y + i + 8, card_x + card_w + 8, card_y + card_h + i + 8],
-            radius=36, fill=(0, 0, 0, 6),
-        )
-    base = Image.alpha_composite(base, shadow)
-
-    card = Image.new("RGBA", (card_w, card_h), (0, 0, 0, 0))
-    cdraw = ImageDraw.Draw(card)
-    for y in range(card_h):
-        t = y / card_h
-        c = int(253 - t * 6)
-        cdraw.line([(0, y), (card_w, y)], fill=(c, c, min(255, c + 2), 255))
-    mask = Image.new("L", (card_w, card_h), 0)
-    ImageDraw.Draw(mask).rounded_rectangle([0, 0, card_w - 1, card_h - 1], radius=32, fill=255)
-    card.putalpha(mask)
-    shine = Image.new("RGBA", (card_w, card_h), (0, 0, 0, 0))
-    ImageDraw.Draw(shine).rounded_rectangle([24, 10, card_w - 24, 54], radius=20, fill=(255, 255, 255, 60))
-    card = Image.alpha_composite(card, shine)
-    draw_card = ImageDraw.Draw(card)
-    draw_premium_frame(draw_card, (2, 2, card_w - 3, card_h - 3), accent, radius=30)
-
-    target_w = card_w - 60
+    target_w = 1040
     scale = target_w / logo.width
     nw, nh = int(logo.width * scale), int(logo.height * scale)
     logo = logo.resize((nw, nh), Image.Resampling.LANCZOS)
-    lx = (card_w - nw) // 2
-    ly = (card_h - nh) // 2 - 8
-    card.paste(logo, (lx, ly), logo)
-    base.paste(card, (card_x, card_y), card)
 
-    spark = ImageDraw.Draw(base)
-    for sx, sy in [(180, 540), (900, 580), (140, 820), (940, 800)]:
-        spark.ellipse([sx - 3, sy - 3, sx + 3, sy + 3], fill=(*gold, 180))
+    pad_x, pad_y = 50, 40
+    pill_w, pill_h = nw + pad_x * 2, nh + pad_y * 2
+    pill = Image.new("RGBA", (pill_w, pill_h), (0, 0, 0, 0))
+    pdraw = ImageDraw.Draw(pill)
+    for y in range(pill_h):
+        t = y / pill_h
+        c = int(254 - t * 5)
+        pdraw.line([(0, y), (pill_w, y)], fill=(c, c, min(255, c + 1), 255))
+    mask = Image.new("L", (pill_w, pill_h), 0)
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, pill_w - 1, pill_h - 1], radius=38, fill=255)
+    pill.putalpha(mask)
+    shine = Image.new("RGBA", (pill_w, pill_h), (0, 0, 0, 0))
+    ImageDraw.Draw(shine).rounded_rectangle([24, 10, pill_w - 24, 58], radius=26, fill=(255, 255, 255, 75))
+    pill = Image.alpha_composite(pill, shine)
+    draw_premium_frame(ImageDraw.Draw(pill), (4, 4, pill_w - 5, pill_h - 5), accent, radius=36)
+    pill.paste(logo, (pad_x, pad_y), logo)
+
+    px, py = (W - pill_w) // 2, 480
+    shadow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    sdraw = ImageDraw.Draw(shadow)
+    for i in range(35, 0, -1):
+        sdraw.rounded_rectangle(
+            [px - 6, py + i + 10, px + pill_w + 6, py + pill_h + i + 10],
+            radius=40, fill=(0, 0, 0, 7),
+        )
+    base = Image.alpha_composite(base, shadow)
+    base.paste(pill, (px, py), pill)
 
     draw = ImageDraw.Draw(base)
     rbi = "RBI LSP Registered Platform"
-    rbi_font = load_font(32, bold=True)
+    rbi_font = load_font(34, bold=True)
     rw = draw.textlength(rbi, font=rbi_font)
-    ry = 990
-    draw.line([card_x + 50, ry + 18, W // 2 - rw // 2 - 18, ry + 18], fill=(*gold, 160), width=2)
-    draw.line([W // 2 + rw // 2 + 18, ry + 18, card_x + card_w - 50, ry + 18], fill=(*gold, 160), width=2)
+    ry = py + pill_h + 48
+    draw.line([px + 30, ry + 20, W // 2 - rw // 2 - 16, ry + 20], fill=(*gold, 180), width=2)
+    draw.line([W // 2 + rw // 2 + 16, ry + 20, px + pill_w - 30, ry + 20], fill=(*gold, 180), width=2)
     draw.text(((W - rw) / 2, ry), rbi, fill=gold, font=rbi_font)
 
     return base.convert("RGB")
 
 
-def render_scene(scene: dict, logo_path: Path | None, photo_path: Path | None) -> Image.Image:
+def render_scene(
+    scene: dict,
+    logo_path: Path | None,
+    photo_path: Path | None,
+    center_logo_path: Path | None = None,
+) -> Image.Image:
     accent = scene["accent"]
     img = Image.new("RGB", (W, H), BRAND["navy"])
     draw_gradient(img, "#070D18", "#0F172A")
@@ -418,13 +477,21 @@ def render_scene(scene: dict, logo_path: Path | None, photo_path: Path | None) -
     if scene.get("brand_close") and logo_path and logo_path.exists():
         img = render_premium_close(img, logo_path, accent)
         draw = ImageDraw.Draw(img)
+    elif scene.get("no_border") and photo_path and photo_path.exists() and center_logo_path:
+        img = render_step5_fullbleed(
+            img, photo_path, center_logo_path,
+            scene.get("headline", ""), scene.get("sub", ""),
+        )
+        draw = ImageDraw.Draw(img)
     elif photo_path and photo_path.exists():
         paste_photo_card(
             img, photo_path, accent, card,
             headline=scene.get("headline", ""),
             sub=scene.get("sub", ""),
-            no_border=scene.get("no_border", False),
+            no_border=False,
         )
+        if center_logo_path and center_logo_path.exists():
+            img = overlay_center_logo(img, center_logo_path, width=400, y=780)
         draw = ImageDraw.Draw(img)
 
     draw_footer_bar(draw, accent)
@@ -485,55 +552,91 @@ async def synth_vo(scene: dict, out_path: Path) -> float:
     return float(json.loads(probe.stdout)["format"]["duration"])
 
 
-def ensure_logo() -> Path:
-    """Logo + tagline for close scene: NeerCred one line, Dream Big below in small text."""
-    logo = SCENES_DIR / "neercred-logo-original.png"
-    svg_content = """<svg width="600" height="130" viewBox="0 0 600 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+def ensure_logo() -> tuple[Path, Path]:
+    """Return (center_logo, close_logo). Center = one line; close = with tagline, bigger."""
+    center_logo = SCENES_DIR / "neercred-logo-center.png"
+    close_logo = SCENES_DIR / "neercred-logo-close.png"
+
+    center_svg = """<svg width="600" height="90" viewBox="0 0 600 90" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="lg-blue" x1="8" y1="8" x2="36" y2="52" gradientUnits="userSpaceOnUse">
+    <linearGradient id="c-blue" x1="8" y1="8" x2="36" y2="52" gradientUnits="userSpaceOnUse">
       <stop stop-color="#22D3EE"/><stop offset="0.55" stop-color="#3B82F6"/><stop offset="1" stop-color="#1E3A8A"/>
     </linearGradient>
-    <linearGradient id="lg-gold" x1="42" y1="12" x2="52" y2="50" gradientUnits="userSpaceOnUse">
+    <linearGradient id="c-gold" x1="42" y1="12" x2="52" y2="50" gradientUnits="userSpaceOnUse">
       <stop stop-color="#FDE68A"/><stop offset="0.45" stop-color="#E8C547"/><stop offset="1" stop-color="#B8860B"/>
     </linearGradient>
-    <linearGradient id="lg-ring-blue" x1="6" y1="32" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+    <linearGradient id="c-ring-blue" x1="6" y1="32" x2="32" y2="32" gradientUnits="userSpaceOnUse">
       <stop stop-color="#38BDF8"/><stop offset="1" stop-color="#1D4ED8"/>
     </linearGradient>
-    <linearGradient id="lg-ring-gold" x1="32" y1="32" x2="58" y2="32" gradientUnits="userSpaceOnUse">
+    <linearGradient id="c-ring-gold" x1="32" y1="32" x2="58" y2="32" gradientUnits="userSpaceOnUse">
       <stop stop-color="#F5D76E"/><stop offset="1" stop-color="#C9A227"/>
     </linearGradient>
-    <linearGradient id="lg-cred" x1="100" y1="0" x2="400" y2="0" gradientUnits="userSpaceOnUse">
+    <linearGradient id="c-cred" x1="100" y1="0" x2="400" y2="0" gradientUnits="userSpaceOnUse">
       <stop stop-color="#0F766E"/><stop offset="1" stop-color="#14B8A6"/>
     </linearGradient>
   </defs>
-  <g transform="translate(8, 4) scale(1.05)">
-    <path d="M48 14 A34 34 0 0 0 48 82" stroke="url(#lg-ring-blue)" stroke-width="2.8" fill="none" stroke-linecap="round"/>
-    <path d="M48 14 A34 34 0 0 1 48 82" stroke="url(#lg-ring-gold)" stroke-width="2.8" fill="none" stroke-linecap="round"/>
-    <path d="M34 30 L34 66" stroke="url(#lg-blue)" stroke-width="7.5" stroke-linecap="round"/>
-    <path d="M34 30 L62 66" stroke="url(#lg-blue)" stroke-width="7.5" stroke-linecap="round"/>
-    <path d="M62 30 L62 66" stroke="url(#lg-gold)" stroke-width="7.5" stroke-linecap="round"/>
-    <path d="M48 9.5 L49.8 13.8 L54.4 13.8 L50.8 16.6 L52.2 21 L48 18.4 L43.8 21 L45.2 16.6 L41.6 13.8 L46.2 13.8 Z" fill="url(#lg-gold)"/>
+  <g transform="translate(8, 2) scale(1.0)">
+    <path d="M48 14 A34 34 0 0 0 48 82" stroke="url(#c-ring-blue)" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+    <path d="M48 14 A34 34 0 0 1 48 82" stroke="url(#c-ring-gold)" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+    <path d="M34 30 L34 66" stroke="url(#c-blue)" stroke-width="7.5" stroke-linecap="round"/>
+    <path d="M34 30 L62 66" stroke="url(#c-blue)" stroke-width="7.5" stroke-linecap="round"/>
+    <path d="M62 30 L62 66" stroke="url(#c-gold)" stroke-width="7.5" stroke-linecap="round"/>
+    <path d="M48 9.5 L49.8 13.8 L54.4 13.8 L50.8 16.6 L52.2 21 L48 18.4 L43.8 21 L45.2 16.6 L41.6 13.8 L46.2 13.8 Z" fill="url(#c-gold)"/>
   </g>
-  <text x="108" y="62" font-family="Poppins, system-ui, sans-serif" font-size="52" font-weight="700" letter-spacing="-0.5">
-    <tspan fill="#0B1220">Neer</tspan><tspan fill="url(#lg-cred)">Cred</tspan>
+  <text x="108" y="58" font-family="Poppins, system-ui, sans-serif" font-size="48" font-weight="700" letter-spacing="-0.5">
+    <tspan fill="#0B1220">Neer</tspan><tspan fill="url(#c-cred)">Cred</tspan>
   </text>
-  <text x="108" y="98" font-family="Poppins, system-ui, sans-serif" font-size="16" font-weight="600" fill="#64748B" letter-spacing="3.2">DREAM BIG. BORROW SMART.</text>
 </svg>"""
-    html = OUT / "render-logo.html"
-    html.write_text(
-        f"""<!DOCTYPE html>
-<html><head><meta charset="utf-8"><style>
-*{{margin:0;padding:0}}body{{
-  width:1200px;height:280px;background:#FFFFFF;
-  display:flex;align-items:center;justify-content:center}}
-svg{{width:1100px;height:auto}}
-</style></head><body>{svg_content}</body></html>"""
-    )
-    run([
-        "npx", "playwright", "screenshot", "--browser", "chromium",
-        f"file://{html}", str(logo), "--viewport-size=1200,280",
-    ], cwd=ROOT / "frontend")
-    return logo
+
+    close_svg = """<svg width="700" height="160" viewBox="0 0 700 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="x-blue" x1="8" y1="8" x2="36" y2="52" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22D3EE"/><stop offset="0.55" stop-color="#3B82F6"/><stop offset="1" stop-color="#1E3A8A"/>
+    </linearGradient>
+    <linearGradient id="x-gold" x1="42" y1="12" x2="52" y2="50" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FDE68A"/><stop offset="0.45" stop-color="#E8C547"/><stop offset="1" stop-color="#B8860B"/>
+    </linearGradient>
+    <linearGradient id="x-ring-blue" x1="6" y1="32" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38BDF8"/><stop offset="1" stop-color="#1D4ED8"/>
+    </linearGradient>
+    <linearGradient id="x-ring-gold" x1="32" y1="32" x2="58" y2="32" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F5D76E"/><stop offset="1" stop-color="#C9A227"/>
+    </linearGradient>
+    <linearGradient id="x-cred" x1="100" y1="0" x2="500" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F766E"/><stop offset="1" stop-color="#14B8A6"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(12, 8) scale(1.2)">
+    <path d="M48 14 A34 34 0 0 0 48 82" stroke="url(#x-ring-blue)" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+    <path d="M48 14 A34 34 0 0 1 48 82" stroke="url(#x-ring-gold)" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+    <path d="M34 30 L34 66" stroke="url(#x-blue)" stroke-width="7.5" stroke-linecap="round"/>
+    <path d="M34 30 L62 66" stroke="url(#x-blue)" stroke-width="7.5" stroke-linecap="round"/>
+    <path d="M62 30 L62 66" stroke="url(#x-gold)" stroke-width="7.5" stroke-linecap="round"/>
+    <path d="M48 9.5 L49.8 13.8 L54.4 13.8 L50.8 16.6 L52.2 21 L48 18.4 L43.8 21 L45.2 16.6 L41.6 13.8 L46.2 13.8 Z" fill="url(#x-gold)"/>
+  </g>
+  <text x="128" y="72" font-family="Poppins, system-ui, sans-serif" font-size="62" font-weight="700" letter-spacing="-0.5">
+    <tspan fill="#0B1220">Neer</tspan><tspan fill="url(#x-cred)">Cred</tspan>
+  </text>
+  <text x="128" y="118" font-family="Poppins, system-ui, sans-serif" font-size="18" font-weight="600" fill="#64748B" letter-spacing="3.5">DREAM BIG. BORROW SMART.</text>
+</svg>"""
+
+    for path, svg, vp in [
+        (center_logo, center_svg, "1200,200"),
+        (close_logo, close_svg, "1400,340"),
+    ]:
+        html = OUT / f"render-{path.stem}.html"
+        html.write_text(
+            f"""<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+*{{margin:0;padding:0}}body{{width:{vp.split(',')[0]}px;height:{vp.split(',')[1]}px;background:#FFFFFF;
+display:flex;align-items:center;justify-content:center}}svg{{width:95%;height:auto}}</style></head>
+<body>{svg}</body></html>"""
+        )
+        w, h = vp.split(",")
+        run([
+            "npx", "playwright", "screenshot", "--browser", "chromium",
+            f"file://{html}", str(path), f"--viewport-size={w},{h}",
+        ], cwd=ROOT / "frontend")
+    return center_logo, close_logo
 
 
 def build_scene_clip(scene_img: Path, vo_path: Path, vo_duration: float, idx: int) -> Path:
@@ -595,7 +698,7 @@ async def main() -> None:
     for d in (SCENES_DIR, AUDIO_DIR, FRAMES_DIR, AI_DIR):
         d.mkdir(parents=True, exist_ok=True)
 
-    logo = ensure_logo()
+    logo_center, logo_close = ensure_logo()
 
     vo_durations: list[float] = []
     for i, scene in enumerate(SCENES):
@@ -610,8 +713,9 @@ async def main() -> None:
             if not photo.exists():
                 photo = Path("/opt/cursor/artifacts/assets") / scene["photo"]
 
+        use_logo = logo_close if scene.get("brand_close") else logo_center
         frame_path = FRAMES_DIR / f"scene_{i:02d}.png"
-        render_scene(scene, logo, photo).save(frame_path, quality=96)
+        render_scene(scene, use_logo, photo, logo_center).save(frame_path, quality=96)
 
     clips = []
     for i, scene in enumerate(SCENES):
