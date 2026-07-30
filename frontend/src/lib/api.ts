@@ -1,6 +1,8 @@
 import { getApiBase } from "@/lib/api-base";
 
-const API_BASE = getApiBase();
+function apiBase(): string {
+  return getApiBase();
+}
 
 function sessionHeaders(token: string) {
   return { Authorization: `Bearer ${token}` };
@@ -36,22 +38,47 @@ export type EligibilityResult = {
 };
 
 export async function sendOtp(mobile: string, smsConsent: boolean) {
-  const res = await fetch(`${API_BASE}/api/auth/send-otp`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ mobile, sms_consent: smsConsent }),
-  });
-  if (!res.ok) throw new Error((await res.json()).detail || "Failed to send OTP");
+  let res: Response;
+  try {
+    res = await fetch(`${apiBase()}/api/auth/send-otp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mobile, sms_consent: smsConsent }),
+    });
+  } catch {
+    throw new Error(
+      "Cannot reach server. Start backend: cd backend && source .venv/bin/activate && uvicorn app.main:app --reload --port 8000",
+    );
+  }
+  if (!res.ok) {
+    const body = (await res.json().catch(() => ({}))) as { detail?: string | { msg?: string }[] };
+    const detail = body.detail;
+    const message =
+      typeof detail === "string"
+        ? detail
+        : Array.isArray(detail)
+          ? detail.map((d) => d.msg).filter(Boolean).join(", ")
+          : "Failed to send OTP";
+    throw new Error(message);
+  }
   return res.json() as Promise<{ message: string; expires_in: number; dev_otp?: string }>;
 }
 
 export async function verifyOtp(mobile: string, otp: string) {
-  const res = await fetch(`${API_BASE}/api/auth/verify-otp`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ mobile, otp }),
-  });
-  if (!res.ok) throw new Error((await res.json()).detail || "Invalid OTP");
+  let res: Response;
+  try {
+    res = await fetch(`${apiBase()}/api/auth/verify-otp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mobile, otp }),
+    });
+  } catch {
+    throw new Error("Cannot reach server. Is the backend running on port 8000?");
+  }
+  if (!res.ok) {
+    const body = (await res.json().catch(() => ({}))) as { detail?: string };
+    throw new Error(body.detail || "Invalid OTP");
+  }
   return res.json() as Promise<{ session_token: string; verified: boolean }>;
 }
 
@@ -78,7 +105,7 @@ export async function submitDetails(data: {
   };
   page_url?: string;
 }) {
-  const res = await fetch(`${API_BASE}/api/leads/details`, {
+  const res = await fetch(`${apiBase()}/api/leads/details`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -92,7 +119,7 @@ export async function checkEligibility(data: {
   loan_purpose: string;
   existing_emi: number;
 }) {
-  const res = await fetch(`${API_BASE}/api/leads/check-eligibility`, {
+  const res = await fetch(`${apiBase()}/api/leads/check-eligibility`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -102,7 +129,7 @@ export async function checkEligibility(data: {
 }
 
 export async function fetchOffers(sessionToken: string) {
-  const res = await fetch(`${API_BASE}/api/leads/offers`, {
+  const res = await fetch(`${apiBase()}/api/leads/offers`, {
     headers: sessionHeaders(sessionToken),
   });
   if (!res.ok) throw new Error((await res.json()).detail || "Failed to fetch offers");
@@ -186,13 +213,13 @@ export async function getJourney(sessionToken?: string): Promise<JourneyState> {
 
   const headers: Record<string, string> = {};
   if (sessionToken) headers.Authorization = `Bearer ${sessionToken}`;
-  const res = await fetch(`${API_BASE}/api/leads/journey`, { headers, cache: "no-store" });
+  const res = await fetch(`${apiBase()}/api/leads/journey`, { headers, cache: "no-store" });
   if (!res.ok) throw new Error("Failed to load journey");
   return res.json();
 }
 
 export async function getAuthMe(sessionToken: string) {
-  const res = await fetch(`${API_BASE}/api/auth/me`, {
+  const res = await fetch(`${apiBase()}/api/auth/me`, {
     headers: sessionHeaders(sessionToken),
     cache: "no-store",
   });
@@ -201,7 +228,7 @@ export async function getAuthMe(sessionToken: string) {
 }
 
 export async function logoutCustomer(sessionToken: string) {
-  const res = await fetch(`${API_BASE}/api/auth/logout`, {
+  const res = await fetch(`${apiBase()}/api/auth/logout`, {
     method: "POST",
     headers: sessionHeaders(sessionToken),
   });
@@ -210,7 +237,7 @@ export async function logoutCustomer(sessionToken: string) {
 }
 
 export async function panLookup(sessionToken: string, pan: string) {
-  const res = await fetch(`${API_BASE}/api/leads/pan-lookup`, {
+  const res = await fetch(`${apiBase()}/api/leads/pan-lookup`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ session_token: sessionToken, pan }),
@@ -226,7 +253,7 @@ export async function panLookup(sessionToken: string, pan: string) {
 }
 
 export async function setPartnerPreference(sessionToken: string, partnerSlug: string) {
-  const res = await fetch(`${API_BASE}/api/leads/partner-preference`, {
+  const res = await fetch(`${apiBase()}/api/leads/partner-preference`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ session_token: sessionToken, partner_slug: partnerSlug }),
@@ -237,7 +264,7 @@ export async function setPartnerPreference(sessionToken: string, partnerSlug: st
 
 export async function getKycStatus(sessionToken: string, applicationId: number) {
   const res = await fetch(
-    `${API_BASE}/api/kyc/status/${applicationId}?session_token=${encodeURIComponent(sessionToken)}`,
+    `${apiBase()}/api/kyc/status/${applicationId}?session_token=${encodeURIComponent(sessionToken)}`,
     { cache: "no-store" },
   );
   if (!res.ok) throw new Error((await res.json()).detail || "Failed to load KYC status");
@@ -264,7 +291,7 @@ export async function selectOffer(data: {
   lender_data_sharing_consent: boolean;
   page_url?: string;
 }) {
-  const res = await fetch(`${API_BASE}/api/leads/select-offer`, {
+  const res = await fetch(`${apiBase()}/api/leads/select-offer`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -293,7 +320,7 @@ export type PartnerHandoff = {
 };
 
 export async function getPartnerHandoff(sessionToken: string, slug: string) {
-  const res = await fetch(`${API_BASE}/api/leads/partner-handoff/${encodeURIComponent(slug)}`, {
+  const res = await fetch(`${apiBase()}/api/leads/partner-handoff/${encodeURIComponent(slug)}`, {
     headers: sessionHeaders(sessionToken),
     cache: "no-store",
   });
@@ -307,7 +334,7 @@ export async function aadhaarSendOtp(data: {
   application_id: number;
   aadhaar: string;
 }) {
-  const res = await fetch(`${API_BASE}/api/kyc/aadhaar/send-otp`, {
+  const res = await fetch(`${apiBase()}/api/kyc/aadhaar/send-otp`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -321,7 +348,7 @@ export async function aadhaarVerify(data: {
   application_id: number;
   otp: string;
 }) {
-  const res = await fetch(`${API_BASE}/api/kyc/aadhaar/verify`, {
+  const res = await fetch(`${apiBase()}/api/kyc/aadhaar/verify`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -337,7 +364,7 @@ export async function bankVerify(data: {
   ifsc: string;
   address: string;
 }) {
-  const res = await fetch(`${API_BASE}/api/kyc/bank/verify`, {
+  const res = await fetch(`${apiBase()}/api/kyc/bank/verify`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -352,7 +379,7 @@ export async function esignComplete(data: {
   agreed: boolean;
   page_url?: string;
 }) {
-  const res = await fetch(`${API_BASE}/api/kyc/esign`, {
+  const res = await fetch(`${apiBase()}/api/kyc/esign`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -365,7 +392,7 @@ export async function submitApplication(data: {
   session_token: string;
   application_id: number;
 }) {
-  const res = await fetch(`${API_BASE}/api/kyc/submit`, {
+  const res = await fetch(`${apiBase()}/api/kyc/submit`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -392,7 +419,7 @@ export type LoanApplication = {
 };
 
 export async function getDashboardProfile(token: string) {
-  const res = await fetch(`${API_BASE}/api/dashboard/profile`, {
+  const res = await fetch(`${apiBase()}/api/dashboard/profile`, {
     headers: sessionHeaders(token),
   });
   if (!res.ok) throw new Error("Failed to load profile");
@@ -400,7 +427,7 @@ export async function getDashboardProfile(token: string) {
 }
 
 export async function getApplications(token: string) {
-  const res = await fetch(`${API_BASE}/api/dashboard/applications`, {
+  const res = await fetch(`${apiBase()}/api/dashboard/applications`, {
     headers: sessionHeaders(token),
   });
   if (!res.ok) throw new Error("Failed to load applications");
@@ -408,7 +435,7 @@ export async function getApplications(token: string) {
 }
 
 export async function getApplicationDetail(token: string, appId: number) {
-  const res = await fetch(`${API_BASE}/api/dashboard/applications/${appId}`, {
+  const res = await fetch(`${apiBase()}/api/dashboard/applications/${appId}`, {
     headers: sessionHeaders(token),
   });
   if (!res.ok) throw new Error("Failed to load application");
@@ -416,7 +443,7 @@ export async function getApplicationDetail(token: string, appId: number) {
 }
 
 export async function trackApplication(ref: string, mobile: string) {
-  const res = await fetch(`${API_BASE}/api/dashboard/track`, {
+  const res = await fetch(`${apiBase()}/api/dashboard/track`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ application_ref: ref, mobile }),
@@ -426,7 +453,7 @@ export async function trackApplication(ref: string, mobile: string) {
 }
 
 export async function getEmiSchedule(token: string, appId: number) {
-  const res = await fetch(`${API_BASE}/api/dashboard/applications/${appId}/emi-schedule`, {
+  const res = await fetch(`${apiBase()}/api/dashboard/applications/${appId}/emi-schedule`, {
     headers: sessionHeaders(token),
   });
   if (!res.ok) throw new Error("Failed to load EMI schedule");
@@ -442,7 +469,7 @@ export async function sendChatMessage(data: {
   page_url?: string;
   history?: ChatMessage[];
 }) {
-  const res = await fetch(`${API_BASE}/api/chat`, {
+  const res = await fetch(`${apiBase()}/api/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -464,7 +491,7 @@ export async function reportBug(data: {
   page_url?: string;
   reported_by?: string;
 }) {
-  const res = await fetch(`${API_BASE}/api/admin/bugs`, {
+  const res = await fetch(`${apiBase()}/api/admin/bugs`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -524,7 +551,7 @@ function adminHeaders(token: string) {
 export async function adminLogin(password: string) {
   let res: Response;
   try {
-    res = await fetch(`${API_BASE}/api/admin/login`, {
+    res = await fetch(`${apiBase()}/api/admin/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ password: password.trim() }),
@@ -544,19 +571,19 @@ export async function adminLogin(password: string) {
 }
 
 export async function getAdminStats(token: string) {
-  const res = await fetch(`${API_BASE}/api/admin/stats`, { headers: adminHeaders(token) });
+  const res = await fetch(`${apiBase()}/api/admin/stats`, { headers: adminHeaders(token) });
   if (!res.ok) throw new Error("Failed to fetch stats");
   return res.json() as Promise<AdminStats>;
 }
 
 export async function getAdminLeads(token: string) {
-  const res = await fetch(`${API_BASE}/api/admin/leads`, { headers: adminHeaders(token) });
+  const res = await fetch(`${apiBase()}/api/admin/leads`, { headers: adminHeaders(token) });
   if (!res.ok) throw new Error("Failed to fetch leads");
   return res.json() as Promise<Lead[]>;
 }
 
 export async function getAdminBugs(token: string) {
-  const res = await fetch(`${API_BASE}/api/admin/bugs`, { headers: adminHeaders(token) });
+  const res = await fetch(`${apiBase()}/api/admin/bugs`, { headers: adminHeaders(token) });
   if (!res.ok) throw new Error("Failed to fetch bugs");
   return res.json() as Promise<Bug[]>;
 }
@@ -566,7 +593,7 @@ export async function updateBug(
   bugId: number,
   data: { status?: string; severity?: string; fix_notes?: string }
 ) {
-  const res = await fetch(`${API_BASE}/api/admin/bugs/${bugId}`, {
+  const res = await fetch(`${apiBase()}/api/admin/bugs/${bugId}`, {
     method: "PATCH",
     headers: adminHeaders(token),
     body: JSON.stringify(data),
@@ -576,7 +603,7 @@ export async function updateBug(
 }
 
 export async function deleteBug(token: string, bugId: number) {
-  const res = await fetch(`${API_BASE}/api/admin/bugs/${bugId}`, {
+  const res = await fetch(`${apiBase()}/api/admin/bugs/${bugId}`, {
     method: "DELETE",
     headers: adminHeaders(token),
   });
@@ -598,7 +625,7 @@ export type AdminApplication = {
 };
 
 export async function getAdminApplications(token: string) {
-  const res = await fetch(`${API_BASE}/api/admin/applications`, { headers: adminHeaders(token) });
+  const res = await fetch(`${apiBase()}/api/admin/applications`, { headers: adminHeaders(token) });
   if (!res.ok) throw new Error("Failed to fetch applications");
   return res.json() as Promise<AdminApplication[]>;
 }
@@ -608,7 +635,7 @@ export async function updateApplicationStatus(
   appId: number,
   data: { status: string; message?: string }
 ) {
-  const res = await fetch(`${API_BASE}/api/admin/applications/${appId}`, {
+  const res = await fetch(`${apiBase()}/api/admin/applications/${appId}`, {
     method: "PATCH",
     headers: adminHeaders(token),
     body: JSON.stringify(data),
@@ -636,7 +663,7 @@ export async function getAdminConsents(token: string, params?: { lead_id?: numbe
   if (params?.lead_id) qs.set("lead_id", String(params.lead_id));
   if (params?.mobile) qs.set("mobile", params.mobile);
   const suffix = qs.toString() ? `?${qs}` : "";
-  const res = await fetch(`${API_BASE}/api/admin/consents${suffix}`, {
+  const res = await fetch(`${apiBase()}/api/admin/consents${suffix}`, {
     headers: adminHeaders(token),
   });
   if (!res.ok) throw new Error("Failed to fetch consents");
@@ -647,7 +674,7 @@ export async function getAdminConsents(token: string, params?: { lead_id?: numbe
 export type RequiredField = { key: string; label: string; step: string; type: string };
 
 export async function getRequiredFields() {
-  const res = await fetch(`${API_BASE}/api/leads/required-fields`);
+  const res = await fetch(`${apiBase()}/api/leads/required-fields`);
   if (!res.ok) throw new Error("Failed to load required fields");
   return res.json() as Promise<{ fields: RequiredField[]; partners_count: number }>;
 }
@@ -698,7 +725,7 @@ export type PublicPartner = {
 };
 
 export async function getPartnerFieldCatalog(token: string) {
-  const res = await fetch(`${API_BASE}/api/admin/partners/field-catalog`, {
+  const res = await fetch(`${apiBase()}/api/admin/partners/field-catalog`, {
     headers: adminHeaders(token),
   });
   if (!res.ok) throw new Error("Failed to load field catalog");
@@ -706,13 +733,13 @@ export async function getPartnerFieldCatalog(token: string) {
 }
 
 export async function getAdminPartners(token: string) {
-  const res = await fetch(`${API_BASE}/api/admin/partners`, { headers: adminHeaders(token) });
+  const res = await fetch(`${apiBase()}/api/admin/partners`, { headers: adminHeaders(token) });
   if (!res.ok) throw new Error("Failed to fetch partners");
   return res.json() as Promise<AdminPartner[]>;
 }
 
 export async function createAdminPartner(token: string, data: Record<string, unknown>) {
-  const res = await fetch(`${API_BASE}/api/admin/partners`, {
+  const res = await fetch(`${apiBase()}/api/admin/partners`, {
     method: "POST",
     headers: adminHeaders(token),
     body: JSON.stringify(data),
@@ -722,7 +749,7 @@ export async function createAdminPartner(token: string, data: Record<string, unk
 }
 
 export async function updateAdminPartner(token: string, id: number, data: Record<string, unknown>) {
-  const res = await fetch(`${API_BASE}/api/admin/partners/${id}`, {
+  const res = await fetch(`${apiBase()}/api/admin/partners/${id}`, {
     method: "PATCH",
     headers: adminHeaders(token),
     body: JSON.stringify(data),
@@ -732,7 +759,7 @@ export async function updateAdminPartner(token: string, id: number, data: Record
 }
 
 export async function deleteAdminPartner(token: string, id: number) {
-  const res = await fetch(`${API_BASE}/api/admin/partners/${id}`, {
+  const res = await fetch(`${apiBase()}/api/admin/partners/${id}`, {
     method: "DELETE",
     headers: adminHeaders(token),
   });
@@ -741,13 +768,13 @@ export async function deleteAdminPartner(token: string, id: number) {
 }
 
 export async function getPublicPartners() {
-  const res = await fetch(`${API_BASE}/api/partners`);
+  const res = await fetch(`${apiBase()}/api/partners`);
   if (!res.ok) throw new Error("Failed to load partners");
   return res.json() as Promise<PublicPartner[]>;
 }
 
 export async function getPublicPartner(slug: string) {
-  const res = await fetch(`${API_BASE}/api/partners/${encodeURIComponent(slug)}`);
+  const res = await fetch(`${apiBase()}/api/partners/${encodeURIComponent(slug)}`);
   if (!res.ok) throw new Error("Partner not found");
   return res.json() as Promise<PublicPartner>;
 }

@@ -34,6 +34,7 @@ def api_send_otp(payload: SendOtpRequest, request: Request, db: Session = Depend
         ip_address=ip,
         user_agent=ua,
     )
+    db.commit()
     dev_otp, expires_in = send_otp(db, payload.mobile)
     return SendOtpResponse(
         message="OTP sent successfully",

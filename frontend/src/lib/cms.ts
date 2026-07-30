@@ -159,8 +159,6 @@ export type SiteConfig = {
 
 import { getApiBase } from "@/lib/api-base";
 
-const API_BASE = getApiBase();
-
 export const FALLBACK_CONFIG: SiteConfig = {
   hero: {
     badge: "RBI LSP Registered · Premium Marketplace",
@@ -441,7 +439,7 @@ export const FALLBACK_CONFIG: SiteConfig = {
 
 export async function fetchSiteConfig(): Promise<SiteConfig> {
   try {
-    const res = await fetch(`${API_BASE}/api/cms/config`, { cache: "no-store" });
+    const res = await fetch(`${getApiBase()}/api/cms/config`, { cache: "no-store" });
     if (!res.ok) return FALLBACK_CONFIG;
     const data = await res.json();
     return mergeConfig(data.config);
@@ -451,7 +449,7 @@ export async function fetchSiteConfig(): Promise<SiteConfig> {
 }
 
 export async function fetchPreviewConfig(token: string): Promise<SiteConfig> {
-  const res = await fetch(`${API_BASE}/api/cms/preview?token=${encodeURIComponent(token)}`, {
+  const res = await fetch(`${getApiBase()}/api/cms/preview?token=${encodeURIComponent(token)}`, {
     cache: "no-store",
   });
   if (!res.ok) throw new Error("Preview load failed");
@@ -538,7 +536,7 @@ function mergeConfig(raw: Partial<SiteConfig>): SiteConfig {
 export async function cmsAdminSaveDraft(token: string, config: SiteConfig) {
   let res: Response;
   try {
-    res = await fetch(`${API_BASE}/api/cms/admin/draft`, {
+    res = await fetch(`${getApiBase()}/api/cms/admin/draft`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -548,7 +546,7 @@ export async function cmsAdminSaveDraft(token: string, config: SiteConfig) {
     });
   } catch {
     throw new Error(
-      `Cannot reach API at ${API_BASE}. Is the backend running on port 8000?`,
+      `Cannot reach API at ${getApiBase()}. Is the backend running on port 8000?`,
     );
   }
   if (!res.ok) {
@@ -564,7 +562,7 @@ export async function cmsAdminChat(
   sessionId = "default",
   history: { role: "user" | "assistant"; content: string }[] = [],
 ) {
-  const res = await fetch(`${API_BASE}/api/cms/admin/chat`, {
+  const res = await fetch(`${getApiBase()}/api/cms/admin/chat`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -587,7 +585,7 @@ export async function cmsAdminChat(
 }
 
 export async function cmsAdminPublish(token: string) {
-  const res = await fetch(`${API_BASE}/api/cms/admin/publish`, {
+  const res = await fetch(`${getApiBase()}/api/cms/admin/publish`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -596,7 +594,7 @@ export async function cmsAdminPublish(token: string) {
 }
 
 export async function cmsAdminDiscard(token: string) {
-  const res = await fetch(`${API_BASE}/api/cms/admin/discard`, {
+  const res = await fetch(`${getApiBase()}/api/cms/admin/discard`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -605,7 +603,7 @@ export async function cmsAdminDiscard(token: string) {
 }
 
 export async function cmsAdminStatus(token: string) {
-  const res = await fetch(`${API_BASE}/api/cms/admin/status`, {
+  const res = await fetch(`${getApiBase()}/api/cms/admin/status`, {
     headers: { Authorization: `Bearer ${token}` },
     cache: "no-store",
   });
@@ -618,7 +616,7 @@ export async function cmsAdminChatLegacy(token: string, message: string) {
 }
 
 export async function cmsAdminReset(token: string) {
-  const res = await fetch(`${API_BASE}/api/cms/admin/reset`, {
+  const res = await fetch(`${getApiBase()}/api/cms/admin/reset`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
   });

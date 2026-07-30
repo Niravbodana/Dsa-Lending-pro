@@ -1,10 +1,20 @@
 /**
- * API base URL — browser uses same-origin `/backend` proxy (see next.config rewrites)
- * to avoid CORS/CSP issues in local dev. Set NEXT_PUBLIC_API_URL in production.
+ * API base URL for frontend → backend calls.
+ *
+ * Local dev (browser): always use same-origin `/backend` proxy (next.config rewrites)
+ * so OTP/login work without CORS or wrong localhost vs 127.0.0.1 issues.
+ *
+ * Production: set NEXT_PUBLIC_API_URL to your API host.
  */
 export function getApiBase(): string {
   const env = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
-  if (env) return env;
-  if (typeof window !== "undefined") return "/backend";
-  return "http://127.0.0.1:8000";
+
+  if (typeof window !== "undefined") {
+    if (process.env.NODE_ENV === "development") {
+      return "/backend";
+    }
+    return env || "/backend";
+  }
+
+  return env || "http://127.0.0.1:8000";
 }

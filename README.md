@@ -80,7 +80,7 @@ uvicorn app.main:app --reload --port 8000
 # 3. Frontend (Terminal 2)
 cd frontend
 npm install
-echo "NEXT_PUBLIC_API_URL=http://localhost:8000" > .env.local
+# Optional: cp .env.local.example .env.local  (proxy works without it)
 npm run dev
 ```
 

@@ -6,8 +6,6 @@ import { COOKIE_CONSENT_KEY, type CookiePreferences } from "@/lib/consent";
 
 import { getApiBase } from "@/lib/api-base";
 
-const API_BASE = getApiBase();
-
 export function CookieConsent() {
   const [visible, setVisible] = useState(false);
 
@@ -27,7 +25,7 @@ export function CookieConsent() {
     setVisible(false);
 
     try {
-      await fetch(`${API_BASE}/api/consent/cookies`, {
+      await fetch(`${getApiBase()}/api/consent/cookies`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
