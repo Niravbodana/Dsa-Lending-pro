@@ -65,17 +65,18 @@ Homepage auto-refreshes every 15 seconds. Public config API: `GET /api/cms/confi
 
 ## Quick Start (Mac / Linux)
 
+**Stable branch:** `cursor/fix-mobile-fetch-0fce` (admin login, mobile session, photos, fast scroll)
+
 ```bash
-# 1. Clone (if not done)
+# 1. Clone + checkout stable branch
 git clone https://github.com/Niravbodana/Dsa-Lending-pro.git
 cd Dsa-Lending-pro
+git checkout cursor/fix-mobile-fetch-0fce
 
-# 2. Backend (Terminal 1)
+# 2. Backend (Terminal 1) — first time only
 cd backend
-python3 -m venv .venv
+chmod +x setup.sh && ./setup.sh
 source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
 uvicorn app.main:app --reload --port 8000
 
 # 3. Frontend (Terminal 2)
@@ -86,6 +87,20 @@ npm run dev
 ```
 
 Open **http://localhost:3000** — Admin password: `admin123`
+
+### Already inside `backend/` folder?
+
+Do **not** run `cd backend` again. If you see `source: no such file or directory: .venv/bin/activate`, create the venv first:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+uvicorn app.main:app --reload --port 8000
+```
+
+Or use the helper script: `chmod +x setup.sh && ./setup.sh`
 
 > **Note:** Local dev uses SQLite (no PostgreSQL needed). For Docker/PostgreSQL use `pip install -r requirements-prod.txt`.
 

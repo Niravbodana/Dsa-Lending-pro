@@ -12,7 +12,7 @@ Guidance for AI agents working in this repository.
 
 | Service | Port | How to start |
 |---------|------|--------------|
-| FastAPI backend | 8000 | `cd backend && source .venv/bin/activate && uvicorn app.main:app --reload --port 8000` |
+| FastAPI backend | 8000 | `cd backend && ./setup.sh` (first time) then `source .venv/bin/activate && uvicorn app.main:app --reload --port 8000` |
 | Next.js frontend | 3000 | `cd frontend && npm run dev` |
 | PostgreSQL | 5432 | Optional — `docker compose up -d` (uses SQLite by default in dev) |
 | Redis | 6379 | Optional — `docker compose up -d` (not required for Phase 1) |
@@ -20,9 +20,11 @@ Guidance for AI agents working in this repository.
 ### First-time setup
 
 ```bash
-cd backend && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+cd backend && chmod +x setup.sh && ./setup.sh
 cd frontend && npm install
 ```
+
+If `.venv` is missing: `python3 -m venv .venv` before `source .venv/bin/activate`.
 
 For PostgreSQL instead of SQLite, run `docker compose up -d` and set `DATABASE_URL=postgresql://dsa_user:dsa_pass@localhost:5432/dsa_lending` in `backend/.env`.
 
