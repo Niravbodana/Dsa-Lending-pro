@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { COOKIE_CONSENT_KEY, type CookiePreferences } from "@/lib/consent";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+import { getApiBase } from "@/lib/api-base";
+
+const API_BASE = getApiBase();
 
 export function CookieConsent() {
   const [visible, setVisible] = useState(false);

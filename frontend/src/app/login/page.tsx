@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
@@ -11,6 +11,10 @@ import {
   journeyRedirectPath,
   loadCustomerJourney,
   setStoredSessionToken,
+  getDraftMobile,
+  setDraftMobile,
+  clearDraftMobile,
+  getStoredSessionToken,
 } from "@/lib/customer-session";
 
 const inputClass =
@@ -26,6 +30,21 @@ function LoginInner() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    const draft = getDraftMobile();
+    if (draft) setMobile(draft);
+
+    const token = getStoredSessionToken();
+    if (!token) return;
+
+    void loadCustomerJourney(token).then((journey) => {
+      if (!journey?.authenticated) return;
+      const savedMobile = journey.mobile ?? journey.lead?.mobile;
+      if (savedMobile) setMobile(savedMobile);
+      router.replace(journeyRedirectPath(journey));
+    });
+  }, [router]);
+
   async function handleSendOtp(e: React.FormEvent) {
     e.preventDefault();
     if (!smsConsent) {
@@ -36,6 +55,7 @@ function LoginInner() {
     setLoading(true);
     try {
       const res = await sendOtp(mobile, true);
+      setDraftMobile(mobile);
       setDevOtp(res.dev_otp || null);
       setPhase("otp");
     } catch (err) {
@@ -52,6 +72,7 @@ function LoginInner() {
     try {
       const res = await verifyOtp(mobile, otp);
       setStoredSessionToken(res.session_token);
+      clearDraftMobile();
       window.dispatchEvent(new Event("neercred:session"));
       const journey = await loadCustomerJourney(res.session_token);
       router.replace(journey ? journeyRedirectPath(journey) : "/apply");
