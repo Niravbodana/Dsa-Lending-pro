@@ -184,6 +184,14 @@ export function IconArrowRight({ size, className }: IconProps) {
   );
 }
 
+export function IconPlay({ size, className }: IconProps) {
+  return (
+    <Icon size={size} className={className} fill="currentColor" stroke="none">
+      <path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11.04-6.86a1 1 0 0 0 0-1.72L9.5 4.28A1 1 0 0 0 8 5.14z" />
+    </Icon>
+  );
+}
+
 export function IconRupee({ size, className }: IconProps) {
   return (
     <Icon size={size} className={className}>

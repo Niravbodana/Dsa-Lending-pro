@@ -10,6 +10,7 @@ import {
   EmotionalCtaBand,
   MobileStickyCTA,
 } from "@/components/ConversionSections";
+import { ProcessJourneyVideo } from "@/components/ProcessJourneyVideo";
 import {
   HowItWorks,
   LoanProductsStrip,
@@ -119,6 +120,7 @@ export function HomePage({ previewConfig, isPreview = false, visualEdit = false 
       <LoanProductsStrip config={config} />
       <EmotionalCtaBand config={config} />
       <LifestyleShowcase config={config} />
+      <ProcessJourneyVideo />
       <HowItWorks config={config} />
       <PremiumFeaturesGrid config={config} />
       {config.sections.emi_calculator !== false && <EmiCalculator />}
