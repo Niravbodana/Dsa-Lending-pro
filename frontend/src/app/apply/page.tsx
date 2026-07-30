@@ -31,9 +31,101 @@ import { CONSENT_VERSIONS } from "@/lib/consent";
 
 type Step = "mobile" | "otp" | "details" | "offers";
 type SortBy = "rate" | "amount" | "emi";
+type ProfileSubStep =
+  | "pan"
+  | "name"
+  | "dob"
+  | "email"
+  | "pincode"
+  | "gender"
+  | "income"
+  | "employment"
+  | "city"
+  | "purpose"
+  | "emi"
+  | "consent";
 
 const STEPS: Step[] = ["mobile", "otp", "details", "offers"];
 const STEP_LABELS = ["Mobile", "Verify", "Profile", "Offers"];
+
+const PROFILE_SUB_LABELS: Record<ProfileSubStep, string> = {
+  pan: "PAN number",
+  name: "Full name",
+  dob: "Date of birth",
+  email: "Email",
+  pincode: "PIN code",
+  gender: "Gender",
+  income: "Monthly income",
+  employment: "Employment type",
+  city: "City",
+  purpose: "Loan purpose",
+  emi: "Existing EMI",
+  consent: "Terms & consent",
+};
+
+function buildProfileSubSteps(
+  needs: (key: string) => boolean,
+  needsPartnerExtras: boolean,
+  panVerified: boolean,
+): ProfileSubStep[] {
+  const steps: ProfileSubStep[] = ["pan", "name"];
+  if (needs("date_of_birth") || panVerified) steps.push("dob");
+  if (needsPartnerExtras) {
+    steps.push("email", "pincode");
+  } else {
+    if (needs("email")) steps.push("email");
+    if (needs("pincode")) steps.push("pincode");
+  }
+  if (needs("gender")) steps.push("gender");
+  steps.push("income", "employment", "city", "purpose", "emi", "consent");
+  return steps;
+}
+
+function validateProfileStep(
+  subStep: ProfileSubStep,
+  form: {
+    pan: string;
+    full_name: string;
+    date_of_birth: string;
+    email: string;
+    pincode: string;
+    gender: string;
+    monthly_income: string;
+    city: string;
+  },
+  needsPartnerExtras: boolean,
+  preferredPartner: string,
+  allRequiredConsents: boolean,
+): string | null {
+  switch (subStep) {
+    case "pan":
+      return form.pan.length !== 10 ? "Enter a valid 10-character PAN." : null;
+    case "name":
+      return !form.full_name.trim() ? "Enter your full name as per PAN." : null;
+    case "dob":
+      return !form.date_of_birth ? "Select your date of birth." : null;
+    case "email":
+      if (preferredPartner === "choiceconnect" || needsPartnerExtras) {
+        return !form.email.includes("@") ? "Enter a valid email address." : null;
+      }
+      return null;
+    case "pincode":
+      if (preferredPartner === "choiceconnect" || needsPartnerExtras) {
+        return form.pincode.length !== 6 ? "Enter a valid 6-digit PIN code." : null;
+      }
+      return null;
+    case "gender":
+      return !form.gender ? "Please select gender." : null;
+    case "income":
+      return Number(form.monthly_income) < 15000 ? "Minimum monthly income is ₹15,000." : null;
+    case "city":
+      return !form.city.trim() ? "Enter your city." : null;
+    case "consent":
+      return !allRequiredConsents ? "Please accept required terms to continue." : null;
+    default:
+      return null;
+  }
+}
 
 const DEFAULT_WORKFLOW: WorkflowStep[] = [
   { id: "mobile", label: "Mobile", phase: "apply" },
@@ -82,12 +174,29 @@ function ApplyPageInner() {
   const [creditConsent, setCreditConsent] = useState(false);
   const [marketingConsent, setMarketingConsent] = useState(false);
   const [lenderConsent, setLenderConsent] = useState(false);
+  const [profileStepIndex, setProfileStepIndex] = useState(0);
 
   const allRequiredConsents = privacyConsent && termsConsent && dpdpConsent;
+  const allConsentsAccepted =
+    privacyConsent && termsConsent && dpdpConsent && creditConsent && marketingConsent;
+
+  const acceptAllConsents = useCallback((checked: boolean) => {
+    setPrivacyConsent(checked);
+    setTermsConsent(checked);
+    setDpdpConsent(checked);
+    setCreditConsent(checked);
+    setMarketingConsent(checked);
+  }, []);
 
   const [requiredFields, setRequiredFields] = useState<RequiredField[]>([]);
   const needs = (key: string) => requiredFields.some((f) => f.key === key);
   const needsPartnerExtras = preferredPartner === "choiceconnect" || needs("email") || needs("pincode");
+
+  const profileSubSteps = useMemo(
+    () => buildProfileSubSteps(needs, needsPartnerExtras, panVerified),
+    [needsPartnerExtras, panVerified, requiredFields],
+  );
+  const currentProfileStep = profileSubSteps[profileStepIndex] ?? "pan";
 
   const [form, setForm] = useState({
     full_name: "",
@@ -142,6 +251,7 @@ function ApplyPageInner() {
     const applyStep = journey.apply_step as Step;
     if (applyStep && STEPS.includes(applyStep)) {
       setStep(applyStep);
+      if (applyStep === "details") setProfileStepIndex(0);
       if (applyStep === "offers" && token) {
         try {
           const offersRes = await fetchOffers(token);
@@ -275,6 +385,7 @@ function ApplyPageInner() {
       }
       setStep("details");
       setWorkflowStep("details");
+      setProfileStepIndex(0);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Incorrect OTP. Please try again.");
     } finally {
@@ -282,8 +393,8 @@ function ApplyPageInner() {
     }
   }
 
-  async function handleSubmitDetails(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleSubmitDetails(e?: React.FormEvent) {
+    e?.preventDefault();
     if (!allRequiredConsents) {
       setError("Please accept Privacy Policy, Terms, and data processing consent.");
       return;
@@ -336,6 +447,39 @@ function ApplyPageInner() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function handleProfileContinue() {
+    const validationError = validateProfileStep(
+      currentProfileStep,
+      form,
+      needsPartnerExtras,
+      preferredPartner,
+      allRequiredConsents,
+    );
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+    setError("");
+    if (currentProfileStep === "pan" && form.pan.length === 10 && !panVerified) {
+      void handlePanBlur();
+    }
+    if (profileStepIndex < profileSubSteps.length - 1) {
+      setProfileStepIndex((i) => i + 1);
+      return;
+    }
+    void handleSubmitDetails();
+  }
+
+  function handleProfileBack() {
+    setError("");
+    if (profileStepIndex > 0) {
+      setProfileStepIndex((i) => i - 1);
+      return;
+    }
+    setStep("otp");
+    setWorkflowStep("otp");
   }
 
   async function handleSelectOffer(offer: LoanOffer) {
@@ -513,100 +657,109 @@ function ApplyPageInner() {
           )}
 
           {step === "details" && (
-            <form onSubmit={handleSubmitDetails}>
-              <h2 className="text-xl font-bold text-neercred-navy">Your profile</h2>
-              <p className="mt-1 text-sm text-slate-500">
-                Enter PAN — name &amp; details auto-fill. Only minimal fields needed.
+            <div>
+              <p className="text-xs font-medium text-slate-400">
+                Profile {profileStepIndex + 1} of {profileSubSteps.length} · {PROFILE_SUB_LABELS[currentProfileStep]}
               </p>
-              <div className="mt-6 space-y-4">
-                <div>
-                  <input
-                    type="text"
-                    maxLength={10}
-                    placeholder="PAN number (auto-fills name)"
-                    value={form.pan}
-                    onChange={(e) => {
-                      setPanVerified(false);
-                      setForm({ ...form, pan: e.target.value.toUpperCase() });
-                    }}
-                    onFocus={() => setActiveField("pan")}
-                    onBlur={() => void handlePanBlur()}
-                    className={`${inputClass} uppercase`}
-                    required
-                  />
-                  {panLoading && <p className="mt-1 text-xs text-neercred-teal">Fetching PAN details…</p>}
-                  {panVerified && (
-                    <p className="mt-1 text-xs text-emerald-600">✓ PAN verified — details auto-filled</p>
-                  )}
-                </div>
-                <input
-                  type="text"
-                  placeholder="Full name (as per PAN)"
-                  value={form.full_name}
-                  onChange={(e) => setForm({ ...form, full_name: e.target.value })}
-                  onFocus={() => setActiveField("full_name")}
-                  className={inputClass}
-                  required
-                  readOnly={panVerified}
-                />
-                {(needs("date_of_birth") || panVerified) && (
+              <h2 className="mt-2 text-xl font-bold text-neercred-navy">{PROFILE_SUB_LABELS[currentProfileStep]}</h2>
+              <p className="mt-1 text-sm text-slate-500">
+                {currentProfileStep === "pan" && "Enter PAN — name and details auto-fill from records."}
+                {currentProfileStep === "name" && "Name as per your PAN card."}
+                {currentProfileStep === "dob" && "Your date of birth as per PAN."}
+                {currentProfileStep === "email" && "We'll send application updates here."}
+                {currentProfileStep === "pincode" && "Your current residential PIN code."}
+                {currentProfileStep === "gender" && "Select gender as per official records."}
+                {currentProfileStep === "income" && "Your gross monthly income in rupees."}
+                {currentProfileStep === "employment" && "How do you earn your income?"}
+                {currentProfileStep === "city" && "City where you currently live."}
+                {currentProfileStep === "purpose" && "What will you use this loan for?"}
+                {currentProfileStep === "emi" && "Total EMI you pay on other loans each month."}
+                {currentProfileStep === "consent" && "Review and accept to see your loan offers."}
+              </p>
+
+              <div className="mt-6">
+                {currentProfileStep === "pan" && (
                   <div>
-                    <label className="text-sm font-medium text-slate-700">Date of birth</label>
                     <input
-                      type="date"
-                      value={form.date_of_birth}
-                      onChange={(e) => setForm({ ...form, date_of_birth: e.target.value })}
-                      className={`${inputClass} mt-1`}
+                      type="text"
+                      maxLength={10}
+                      placeholder="ABCDE1234F"
+                      value={form.pan}
+                      onChange={(e) => {
+                        setPanVerified(false);
+                        setForm({ ...form, pan: e.target.value.toUpperCase() });
+                      }}
+                      onFocus={() => setActiveField("pan")}
+                      onBlur={() => void handlePanBlur()}
+                      className={`${inputClass} uppercase text-lg`}
                       required
-                      readOnly={panVerified}
+                      autoFocus
                     />
+                    {panLoading && <p className="mt-2 text-xs text-neercred-teal">Fetching PAN details…</p>}
+                    {panVerified && (
+                      <p className="mt-2 text-xs text-emerald-600">✓ PAN verified — details auto-filled</p>
+                    )}
                   </div>
                 )}
-                {needsPartnerExtras && (
+
+                {currentProfileStep === "name" && (
                   <input
-                    type="email"
-                    placeholder="Email address"
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    className={inputClass}
-                    required={preferredPartner === "choiceconnect"}
+                    type="text"
+                    placeholder="Full name (as per PAN)"
+                    value={form.full_name}
+                    onChange={(e) => setForm({ ...form, full_name: e.target.value })}
+                    onFocus={() => setActiveField("full_name")}
+                    className={`${inputClass} text-lg`}
+                    required
+                    readOnly={panVerified}
+                    autoFocus
                   />
                 )}
-                {needsPartnerExtras && (
+
+                {currentProfileStep === "dob" && (
+                  <input
+                    type="date"
+                    value={form.date_of_birth}
+                    onChange={(e) => setForm({ ...form, date_of_birth: e.target.value })}
+                    className={`${inputClass} text-lg`}
+                    required
+                    readOnly={panVerified}
+                    autoFocus
+                  />
+                )}
+
+                {currentProfileStep === "email" && (
+                  <input
+                    type="email"
+                    placeholder="you@email.com"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    className={`${inputClass} text-lg`}
+                    required={preferredPartner === "choiceconnect" || needsPartnerExtras}
+                    autoFocus
+                  />
+                )}
+
+                {currentProfileStep === "pincode" && (
                   <input
                     type="text"
                     maxLength={6}
-                    placeholder="PIN code"
+                    inputMode="numeric"
+                    placeholder="6-digit PIN"
                     value={form.pincode}
                     onChange={(e) => setForm({ ...form, pincode: e.target.value.replace(/\D/g, "") })}
-                    className={inputClass}
-                    required={preferredPartner === "choiceconnect"}
+                    className={`${inputClass} text-lg`}
+                    required={preferredPartner === "choiceconnect" || needsPartnerExtras}
+                    autoFocus
                   />
                 )}
-                {needs("email") && !needsPartnerExtras && (
-                  <input
-                    type="email"
-                    placeholder="Email address"
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    className={inputClass}
-                  />
-                )}
-                {needs("pincode") && !needsPartnerExtras && (
-                  <input
-                    type="text"
-                    maxLength={6}
-                    placeholder="PIN code"
-                    value={form.pincode}
-                    onChange={(e) => setForm({ ...form, pincode: e.target.value.replace(/\D/g, "") })}
-                    className={inputClass}
-                  />
-                )}
-                {needs("gender") && (
+
+                {currentProfileStep === "gender" && (
                   <select
                     value={form.gender}
                     onChange={(e) => setForm({ ...form, gender: e.target.value as typeof form.gender })}
-                    className={inputClass}
+                    className={`${inputClass} text-lg`}
+                    autoFocus
                   >
                     <option value="">Select gender</option>
                     <option value="male">Male</option>
@@ -614,46 +767,59 @@ function ApplyPageInner() {
                     <option value="other">Other</option>
                   </select>
                 )}
-                <input
-                  type="number"
-                  placeholder="Monthly income (₹)"
-                  value={form.monthly_income}
-                  onChange={(e) => setForm({ ...form, monthly_income: e.target.value })}
-                  onFocus={() => setActiveField("monthly_income")}
-                  className={inputClass}
-                  required
-                  min={15000}
-                />
-                <select
-                  value={form.employment_type}
-                  onChange={(e) =>
-                    setForm({ ...form, employment_type: e.target.value as typeof form.employment_type })
-                  }
-                  onFocus={() => setActiveField("employment_type")}
-                  className={inputClass}
-                >
-                  <option value="salaried">Salaried</option>
-                  <option value="self_employed">Self employed</option>
-                  <option value="business">Business owner</option>
-                </select>
-                <input
-                  type="text"
-                  placeholder="City"
-                  value={form.city}
-                  onChange={(e) => setForm({ ...form, city: e.target.value })}
-                  onFocus={() => setActiveField("city")}
-                  className={inputClass}
-                  required
-                />
-                <div>
-                  <label className="text-sm font-medium text-slate-700">Loan purpose</label>
+
+                {currentProfileStep === "income" && (
+                  <input
+                    type="number"
+                    placeholder="Monthly income (₹)"
+                    value={form.monthly_income}
+                    onChange={(e) => setForm({ ...form, monthly_income: e.target.value })}
+                    onFocus={() => setActiveField("monthly_income")}
+                    className={`${inputClass} text-lg`}
+                    required
+                    min={15000}
+                    autoFocus
+                  />
+                )}
+
+                {currentProfileStep === "employment" && (
+                  <select
+                    value={form.employment_type}
+                    onChange={(e) =>
+                      setForm({ ...form, employment_type: e.target.value as typeof form.employment_type })
+                    }
+                    onFocus={() => setActiveField("employment_type")}
+                    className={`${inputClass} text-lg`}
+                    autoFocus
+                  >
+                    <option value="salaried">Salaried</option>
+                    <option value="self_employed">Self employed</option>
+                    <option value="business">Business owner</option>
+                  </select>
+                )}
+
+                {currentProfileStep === "city" && (
+                  <input
+                    type="text"
+                    placeholder="Your city"
+                    value={form.city}
+                    onChange={(e) => setForm({ ...form, city: e.target.value })}
+                    onFocus={() => setActiveField("city")}
+                    className={`${inputClass} text-lg`}
+                    required
+                    autoFocus
+                  />
+                )}
+
+                {currentProfileStep === "purpose" && (
                   <select
                     value={form.loan_purpose}
                     onChange={(e) =>
                       setForm({ ...form, loan_purpose: e.target.value as typeof form.loan_purpose })
                     }
                     onFocus={() => setActiveField("loan_purpose")}
-                    className={`${inputClass} mt-1`}
+                    className={`${inputClass} text-lg`}
+                    autoFocus
                   >
                     <option value="personal">Personal</option>
                     <option value="medical">Medical</option>
@@ -662,71 +828,118 @@ function ApplyPageInner() {
                     <option value="business">Business</option>
                     <option value="education">Education</option>
                   </select>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-slate-700">Existing monthly EMI (if any)</label>
+                )}
+
+                {currentProfileStep === "emi" && (
                   <input
                     type="number"
-                    placeholder="0"
+                    placeholder="0 if none"
                     value={form.existing_emi}
                     onChange={(e) => setForm({ ...form, existing_emi: e.target.value })}
                     onFocus={() => setActiveField("existing_emi")}
-                    className={`${inputClass} mt-1`}
+                    className={`${inputClass} text-lg`}
                     min={0}
+                    autoFocus
                   />
-                </div>
+                )}
+
+                {currentProfileStep === "consent" && (
+                  <div
+                    className="space-y-3 rounded-2xl border border-slate-100 bg-slate-50/80 p-4 text-sm text-slate-600"
+                    onFocus={() => setActiveField("consent")}
+                  >
+                    <label className="flex items-center gap-3 rounded-xl border-2 border-teal-200 bg-teal-50 px-3 py-3 font-semibold text-slate-800">
+                      <input
+                        type="checkbox"
+                        checked={allConsentsAccepted}
+                        onChange={(e) => acceptAllConsents(e.target.checked)}
+                        className="accent-neercred-teal"
+                      />
+                      Accept all terms &amp; consents
+                    </label>
+                    <label className="flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        checked={privacyConsent}
+                        onChange={(e) => setPrivacyConsent(e.target.checked)}
+                        className="mt-1 accent-neercred-teal"
+                      />
+                      <span>
+                        I accept the{" "}
+                        <Link href="/compliance" className="font-medium text-neercred-teal underline">
+                          Privacy Policy
+                        </Link>
+                        .
+                      </span>
+                    </label>
+                    <label className="flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        checked={termsConsent}
+                        onChange={(e) => setTermsConsent(e.target.checked)}
+                        className="mt-1 accent-neercred-teal"
+                      />
+                      <span>
+                        I accept the{" "}
+                        <Link href="/compliance" className="font-medium text-neercred-teal underline">
+                          Terms of Service
+                        </Link>
+                        .
+                      </span>
+                    </label>
+                    <label className="flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        checked={dpdpConsent}
+                        onChange={(e) => setDpdpConsent(e.target.checked)}
+                        className="mt-1 accent-neercred-teal"
+                      />
+                      <span>I consent to data processing under DPDP Act 2023.</span>
+                    </label>
+                    <label className="flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        checked={creditConsent}
+                        onChange={(e) => setCreditConsent(e.target.checked)}
+                        className="mt-1 accent-neercred-teal"
+                      />
+                      <span className="text-slate-500">Credit bureau check for better offers.</span>
+                    </label>
+                    <label className="flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        checked={marketingConsent}
+                        onChange={(e) => setMarketingConsent(e.target.checked)}
+                        className="mt-1 accent-neercred-teal"
+                      />
+                      <span className="text-slate-500">Product updates via SMS or email.</span>
+                    </label>
+                  </div>
+                )}
               </div>
 
-              <div
-                className="mt-6 space-y-3 rounded-2xl border border-slate-100 bg-slate-50/80 p-4 text-sm text-slate-600"
-                onFocus={() => setActiveField("consent")}
-              >
-                <p className="flex items-center gap-2 font-semibold text-slate-800">
-                  <IconShield size={16} className="text-neercred-teal" />
-                  Consent
-                </p>
-                <label className="flex items-start gap-3">
-                  <input type="checkbox" checked={privacyConsent} onChange={(e) => setPrivacyConsent(e.target.checked)} className="mt-1 accent-neercred-teal" />
-                  <span>
-                    I accept the{" "}
-                    <Link href="/compliance" className="font-medium text-neercred-teal underline">
-                      Privacy Policy
-                    </Link>
-                    .
-                  </span>
-                </label>
-                <label className="flex items-start gap-3">
-                  <input type="checkbox" checked={termsConsent} onChange={(e) => setTermsConsent(e.target.checked)} className="mt-1 accent-neercred-teal" />
-                  <span>
-                    I accept the{" "}
-                    <Link href="/compliance" className="font-medium text-neercred-teal underline">
-                      Terms of Service
-                    </Link>
-                    .
-                  </span>
-                </label>
-                <label className="flex items-start gap-3">
-                  <input type="checkbox" checked={dpdpConsent} onChange={(e) => setDpdpConsent(e.target.checked)} className="mt-1 accent-neercred-teal" />
-                  <span>I consent to data processing under DPDP Act 2023.</span>
-                </label>
-                <label className="flex items-start gap-3">
-                  <input type="checkbox" checked={creditConsent} onChange={(e) => setCreditConsent(e.target.checked)} className="mt-1 accent-neercred-teal" />
-                  <span className="text-slate-500">Optional: credit bureau check for better offers.</span>
-                </label>
-                <label className="flex items-start gap-3">
-                  <input type="checkbox" checked={marketingConsent} onChange={(e) => setMarketingConsent(e.target.checked)} className="mt-1 accent-neercred-teal" />
-                  <span className="text-slate-500">Optional: product updates via SMS or email.</span>
-                </label>
+              <div className="mt-6 flex gap-3">
+                <button
+                  type="button"
+                  onClick={handleProfileBack}
+                  className="w-full rounded-xl border border-slate-200 py-3.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+                >
+                  Back
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void handleProfileContinue()}
+                  disabled={loading || (currentProfileStep === "consent" && !allRequiredConsents)}
+                  className="neercred-btn w-full py-3.5 disabled:opacity-50"
+                >
+                  {loading
+                    ? "Finding your offers…"
+                    : profileStepIndex < profileSubSteps.length - 1
+                      ? "Continue"
+                      : "See my offers"}
+                </button>
               </div>
-
-              <button
-                type="submit"
-                disabled={loading || !allRequiredConsents}
-                className="neercred-btn mt-6 w-full py-3.5 disabled:opacity-50"
-              >
-                {loading ? "Finding your offers…" : "See my offers"}
-              </button>
-            </form>
+            </div>
           )}
 
           {step === "offers" && (
