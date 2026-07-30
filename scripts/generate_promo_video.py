@@ -21,7 +21,7 @@ FRAMES_DIR = OUT / "frames"
 W, H = 1080, 1920
 FPS = 30
 VOICE = "hi-IN-MadhurNeural"
-RATE = "+6%"
+RATE = "+3%"
 PITCH = "+0Hz"
 
 BRAND = {
@@ -92,7 +92,7 @@ SCENES = [
         "id": "close",
         "step": None,
         "headline": "",
-        "sub": "neerloansolutions.com",
+        "sub": "",
         "vo": "Neer Cred. Dream Big, Borrow Smart.",
         "accent": "gold",
         "photo": None,
@@ -153,6 +153,47 @@ def cover_crop(img: Image.Image, tw: int, th: int) -> Image.Image:
     return src.crop((left, top, left + tw, top + th))
 
 
+def draw_premium_frame(
+    draw: ImageDraw.ImageDraw,
+    box: tuple[int, int, int, int],
+    accent: str,
+    radius: int = 48,
+) -> None:
+    """Company-level double-border frame with gold accents."""
+    x1, y1, x2, y2 = box
+    accent_rgb = hex_to_rgb(BRAND[accent])
+    gold_rgb = hex_to_rgb(BRAND["gold"])
+    teal_rgb = hex_to_rgb(BRAND["teal"])
+
+    # Outer ambient glow (RGBA layer)
+    glow = Image.new("RGBA", (x2 - x1 + 80, y2 - y1 + 80), (0, 0, 0, 0))
+    gdraw = ImageDraw.Draw(glow)
+    ox, oy = 40, 40
+    for pad, alpha in [(34, 14), (22, 22), (12, 32)]:
+        gdraw.rounded_rectangle(
+            [ox - pad, oy - pad, x2 - x1 + ox + pad, y2 - y1 + oy + pad],
+            radius=radius + pad,
+            outline=(*accent_rgb, alpha),
+            width=2,
+        )
+
+    # Main borders drawn directly
+    draw.rounded_rectangle([x1, y1, x2, y2], radius=radius, outline=teal_rgb, width=5)
+    draw.rounded_rectangle([x1 + 6, y1 + 6, x2 - 6, y2 - 6], radius=radius - 5, outline=gold_rgb, width=2)
+    draw.rounded_rectangle([x1 + 12, y1 + 12, x2 - 12, y2 - 12], radius=radius - 10, outline="#2A3A4A", width=1)
+
+    # Corner L-brackets (premium fintech detail)
+    cl = 28
+    for cx, cy, dx, dy in [
+        (x1 + 18, y1 + 18, 1, 1),
+        (x2 - 18, y1 + 18, -1, 1),
+        (x1 + 18, y2 - 18, 1, -1),
+        (x2 - 18, y2 - 18, -1, -1),
+    ]:
+        draw.line([cx, cy, cx + dx * cl, cy], fill=gold_rgb, width=3)
+        draw.line([cx, cy, cx, cy + dy * cl], fill=gold_rgb, width=3)
+
+
 def paste_photo_card(
     base: Image.Image,
     photo_path: Path,
@@ -163,39 +204,38 @@ def paste_photo_card(
     cw, ch = x2 - x1, y2 - y1
     accent_rgb = hex_to_rgb(BRAND[accent])
 
-    # Outer glow
+    # Outer glow on base
     glow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     gdraw = ImageDraw.Draw(glow)
-    for pad, alpha in [(28, 18), (16, 28), (8, 42)]:
+    for pad, alpha in [(36, 16), (20, 26), (10, 38)]:
         gdraw.rounded_rectangle(
             [x1 - pad, y1 - pad, x2 + pad, y2 + pad],
-            radius=52 + pad,
+            radius=56 + pad,
             fill=(*accent_rgb, alpha),
         )
     base.paste(Image.alpha_composite(base.convert("RGBA"), glow).convert("RGB"))
 
-    photo = cover_crop(Image.open(photo_path), cw, ch)
-    # Bottom vignette on photo
-    vignette = Image.new("RGBA", (cw, ch), (0, 0, 0, 0))
+    pw, ph = cw - 24, ch - 24
+    photo = cover_crop(Image.open(photo_path), pw, ph)
+    vignette = Image.new("RGBA", (pw, ph), (0, 0, 0, 0))
     vdraw = ImageDraw.Draw(vignette)
-    for i in range(220):
-        a = int(180 * (i / 220) ** 1.6)
-        vdraw.rectangle([0, ch - 220 + i, cw, ch - 220 + i + 1], fill=(0, 0, 0, a))
+    for i in range(200):
+        a = int(170 * (i / 200) ** 1.6)
+        vdraw.rectangle([0, ph - 200 + i, pw, ph - 200 + i + 1], fill=(0, 0, 0, a))
     photo = Image.alpha_composite(photo.convert("RGBA"), vignette).convert("RGB")
 
-    mask = Image.new("L", (cw, ch), 0)
-    ImageDraw.Draw(mask).rounded_rectangle([0, 0, cw, ch], radius=44, fill=255)
-    rounded = Image.new("RGBA", (cw, ch), (0, 0, 0, 0))
+    mask = Image.new("L", (pw, ph), 0)
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, pw - 1, ph - 1], radius=38, fill=255)
+    rounded = Image.new("RGBA", (pw, ph), (0, 0, 0, 0))
     rounded.paste(photo, (0, 0))
     rounded.putalpha(mask)
 
     base_rgba = base.convert("RGBA")
-    base_rgba.paste(rounded, (x1, y1), rounded)
+    base_rgba.paste(rounded, (x1 + 12, y1 + 12), rounded)
     base.paste(base_rgba.convert("RGB"))
 
     draw = ImageDraw.Draw(base)
-    draw.rounded_rectangle([x1, y1, x2, y2], radius=44, outline=accent_rgb, width=3)
-    draw.rounded_rectangle([x1 + 6, y1 + 6, x2 - 6, y2 - 6], radius=40, outline=(*hex_to_rgb(BRAND["gold"]), 80), width=1)
+    draw_premium_frame(draw, card_box, accent, radius=48)
 
 
 def render_scene(scene: dict, logo_path: Path | None, photo_path: Path | None) -> Image.Image:
@@ -217,50 +257,50 @@ def render_scene(scene: dict, logo_path: Path | None, photo_path: Path | None) -
     card = (90, 360, 990, 1380)
 
     if scene.get("brand_close") and logo_path and logo_path.exists():
-        # Close: original horizontal logo on white card — no duplicate brand text
         logo = Image.open(logo_path).convert("RGBA")
         bbox = logo.getbbox()
         if bbox:
             logo = logo.crop(bbox)
 
-        card_w, card_h = 920, 340
+        card_w, card_h = 960, 200
         card_x = (W - card_w) // 2
-        card_y = 620
-        card = Image.new("RGBA", (card_w, card_h), (0, 0, 0, 0))
-        cdraw = ImageDraw.Draw(card)
-        cdraw.rounded_rectangle([0, 0, card_w - 1, card_h - 1], radius=32, fill=(255, 255, 255, 255))
-        # soft shadow
+        card_y = 700
+
+        # Shadow
         shadow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
         sdraw = ImageDraw.Draw(shadow)
-        for i in range(18, 0, -1):
+        for i in range(22, 0, -1):
             sdraw.rounded_rectangle(
                 [card_x - i, card_y + i, card_x + card_w + i, card_y + card_h + i],
-                radius=32 + i, fill=(0, 0, 0, 12),
+                radius=28 + i, fill=(0, 0, 0, 10),
             )
         img = Image.alpha_composite(img.convert("RGBA"), shadow).convert("RGB")
 
-        target_w = card_w - 120
+        card = Image.new("RGBA", (card_w, card_h), (0, 0, 0, 0))
+        cdraw = ImageDraw.Draw(card)
+        cdraw.rounded_rectangle([0, 0, card_w - 1, card_h - 1], radius=24, fill=(255, 255, 255, 255))
+        draw_premium_frame(cdraw, (0, 0, card_w - 1, card_h - 1), accent, radius=24)
+
+        target_w = card_w - 80
         scale = target_w / logo.width
         nw, nh = int(logo.width * scale), int(logo.height * scale)
         logo = logo.resize((nw, nh), Image.Resampling.LANCZOS)
         lx = card_x + (card_w - nw) // 2
         ly = card_y + (card_h - nh) // 2
 
-        img_rgba = img.convert("RGBA")
-        img_rgba.paste(card, (card_x, card_y), card)
-        img_rgba.paste(logo, (lx, ly), logo)
-        img = img_rgba.convert("RGB")
+        img.paste(card, (card_x, card_y), card)
+        img.paste(logo, (lx, ly), logo)
         draw = ImageDraw.Draw(img)
 
-        sub_font = load_font(36)
-        sub = scene["sub"]
-        sw = draw.textlength(sub, font=sub_font)
-        draw.text(((W - sw) / 2, 1040), sub, fill=hex_to_rgb(BRAND["slate"]), font=sub_font)
-
-        rbi_font = load_font(30)
+        rbi_font = load_font(32, bold=True)
         rbi = "RBI LSP Registered Platform"
         rw = draw.textlength(rbi, font=rbi_font)
-        draw.text(((W - rw) / 2, 1110), rbi, fill=hex_to_rgb(BRAND["gold"]), font=rbi_font)
+        draw.text(((W - rw) / 2, 960), rbi, fill=hex_to_rgb(BRAND["gold"]), font=rbi_font)
+
+        tag_font = load_font(30)
+        tag = "Dream Big. Borrow Smart."
+        tw = draw.textlength(tag, font=tag_font)
+        draw.text(((W - tw) / 2, 1020), tag, fill=hex_to_rgb(BRAND["slate"]), font=tag_font)
     elif photo_path and photo_path.exists():
         paste_photo_card(img, photo_path, accent, card)
         draw = ImageDraw.Draw(img)
@@ -276,7 +316,8 @@ def render_scene(scene: dict, logo_path: Path | None, photo_path: Path | None) -
         draw.text(((W - sw) / 2, 1530), sub, fill=hex_to_rgb(BRAND[accent]), font=sub_font)
 
     # Premium footer bar
-    draw.rounded_rectangle([70, 1760, W - 70, 1850], radius=28, fill="#0F766E33", outline=hex_to_rgb(BRAND["teal"]), width=1)
+    draw.rounded_rectangle([60, 1755, W - 60, 1855], radius=30, fill="#0A1628", outline=hex_to_rgb(BRAND["teal"]), width=2)
+    draw.rounded_rectangle([66, 1761, W - 66, 1849], radius=26, outline=hex_to_rgb(BRAND["gold"]), width=1)
     bar_font = load_font(28, bold=True)
     bar = "Rates from 10.99%   ·   100% Digital   ·   Compare 15+ Lenders"
     bw = draw.textlength(bar, font=bar_font)
@@ -294,11 +335,13 @@ async def synth_vo(scene: dict, out_path: Path) -> float:
     run([
         "ffmpeg", "-y", "-i", str(out_path),
         "-af",
-        "highpass=f=110,"
-        "equalizer=f=1800:width_type=h:width=1200:g=2.5,"
-        "equalizer=f=3200:width_type=h:width=1800:g=3.5,"
-        "compand=0.2|0.9:6:-70/-55/-20/-10/-3/0:2:0:0,"
-        "volume=1.18",
+        "highpass=f=120,"
+        "equalizer=f=1500:width_type=h:width=1000:g=2,"
+        "equalizer=f=2500:width_type=h:width=1400:g=4,"
+        "equalizer=f=3800:width_type=h:width=2000:g=3.5,"
+        "compand=0.15|0.85:6:-70/-50/-18/-8/-2/0:2:0:0,"
+        "alimiter=limit=0.95,"
+        "volume=1.25",
         str(polished),
     ])
     polished.replace(out_path)
@@ -312,22 +355,51 @@ async def synth_vo(scene: dict, out_path: Path) -> float:
 
 
 def ensure_logo() -> Path:
+    """Render one-line horizontal logo: icon + NeerCred only (no stacked tagline)."""
     logo = SCENES_DIR / "neercred-logo-original.png"
-    svg_path = ROOT / "frontend/public/neercred-logo-header.svg"
-    svg_content = svg_path.read_text(encoding="utf-8", errors="replace")
+    svg_content = """<svg width="520" height="80" viewBox="0 0 520 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="lg-blue" x1="8" y1="8" x2="36" y2="52" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22D3EE"/><stop offset="0.55" stop-color="#3B82F6"/><stop offset="1" stop-color="#1E3A8A"/>
+    </linearGradient>
+    <linearGradient id="lg-gold" x1="42" y1="12" x2="52" y2="50" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FDE68A"/><stop offset="0.45" stop-color="#E8C547"/><stop offset="1" stop-color="#B8860B"/>
+    </linearGradient>
+    <linearGradient id="lg-ring-blue" x1="6" y1="32" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38BDF8"/><stop offset="1" stop-color="#1D4ED8"/>
+    </linearGradient>
+    <linearGradient id="lg-ring-gold" x1="32" y1="32" x2="58" y2="32" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F5D76E"/><stop offset="1" stop-color="#C9A227"/>
+    </linearGradient>
+    <linearGradient id="lg-cred" x1="100" y1="0" x2="400" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F766E"/><stop offset="1" stop-color="#14B8A6"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(4, 0) scale(0.88)">
+    <path d="M48 14 A34 34 0 0 0 48 82" stroke="url(#lg-ring-blue)" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+    <path d="M48 14 A34 34 0 0 1 48 82" stroke="url(#lg-ring-gold)" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+    <path d="M34 30 L34 66" stroke="url(#lg-blue)" stroke-width="7.5" stroke-linecap="round"/>
+    <path d="M34 30 L62 66" stroke="url(#lg-blue)" stroke-width="7.5" stroke-linecap="round"/>
+    <path d="M62 30 L62 66" stroke="url(#lg-gold)" stroke-width="7.5" stroke-linecap="round"/>
+    <path d="M48 9.5 L49.8 13.8 L54.4 13.8 L50.8 16.6 L52.2 21 L48 18.4 L43.8 21 L45.2 16.6 L41.6 13.8 L46.2 13.8 Z" fill="url(#lg-gold)"/>
+  </g>
+  <text x="88" y="52" font-family="Poppins, system-ui, sans-serif" font-size="42" font-weight="700" letter-spacing="-0.5">
+    <tspan fill="#0B1220">Neer</tspan><tspan fill="url(#lg-cred)">Cred</tspan>
+  </text>
+</svg>"""
     html = OUT / "render-logo.html"
     html.write_text(
         f"""<!DOCTYPE html>
 <html><head><meta charset="utf-8"><style>
 *{{margin:0;padding:0}}body{{
-  width:1400px;height:500px;background:#FFFFFF;
-  display:flex;align-items:center;justify-content:center;padding:40px}}
-svg{{width:1100px;height:auto}}
+  width:1200px;height:220px;background:#FFFFFF;
+  display:flex;align-items:center;justify-content:center}}
+svg{{width:1000px;height:auto}}
 </style></head><body>{svg_content}</body></html>"""
     )
     run([
         "npx", "playwright", "screenshot", "--browser", "chromium",
-        f"file://{html}", str(logo), "--viewport-size=1400,500",
+        f"file://{html}", str(logo), "--viewport-size=1200,220",
     ], cwd=ROOT / "frontend")
     return logo
 
