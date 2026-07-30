@@ -72,10 +72,9 @@ cd Dsa-Lending-pro
 
 # 2. Backend (Terminal 1)
 cd backend
-python3 -m venv .venv
+# IMPORTANT: Use Python 3.12 — NOT 3.14 (pydantic will fail on 3.14)
+chmod +x setup-mac.sh && ./setup-mac.sh
 source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
 uvicorn app.main:app --reload --port 8000
 
 # 3. Frontend (Terminal 2)
