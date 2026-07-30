@@ -121,7 +121,7 @@ export function LoanGuideMascot({ step, activeField, show, variant = "floating" 
           type="button"
           onClick={handleTap}
           className="loan-guide-character"
-          aria-label="Neer Buddy loan guide — tap for fun"
+          aria-label="Neera — your financial guide"
         >
           <svg
             viewBox="0 0 200 240"

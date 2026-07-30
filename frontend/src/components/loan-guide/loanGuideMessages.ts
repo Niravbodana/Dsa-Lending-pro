@@ -29,7 +29,7 @@ export function greetingLine(): string {
 
 const STEP_INTRO: Record<ApplyGuideStep, string[]> = {
   mobile: [
-    "Main Neer Buddy hoon — aapki loan journey guide! 📱",
+    "Main Neera hoon — aapki financial guide! 📱",
     "Pehle yahan apna 10-digit mobile number daliye.",
     "Aadhaar-linked number best rehta hai — KYC easy ho jati hai.",
   ],

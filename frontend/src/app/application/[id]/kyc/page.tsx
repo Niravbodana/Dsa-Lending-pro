@@ -18,6 +18,7 @@ import {
   submitApplication,
 } from "@/lib/api";
 import { JourneyWorkflow } from "@/components/loan-journey/JourneyWorkflow";
+import { JourneyStepHeader } from "@/components/JourneyStepHeader";
 
 type KycStep = "aadhaar" | "aadhaar_otp" | "bank" | "esign" | "submit" | "done";
 
@@ -161,6 +162,33 @@ export default function KycPage() {
 
   const stepIndex = step === "aadhaar_otp" ? 0 : steps.indexOf(step as typeof steps[number]);
 
+  const kycTitles: Record<KycStep, { title: string; subtitle: string }> = {
+    aadhaar: {
+      title: "Verify your identity",
+      subtitle: "Aadhaar eKYC confirms who you are — required by RBI for all digital loans.",
+    },
+    aadhaar_otp: {
+      title: "Enter Aadhaar OTP",
+      subtitle: "We sent a one-time code to your Aadhaar-linked mobile via UIDAI.",
+    },
+    bank: {
+      title: "Link your bank account",
+      subtitle: "Disbursal happens here — we verify ownership before transferring funds.",
+    },
+    esign: {
+      title: "Sign your loan agreement",
+      subtitle: "Digital eSign is legally binding. Review terms before you agree.",
+    },
+    submit: {
+      title: "Submit to lender",
+      subtitle: "One final step — your verified profile goes to the lender for approval.",
+    },
+    done: {
+      title: "Application submitted",
+      subtitle: "You're all set. We'll notify you when the lender updates your status.",
+    },
+  };
+
   return (
     <>
       <Header />
@@ -222,7 +250,15 @@ export default function KycPage() {
           ))}
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+        <JourneyStepHeader
+          stepLabel={`Verification · Step ${stepIndex + 1} of ${steps.length}`}
+          title={kycTitles[step].title}
+          subtitle={kycTitles[step].subtitle}
+          progressPercent={((stepIndex + 1) / steps.length) * 100}
+          trustNote="UIDAI & NPCI compliant · End-to-end encrypted"
+        />
+
+        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-neercred">
           {error && (
             <div className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</div>
           )}

@@ -44,7 +44,6 @@ export function OfferCard({
           Recommended for you
         </div>
       )}
-
       {recommended && !offer.is_best_deal && (
         <div className="absolute -top-3 left-6 rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-neercred-teal">
           {recommended === "rate" && "Lowest rate"}
