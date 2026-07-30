@@ -14,10 +14,14 @@ import {
   getApplications,
   getDashboardProfile,
   getJourney,
+  selectOffer,
   type LoanApplication,
   type LoanOffer,
 } from "@/lib/api";
 import { journeyRedirectPath } from "@/lib/customer-session";
+import { NextActionCard } from "@/components/dashboard/NextActionCard";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { PageLoadingShell } from "@/components/ui/Skeleton";
 import { BRAND } from "@/lib/brand";
 import { INDIAN_IMAGES } from "@/lib/indian-images";
 import {
@@ -146,6 +150,8 @@ function DashboardContent() {
   const [userName, setUserName] = useState("");
   const [continueHref, setContinueHref] = useState("/apply");
   const [continueLabel, setContinueLabel] = useState("Continue application");
+  const [selectingOfferId, setSelectingOfferId] = useState<string | null>(null);
+  const [sessionToken, setSessionToken] = useState("");
 
   useEffect(() => {
     if (isDemo) {
@@ -161,6 +167,7 @@ function DashboardContent() {
       router.push("/login");
       return;
     }
+    setSessionToken(token);
 
     Promise.all([getDashboardProfile(token), getApplications(token), getJourney(token)])
       .then(([profile, apps, journey]) => {
@@ -185,13 +192,40 @@ function DashboardContent() {
   const activeApps = applications.filter((a) => !["rejected", "disbursed"].includes(a.status));
   const completedApps = applications.filter((a) => ["approved", "disbursed"].includes(a.status));
 
+  async function handleDashboardSelectOffer(offer: LoanOffer) {
+    if (!sessionToken || isDemo) {
+      router.push("/apply");
+      return;
+    }
+    setSelectingOfferId(offer.offer_id);
+    try {
+      const res = await selectOffer({
+        session_token: sessionToken,
+        offer_id: offer.offer_id,
+        lender_name: offer.lender_name,
+        loan_amount: offer.loan_amount,
+        interest_rate: offer.interest_rate,
+        tenure_months: offer.tenure_months,
+        emi: offer.emi,
+        lender_data_sharing_consent: true,
+        page_url: "/dashboard",
+      });
+      if (res.application_id) {
+        router.push(`/application/${res.application_id}/kyc`);
+      } else if (res.handoff_path) {
+        router.push(res.handoff_path);
+      }
+    } catch {
+      router.push("/apply");
+    } finally {
+      setSelectingOfferId(null);
+    }
+  }
+
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-neercred-navy">
-        <div className="text-center">
-          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-neercred-gold border-t-transparent" />
-          <p className="text-sm text-white/70">Loading your dashboard…</p>
-        </div>
+      <div className="min-h-screen bg-neercred-navy">
+        <PageLoadingShell dark title="Loading your dashboard" subtitle="Preparing your financial command center…" />
       </div>
     );
   }
@@ -287,7 +321,17 @@ function DashboardContent() {
         </div>
 
         <div className="mx-auto max-w-6xl space-y-8 px-4 py-8 sm:px-6 sm:py-10">
-          {offers.length > 0 && (
+          {!isDemo && (
+            <NextActionCard
+              continueHref={continueHref}
+              continueLabel={continueLabel}
+              activeApplications={activeApps.length}
+              pendingOffers={offers.length}
+              userName={userName}
+            />
+          )}
+
+          {offers.length > 0 ? (
             <section>
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="flex items-center gap-2 text-lg font-bold text-neercred-navy">
@@ -303,8 +347,8 @@ function DashboardContent() {
                   <OfferCard
                     key={offer.offer_id}
                     offer={offer}
-                    loading={false}
-                    onSelect={() => router.push("/apply")}
+                    loading={selectingOfferId === offer.offer_id}
+                    onSelect={handleDashboardSelectOffer}
                     recommended={offer.is_best_deal ? "rate" : undefined}
                   />
                 ))}
@@ -315,7 +359,14 @@ function DashboardContent() {
                 </Link>
               </div>
             </section>
-          )}
+          ) : !isDemo ? (
+            <EmptyState
+              title="No active offers yet"
+              description="Complete your profile and eligibility check to unlock personalised rates from RBI-partnered lenders."
+              action={{ label: "Continue application", href: continueHref }}
+              secondaryAction={{ label: "Start fresh", href: "/apply" }}
+            />
+          ) : null}
 
           <section className="overflow-hidden rounded-2xl bg-white shadow-neercred ring-1 ring-slate-100">
             <div className="grid lg:grid-cols-2">

@@ -10,6 +10,10 @@ import { IconCheckCircle, IconShield } from "@/components/icons";
 import { LoanGuideMascot } from "@/components/loan-guide/LoanGuideMascot";
 import type { GuideField } from "@/components/loan-guide/loanGuideMessages";
 import { JourneyWorkflow } from "@/components/loan-journey/JourneyWorkflow";
+import { JourneyStepHeader } from "@/components/JourneyStepHeader";
+import { OfferComparisonTable } from "@/components/OfferComparisonTable";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { OfferCardSkeleton, PageLoadingShell } from "@/components/ui/Skeleton";
 import {
   checkEligibility,
   EligibilityResult,
@@ -31,6 +35,7 @@ import { CONSENT_VERSIONS } from "@/lib/consent";
 
 type Step = "mobile" | "otp" | "details" | "offers";
 type SortBy = "rate" | "amount" | "emi";
+type OffersView = "compare" | "cards";
 type ProfileSubStep =
   | "pan"
   | "name"
@@ -46,7 +51,6 @@ type ProfileSubStep =
   | "consent";
 
 const STEPS: Step[] = ["mobile", "otp", "details", "offers"];
-const STEP_LABELS = ["Mobile", "Verify", "Profile", "Offers"];
 
 const PROFILE_SUB_LABELS: Record<ProfileSubStep, string> = {
   pan: "PAN number",
@@ -211,6 +215,9 @@ function ApplyPageInner() {
   const [resumeMsg, setResumeMsg] = useState("");
   const [eligibility, setEligibility] = useState<EligibilityResult | null>(null);
   const [sortBy, setSortBy] = useState<SortBy>("rate");
+  const [offersView, setOffersView] = useState<OffersView>("compare");
+  const [offersFetching, setOffersFetching] = useState(false);
+  const [selectingOfferId, setSelectingOfferId] = useState<string | null>(null);
   const [activeField, setActiveField] = useState<GuideField>(null);
   const [panLoading, setPanLoading] = useState(false);
   const [panVerified, setPanVerified] = useState(false);
@@ -365,6 +372,25 @@ function ApplyPageInner() {
   const stepIndex = STEPS.indexOf(step);
   const progress = ((stepIndex + 1) / STEPS.length) * 100;
 
+  const journeyTitles: Record<Step, { title: string; subtitle: string }> = {
+    mobile: {
+      title: "Let's verify it's you",
+      subtitle: "Enter your mobile number. We'll send a secure OTP — no spam, no pressure.",
+    },
+    otp: {
+      title: "Confirm with OTP",
+      subtitle: "One quick code to protect your account and unlock your saved journey.",
+    },
+    details: {
+      title: "Build your profile",
+      subtitle: "One question at a time. Neera guides you — we only ask what's needed for your offers.",
+    },
+    offers: {
+      title: "Your personalised offers",
+      subtitle: "Expert-ranked options from regulated lenders. Compare calmly, choose with confidence.",
+    },
+  };
+
   const sortedOffers = useMemo(() => {
     const copy = [...offers];
     if (sortBy === "rate") copy.sort((a, b) => a.interest_rate - b.interest_rate);
@@ -457,6 +483,7 @@ function ApplyPageInner() {
     }
     setError("");
     setLoading(true);
+    setOffersFetching(true);
     try {
       await submitDetails({
         session_token: sessionToken,
@@ -502,6 +529,7 @@ function ApplyPageInner() {
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
+      setOffersFetching(false);
     }
   }
 
@@ -545,6 +573,7 @@ function ApplyPageInner() {
     }
     setError("");
     setLoading(true);
+    setSelectingOfferId(offer.offer_id);
     try {
       const res = await selectOffer({
         session_token: sessionToken,
@@ -569,31 +598,38 @@ function ApplyPageInner() {
       setError(err instanceof Error ? err.message : "Could not select offer. Try again.");
     } finally {
       setLoading(false);
+      setSelectingOfferId(null);
     }
   }
 
   if (booting) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-slate-50">
-        <p className="animate-pulse text-slate-500">Restoring your journey…</p>
+      <main className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-teal-50/30">
+        <Header />
+        <PageLoadingShell title="Restoring your journey" subtitle="Picking up right where you left off…" />
       </main>
     );
   }
+
+  const bestOfferId =
+    sortedOffers.find((o) => o.is_best_deal)?.offer_id ||
+    [...sortedOffers].sort((a, b) => a.interest_rate - b.interest_rate)[0]?.offer_id;
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-teal-50/30">
       <Header />
 
       <div className="mx-auto max-w-2xl px-4 py-8 sm:py-12">
-        <div className="mb-6 text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neercred-teal">NeerCred Apply</p>
-          <h1 className="mt-2 text-2xl font-bold text-neercred-navy sm:text-3xl">Your loan, step by step</h1>
-          <p className="mt-2 text-sm text-slate-500">
-            {preferredPartner
+        <JourneyStepHeader
+          stepLabel={`Step ${stepIndex + 1} of ${STEPS.length}`}
+          title={journeyTitles[step].title}
+          subtitle={
+            preferredPartner && step === "mobile"
               ? `Applying via partner — all steps on NeerCred, no repeat forms.`
-              : "Light, secure, and guided from OTP to disbursal."}
-          </p>
-        </div>
+              : journeyTitles[step].subtitle
+          }
+          progressPercent={progress}
+        />
 
         <div className="mb-6 hidden sm:block">
           <JourneyWorkflow steps={workflow} currentStepId={workflowStep} />
@@ -608,23 +644,7 @@ function ApplyPageInner() {
           </div>
         )}
 
-        <div className="mb-8 flex items-start gap-2 sm:gap-3">
-          <div className="min-w-0 flex-1">
-            <div className="mb-3 flex justify-between text-xs font-medium text-slate-500">
-              {STEP_LABELS.map((label, i) => (
-                <span key={label} className={i <= stepIndex ? "text-neercred-teal" : ""}>
-                  {label}
-                </span>
-              ))}
-            </div>
-            <div className="h-1.5 overflow-hidden rounded-full bg-slate-200">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-neercred-teal to-neercred-cyan transition-all duration-500"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-          </div>
-
+        <div className="mb-6 flex items-start justify-end gap-2 sm:gap-3">
           <LoanGuideMascot
             step={step}
             activeField={activeField}
@@ -1000,57 +1020,107 @@ function ApplyPageInner() {
 
           {step === "offers" && (
             <div onFocus={() => setActiveField("offers")}>
-              {eligibility && (
+              {offersFetching && (
+                <div className="space-y-4">
+                  <p className="text-sm text-slate-500">Finding your best offers from partner lenders…</p>
+                  <OfferCardSkeleton />
+                  <OfferCardSkeleton />
+                </div>
+              )}
+
+              {!offersFetching && eligibility && (
                 <div className="mb-6 rounded-2xl border border-emerald-100 bg-emerald-50/80 p-4">
                   <p className="flex items-center gap-2 font-semibold text-emerald-800">
                     <IconCheckCircle size={18} />
-                    You&apos;re eligible
+                    You&apos;re eligible — great news
                   </p>
                   <p className="mt-1 text-sm text-emerald-700">
-                    Up to ₹{eligibility.max_loan_amount.toLocaleString("en-IN")} · Score {eligibility.score}/100
+                    Up to ₹{eligibility.max_loan_amount.toLocaleString("en-IN")} · Match score {eligibility.score}/100
                   </p>
                 </div>
               )}
 
-              <div className="flex flex-wrap items-end justify-between gap-4">
-                <div>
-                  <h2 className="text-xl font-bold text-neercred-navy">Your offers</h2>
-                  <p className="text-sm text-slate-500">
-                    {offers.length} options — KYC &amp; disbursal on NeerCred, no repeat forms
-                  </p>
-                </div>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as SortBy)}
-                  className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
-                >
-                  <option value="rate">Sort: lowest rate</option>
-                  <option value="emi">Sort: lowest EMI</option>
-                  <option value="amount">Sort: highest amount</option>
-                </select>
-              </div>
-
-              <label className="mt-6 flex items-start gap-3 rounded-2xl border border-amber-100 bg-amber-50/60 p-4 text-sm text-slate-700">
-                <input
-                  type="checkbox"
-                  checked={lenderConsent}
-                  onChange={(e) => setLenderConsent(e.target.checked)}
-                  className="mt-1 accent-neercred-teal"
+              {!offersFetching && offers.length === 0 && (
+                <EmptyState
+                  title="No offers matched right now"
+                  description="This can happen based on income, credit profile, or lender criteria. Try adjusting your loan amount or check back soon — we'll notify you when new options appear."
+                  action={{ label: "Update profile", href: "/apply" }}
+                  secondaryAction={{ label: "Talk to support", href: "/help" }}
                 />
-                <span>I consent to share my application with the lender I select — processed inside NeerCred.</span>
-              </label>
+              )}
 
-              <div className="mt-6 space-y-5">
-                {sortedOffers.map((offer) => (
-                  <OfferCard
-                    key={offer.offer_id}
-                    offer={offer}
-                    onSelect={handleSelectOffer}
-                    loading={loading}
-                    recommended={recommendations[offer.offer_id]}
-                  />
-                ))}
-              </div>
+              {!offersFetching && offers.length > 0 && (
+                <>
+                  <div className="flex flex-wrap items-end justify-between gap-4">
+                    <div>
+                      <p className="text-sm text-slate-500">
+                        {offers.length} regulated lender{offers.length > 1 ? "s" : ""} · Compare like an expert
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <div className="flex rounded-xl border border-slate-200 p-0.5 text-xs font-semibold">
+                        <button
+                          type="button"
+                          onClick={() => setOffersView("compare")}
+                          className={`rounded-lg px-3 py-1.5 ${offersView === "compare" ? "bg-neercred-teal text-white" : "text-slate-600"}`}
+                        >
+                          Compare
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setOffersView("cards")}
+                          className={`rounded-lg px-3 py-1.5 ${offersView === "cards" ? "bg-neercred-teal text-white" : "text-slate-600"}`}
+                        >
+                          Cards
+                        </button>
+                      </div>
+                      <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value as SortBy)}
+                        className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                      >
+                        <option value="rate">Lowest rate</option>
+                        <option value="emi">Lowest EMI</option>
+                        <option value="amount">Highest amount</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <label className="mt-6 flex items-start gap-3 rounded-2xl border border-amber-100 bg-amber-50/60 p-4 text-sm text-slate-700">
+                    <input
+                      type="checkbox"
+                      checked={lenderConsent}
+                      onChange={(e) => setLenderConsent(e.target.checked)}
+                      className="mt-1 accent-neercred-teal"
+                    />
+                    <span>I consent to share my application with the lender I select — processed securely inside NeerCred.</span>
+                  </label>
+
+                  <div className="mt-6">
+                    {offersView === "compare" ? (
+                      <OfferComparisonTable
+                        offers={sortedOffers}
+                        bestOfferId={bestOfferId}
+                        onSelect={handleSelectOffer}
+                        loading={loading}
+                        loadingOfferId={selectingOfferId ?? undefined}
+                      />
+                    ) : (
+                      <div className="space-y-5">
+                        {sortedOffers.map((offer) => (
+                          <OfferCard
+                            key={offer.offer_id}
+                            offer={offer}
+                            onSelect={handleSelectOffer}
+                            loading={loading && selectingOfferId === offer.offer_id}
+                            recommended={recommendations[offer.offer_id]}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
           )}
         </div>

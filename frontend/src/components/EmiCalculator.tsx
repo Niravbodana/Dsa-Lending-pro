@@ -109,10 +109,11 @@ export function EmiCalculator() {
             </div>
             <Link
               href="/apply"
-              className="mt-8 block rounded-2xl bg-amber-400 py-4 text-center font-extrabold text-slate-900 transition hover:bg-amber-300"
+              className="mt-8 block rounded-2xl bg-gradient-to-r from-neercred-gold to-amber-400 py-4 text-center text-sm font-extrabold text-neercred-navy transition hover:brightness-110"
             >
-              Apply at This EMI →
+              Check your real eligibility →
             </Link>
+            <p className="mt-3 text-center text-xs text-teal-100/80">Illustrative only — actual rate depends on your profile</p>
           </div>
         </div>
       </div>

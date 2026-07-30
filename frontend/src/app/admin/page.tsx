@@ -132,104 +132,113 @@ export default function AdminPage() {
 
   if (!token) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-900 p-4">
-        <form onSubmit={handleLogin} className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-2xl">
+      <div className="flex min-h-screen items-center justify-center bg-[#0a0f1a] p-4">
+        <form onSubmit={handleLogin} className="w-full max-w-md rounded-3xl border border-slate-800 bg-slate-900 p-8 shadow-2xl">
           <div className="text-center">
-            <p className="text-4xl">🔐</p>
-            <h1 className="mt-4 text-2xl font-black text-slate-900">Admin Panel</h1>
-            <p className="mt-2 text-sm text-slate-500">Neer Loan Solutions — Internal Access</p>
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-500/10 text-2xl font-bold text-teal-400">
+              NC
+            </div>
+            <h1 className="mt-5 text-2xl font-bold text-white">Operations Console</h1>
+            <p className="mt-2 text-sm text-slate-400">NeerCred internal — leads, applications & partner ops</p>
           </div>
           {error && (
-            <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
+            <p className="mt-4 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">{error}</p>
           )}
+          <label className="mt-6 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Admin password
+          </label>
           <input
             type="password"
-            placeholder="Admin password"
+            placeholder="Enter password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mt-6 w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-teal-500"
+            className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3.5 text-white outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
             required
           />
           <button
             type="submit"
-            className="mt-4 w-full rounded-xl bg-teal-600 py-3 font-bold text-white hover:bg-teal-700"
+            className="mt-5 w-full rounded-xl bg-teal-600 py-3.5 text-sm font-bold text-white transition hover:bg-teal-500"
           >
-            Login →
+            Sign in to console →
           </button>
-          <Link href="/" className="mt-4 block text-center text-sm text-slate-400 hover:text-teal-600">
-            ← Back to website
+          <Link href="/" className="mt-5 block text-center text-sm text-slate-500 transition hover:text-teal-400">
+            ← Back to customer site
           </Link>
         </form>
       </div>
     );
   }
 
+  const navItems: { id: Tab; label: string; desc: string }[] = [
+    { id: "dashboard", label: "Dashboard", desc: "Funnel & revenue" },
+    { id: "leads", label: "Leads", desc: "All applications" },
+    { id: "applications", label: "Applications", desc: "Selected offers" },
+    { id: "consents", label: "Consents", desc: "Legal audit trail" },
+    { id: "sitebuilder", label: "Site Builder", desc: "CMS & AI editor" },
+    { id: "partners", label: "Partners", desc: "API integrations" },
+    { id: "bugs", label: "Bug Fixer", desc: "User reports" },
+  ];
+
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen bg-slate-50">
       {/* Sidebar */}
-      <div className="fixed inset-y-0 left-0 w-64 bg-slate-900 text-white">
-        <div className="border-b border-slate-700 p-6">
-          <p className="text-lg font-black">
-            Neer <span className="text-teal-400">Admin</span>
+      <div className="fixed inset-y-0 left-0 z-30 flex w-64 flex-col border-r border-slate-800 bg-[#0a0f1a] text-white">
+        <div className="border-b border-slate-800 p-6">
+          <p className="text-lg font-bold tracking-tight">
+            Neer<span className="text-teal-400">Cred</span>
           </p>
-          <p className="text-xs text-slate-400">Bug Fixer & Lead Manager</p>
+          <p className="mt-1 text-xs text-slate-500">Operations Console</p>
         </div>
-        <nav className="mt-4 space-y-1 px-3">
-          {(
-            [
-              { id: "dashboard" as Tab, label: "📊 Dashboard" },
-              { id: "leads" as Tab, label: "👥 Leads" },
-              { id: "applications" as Tab, label: "Applications" },
-              { id: "consents" as Tab, label: "Legal Consents" },
-              { id: "sitebuilder" as Tab, label: "Site Builder AI" },
-              { id: "partners" as Tab, label: "Partner APIs" },
-              { id: "bugs" as Tab, label: "Bug Fixer" },
-            ]
-          ).map((item) => (
+        <nav className="flex-1 space-y-0.5 overflow-y-auto p-3">
+          {navItems.map((item) => (
             <button
               key={item.id}
               onClick={() => setTab(item.id)}
-              className={`w-full rounded-xl px-4 py-3 text-left text-sm font-semibold transition ${
-                tab === item.id ? "bg-teal-600 text-white" : "text-slate-300 hover:bg-slate-800"
+              className={`w-full rounded-xl px-4 py-3 text-left transition ${
+                tab === item.id
+                  ? "bg-teal-600/90 text-white shadow-lg shadow-teal-900/30"
+                  : "text-slate-400 hover:bg-slate-800 hover:text-white"
               }`}
             >
-              {item.label}
+              <span className="block text-sm font-semibold">{item.label}</span>
+              <span className="block text-[11px] opacity-70">{item.desc}</span>
             </button>
           ))}
         </nav>
-        <div className="absolute bottom-0 w-full border-t border-slate-700 p-4">
-          <Link href="/" className="block text-sm text-slate-400 hover:text-white">
-            ← Website
+        <div className="border-t border-slate-800 p-4">
+          <Link href="/" className="block text-sm text-slate-500 transition hover:text-white">
+            ← Customer site
           </Link>
-          <button onClick={logout} className="mt-2 text-sm text-red-400 hover:text-red-300">
-            Logout
+          <button onClick={logout} className="mt-3 text-sm text-red-400 transition hover:text-red-300">
+            Sign out
           </button>
         </div>
       </div>
 
       {/* Main content */}
-      <div className="ml-64 p-8">
+      <div className="ml-64 min-h-screen p-8">
         <div className="mb-8 flex items-center justify-between">
-          <h1 className="text-2xl font-black text-slate-900 capitalize">
-            {tab === "bugs"
-              ? "Bug Fixer"
-              : tab === "consents"
-                ? "Legal Consents"
-                : tab === "sitebuilder"
-                  ? "Site Builder AI"
-                  : tab === "partners"
-                    ? "Partner APIs & Links"
-                    : tab}
-          </h1>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Operations</p>
+            <h1 className="text-2xl font-bold capitalize text-slate-900">
+              {navItems.find((n) => n.id === tab)?.label || tab}
+            </h1>
+          </div>
           <button
             onClick={loadData}
-            className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-600 shadow hover:bg-slate-50"
+            disabled={loading}
+            className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 shadow-sm transition hover:bg-slate-50 disabled:opacity-50"
           >
-            ↻ Refresh
+            {loading ? "Refreshing…" : "↻ Refresh"}
           </button>
         </div>
 
-        {loading && <p className="text-slate-500">Loading...</p>}
+        {loading && (
+          <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-5 py-4 text-sm text-slate-500">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-teal-600 border-t-transparent" />
+            Loading data…
+          </div>
+        )}
 
         {/* Dashboard */}
         {tab === "dashboard" && stats && !loading && (

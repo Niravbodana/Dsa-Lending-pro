@@ -16,6 +16,7 @@ import {
 import type { SiteConfig } from "@/lib/cms";
 import { REF } from "@/lib/reference-theme";
 import { CmsField } from "@/components/cms/CmsField";
+import { InstitutionalTrustRow } from "@/components/ui/InstitutionalTrustRow";
 
 const PARTNERS = [
   { name: "HDFC Bank", logo: "HDFC" },
@@ -39,7 +40,10 @@ export function HeroTrustBand({ config }: { config: SiteConfig }) {
 
   return (
     <section className="glass-strip">
-      <div className="mx-auto max-w-7xl px-4 pb-6 pt-4">
+      <div className="mx-auto max-w-7xl px-4 pb-4 pt-6">
+        <InstitutionalTrustRow className="mb-6" />
+      </div>
+      <div className="mx-auto max-w-7xl px-4 pb-6 pt-2">
         <p className="text-center text-sm font-medium text-slate-500">
           <CmsField path="trust_band.tagline" label="Trust tagline" group="Trust">
             {tagline}

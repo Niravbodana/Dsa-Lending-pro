@@ -1,6 +1,7 @@
 "use client";
 
 import { ReactLenis } from "lenis/react";
+import { useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
 import { ScrollProgressBar } from "@/components/ScrollProgressBar";
 
@@ -10,6 +11,17 @@ type Props = {
 
 /** Mac-style inertia smooth scrolling sitewide */
 export function PremiumProviders({ children }: Props) {
+  const reduceMotion = useReducedMotion();
+
+  if (reduceMotion) {
+    return (
+      <>
+        <ScrollProgressBar />
+        {children}
+      </>
+    );
+  }
+
   return (
     <ReactLenis
       root
