@@ -102,6 +102,20 @@ uvicorn app.main:app --reload --port 8000
 
 Or use the helper script: `chmod +x setup.sh && ./setup.sh`
 
+### `pydantic-core` / Python 3.14 build error?
+
+This project needs **Python 3.10–3.13** (not 3.14). On Mac:
+
+```bash
+brew install python@3.12
+cd backend
+rm -rf .venv
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000
+```
+
 > **Note:** Local dev uses SQLite (no PostgreSQL needed). For Docker/PostgreSQL use `pip install -r requirements-prod.txt`.
 
 ## Partner API Integration
