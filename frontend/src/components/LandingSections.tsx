@@ -13,6 +13,7 @@ import {
   IconStar,
 } from "@/components/icons";
 import { INDIAN_IMAGES } from "@/lib/indian-images";
+import { CmsField } from "@/components/cms/CmsField";
 
 const stats = [
   { value: "₹5L+", label: "Max Loan", Icon: IconRupee },
@@ -51,24 +52,6 @@ const loanCards = [
     href: "/loans",
     image: INDIAN_IMAGES.loans.business,
     rate: "12.49%",
-  },
-];
-
-const lifestyleBlocks = [
-  {
-    title: "Home, Wedding, Dreams — All Possible",
-    desc: "Neer Loan Solutions connects you with India's trusted banks and NBFCs. Compare offers, choose the best rate, and receive funds directly in your account.",
-    image: INDIAN_IMAGES.lifestyle.familyHome,
-    cta: "Explore Loans",
-    href: "/loans",
-  },
-  {
-    title: "100% Digital. Zero Branch Visits.",
-    desc: "OTP login, Aadhaar eKYC, bank verification, digital eSign — the entire process from your phone. Get approved from home.",
-    image: INDIAN_IMAGES.lifestyle.mobileIndia,
-    cta: "Start Application",
-    href: "/apply",
-    reverse: true,
   },
 ];
 
@@ -200,35 +183,63 @@ export function Hero() {
   );
 }
 
-export function LifestyleShowcase() {
+export function LifestyleShowcase({ config }: { config: import("@/lib/cms").SiteConfig }) {
+  const blocks = config.lifestyle_showcase?.blocks?.length ? config.lifestyle_showcase.blocks : [];
+
   return (
     <section className="bg-white">
-      {lifestyleBlocks.map((block, i) => (
+      {blocks.map((block, i) => (
         <div
           key={block.title}
           className={`grid items-center gap-0 lg:grid-cols-2 ${i % 2 === 1 ? "lg:flex-row-reverse" : ""}`}
         >
           <ScrollReveal
-            variant={block.reverse ? "right" : "left"}
-            className={`relative min-h-[360px] lg:min-h-[480px] ${block.reverse ? "lg:order-2" : ""}`}
+            variant={i % 2 === 1 ? "right" : "left"}
+            className={`relative min-h-[360px] lg:min-h-[480px] ${i % 2 === 1 ? "lg:order-2" : ""}`}
           >
-            <Image src={block.image} alt={block.title} fill className="object-cover" />
+            <div className="absolute inset-0">
+              <CmsField
+                path={`lifestyle_showcase.blocks.${i}.image`}
+                type="image"
+                className="h-full w-full object-cover"
+                group="Lifestyle"
+              >
+                {block.image}
+              </CmsField>
+            </div>
             <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent lg:hidden" />
           </ScrollReveal>
           <ScrollReveal
-            variant={block.reverse ? "left" : "right"}
-            className={`px-6 py-16 lg:px-16 lg:py-24 ${block.reverse ? "lg:order-1" : ""}`}
+            variant={i % 2 === 1 ? "left" : "right"}
+            className={`px-6 py-16 lg:px-16 lg:py-24 ${i % 2 === 1 ? "lg:order-1" : ""}`}
           >
             <span className="text-sm font-bold uppercase tracking-widest text-teal-600">
               Neer Loan Solutions
             </span>
-            <h2 className="mt-3 text-3xl font-black text-slate-900 md:text-4xl">{block.title}</h2>
-            <p className="mt-4 text-lg leading-relaxed text-slate-600">{block.desc}</p>
+            <CmsField
+              path={`lifestyle_showcase.blocks.${i}.title`}
+              as="h2"
+              className="mt-3 text-3xl font-black text-slate-900 md:text-4xl"
+              group="Lifestyle"
+            >
+              {block.title}
+            </CmsField>
+            <CmsField
+              path={`lifestyle_showcase.blocks.${i}.desc`}
+              as="p"
+              className="mt-4 text-lg leading-relaxed text-slate-600"
+              group="Lifestyle"
+            >
+              {block.desc}
+            </CmsField>
             <Link
               href={block.href}
               className="mt-8 inline-flex rounded-2xl bg-teal-600 px-8 py-4 font-bold text-white shadow-lg shadow-teal-600/25 transition hover:bg-teal-700"
             >
-              {block.cta} →
+              <CmsField path={`lifestyle_showcase.blocks.${i}.cta`} group="Lifestyle">
+                {block.cta}
+              </CmsField>{" "}
+              →
             </Link>
           </ScrollReveal>
         </div>
@@ -237,24 +248,27 @@ export function LifestyleShowcase() {
   );
 }
 
-export function LoanProductsStrip() {
+export function LoanProductsStrip({ config }: { config: import("@/lib/cms").SiteConfig }) {
+  if (config.sections?.loan_products === false) return null;
+  const section = config.loan_products;
+  const cards = section.cards?.length
+    ? section.cards
+    : loanCards.map((c) => ({ title: c.title, rate: c.rate, image: c.image }));
   return (
-    <section className="bg-slate-50 py-20">
+    <section className="py-20">
       <div className="mx-auto max-w-7xl px-4">
         <ScrollReveal variant="up" className="text-center">
-          <span className="rounded-full bg-teal-100 px-4 py-1 text-sm font-bold text-teal-700">
-            LOAN PRODUCTS
-          </span>
+          <span className="rounded-full bg-teal-100 px-4 py-1 text-sm font-bold text-teal-700">LOAN PRODUCTS</span>
           <h2 className="mt-4 text-4xl font-black text-slate-900">
-            The <span className="text-teal-600">Right Loan</span> for Every Need
+            <CmsField path="loan_products.title" group="Products">{section.title}</CmsField>
           </h2>
         </ScrollReveal>
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {loanCards.map((c, i) => (
+          {cards.map((c, i) => (
             <ScrollRevealAlternate key={c.title} index={i} delay={i * 100}>
               <Link
-                href={c.href}
-                className="group block overflow-hidden rounded-3xl bg-white shadow-lg transition hover:-translate-y-2 hover:shadow-2xl"
+                href="/loans"
+                className="group block overflow-hidden rounded-3xl glass-panel transition hover:-translate-y-2 hover:shadow-2xl"
               >
                 <div className="relative h-44 overflow-hidden">
                   <Image
@@ -264,10 +278,19 @@ export function LoanProductsStrip() {
                     className="object-cover transition duration-500 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent" />
-                  <p className="absolute bottom-4 left-4 text-xl font-black text-white">{c.title}</p>
+                  <CmsField
+                    path={`loan_products.cards.${i}.title`}
+                    as="p"
+                    className="absolute bottom-4 left-4 text-xl font-black text-white"
+                    group="Products"
+                  >
+                    {c.title}
+                  </CmsField>
                 </div>
                 <div className="flex items-center justify-between p-4">
-                  <span className="text-sm text-slate-500">From {c.rate}</span>
+                  <span className="text-sm text-slate-500">
+                    From <CmsField path={`loan_products.cards.${i}.rate`} group="Products">{c.rate}</CmsField>
+                  </span>
                   <span className="text-sm font-bold text-teal-600">Apply →</span>
                 </div>
               </Link>
@@ -284,8 +307,9 @@ export function LoanProductsStrip() {
   );
 }
 
-export function TrustGallery() {
-  const images = INDIAN_IMAGES.trust;
+export function TrustGallery({ config }: { config: import("@/lib/cms").SiteConfig }) {
+  const section = config.trust_gallery;
+  const images = section.images?.length ? section.images : INDIAN_IMAGES.trust;
 
   return (
     <section className="relative overflow-hidden bg-slate-950 py-24 text-white">
@@ -297,18 +321,35 @@ export function TrustGallery() {
       />
       <div className="relative mx-auto max-w-7xl px-4">
         <ScrollReveal variant="up" className="text-center">
-          <h2 className="text-4xl font-black">
-            Trusted by <span className="text-amber-400">Thousands</span> Across India
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-slate-400">
-            From Mumbai to Delhi — professionals, families, and entrepreneurs trust Neer Loan Solutions.
-          </p>
+          <CmsField
+            path="trust_gallery.title"
+            as="h2"
+            className="text-4xl font-black"
+            group="Trust Gallery"
+          >
+            {section.title}
+          </CmsField>
+          <CmsField
+            path="trust_gallery.subtitle"
+            as="p"
+            className="mx-auto mt-4 max-w-2xl text-slate-400"
+            group="Trust Gallery"
+          >
+            {section.subtitle}
+          </CmsField>
         </ScrollReveal>
         <div className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-4">
           {images.map((src, i) => (
             <ScrollReveal key={src} variant="scale" delay={i * 80}>
               <div className="relative aspect-[4/3] overflow-hidden rounded-2xl ring-1 ring-white/10">
-                <Image src={src} alt="Neer Loan customer" fill className="object-cover" />
+                <CmsField
+                  path={`trust_gallery.images.${i}`}
+                  type="image"
+                  className="h-full w-full object-cover"
+                  group="Trust Gallery"
+                >
+                  {src}
+                </CmsField>
               </div>
             </ScrollReveal>
           ))}
@@ -318,29 +359,54 @@ export function TrustGallery() {
   );
 }
 
-export function AppDownloadBanner() {
+export function AppDownloadBanner({ config }: { config: import("@/lib/cms").SiteConfig }) {
+  const section = config.app_download;
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-r from-slate-900 to-teal-900 py-16 text-white">
-      <Image
-        src={INDIAN_IMAGES.misc.appBanner}
-        alt=""
-        fill
-        className="object-cover opacity-20"
-      />
+      <CmsField
+        path="app_download.image"
+        type="image"
+        className="absolute inset-0 h-full w-full object-cover opacity-20"
+        group="App Download"
+      >
+        {section.image}
+      </CmsField>
       <div className="relative mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-8 px-4">
         <ScrollReveal variant="left">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-teal-300">Mobile App — Coming Soon</p>
-          <h2 className="mt-2 text-3xl font-black">Neer Loan App — Loans in Your Pocket</h2>
-          <p className="mt-2 max-w-md text-slate-300">
-            Track applications, compare offers, EMI calculator — all in one premium app. Launching Q3 2026.
-          </p>
+          <CmsField
+            path="app_download.badge"
+            as="p"
+            className="text-xs font-bold uppercase tracking-[0.2em] text-teal-300"
+            group="App Download"
+          >
+            {section.badge}
+          </CmsField>
+          <CmsField
+            path="app_download.title"
+            as="h2"
+            className="mt-2 text-3xl font-black"
+            group="App Download"
+          >
+            {section.title}
+          </CmsField>
+          <CmsField
+            path="app_download.subtitle"
+            as="p"
+            className="mt-2 max-w-md text-slate-300"
+            group="App Download"
+          >
+            {section.subtitle}
+          </CmsField>
         </ScrollReveal>
         <ScrollReveal variant="right">
           <Link
             href="/app"
             className="inline-block rounded-2xl bg-white px-8 py-4 font-bold text-slate-900 shadow-xl hover:bg-slate-100"
           >
-            Join Waitlist →
+            <CmsField path="app_download.cta" group="App Download">
+              {section.cta}
+            </CmsField>
           </Link>
         </ScrollReveal>
       </div>
@@ -348,27 +414,37 @@ export function AppDownloadBanner() {
   );
 }
 
-export function ReferBanner() {
+export function ReferBanner({ config }: { config: import("@/lib/cms").SiteConfig }) {
+  const section = config.refer_banner;
+
   return (
     <section className="relative overflow-hidden border-y border-neercred-gold/20 bg-gradient-to-r from-neercred-navy to-neercred-teal py-16 text-white">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-6 px-4">
         <ScrollReveal variant="left" className="flex items-center gap-6">
           <div className="relative hidden h-24 w-24 overflow-hidden rounded-2xl ring-2 ring-white/20 sm:block">
-            <Image
-              src={INDIAN_IMAGES.misc.referThumb}
-              alt="Referral program"
-              fill
-              className="object-cover"
-            />
+            <CmsField
+              path="refer_banner.image"
+              type="image"
+              className="h-full w-full object-cover"
+              group="Refer Banner"
+            >
+              {section.image}
+            </CmsField>
           </div>
           <div>
-            <p className="text-2xl font-bold">Refer &amp; Earn</p>
-            <p className="text-slate-300">Earn rewards on every successful referral disbursal</p>
+            <CmsField path="refer_banner.title" as="p" className="text-2xl font-bold" group="Refer Banner">
+              {section.title}
+            </CmsField>
+            <CmsField path="refer_banner.subtitle" as="p" className="text-slate-300" group="Refer Banner">
+              {section.subtitle}
+            </CmsField>
           </div>
         </ScrollReveal>
         <ScrollReveal variant="right">
           <Link href="/refer" className="rounded-xl bg-gradient-to-r from-neercred-gold to-amber-500 px-8 py-4 font-bold text-neercred-navy shadow-lg transition hover:brightness-110">
-            View Program
+            <CmsField path="refer_banner.cta" group="Refer Banner">
+              {section.cta}
+            </CmsField>
           </Link>
         </ScrollReveal>
       </div>
@@ -376,22 +452,35 @@ export function ReferBanner() {
   );
 }
 
-export function HowItWorks() {
-  const steps = [
-    { num: "01", title: "Verify Mobile", desc: "Secure OTP login — 30 seconds", image: INDIAN_IMAGES.howItWorks.mobile },
-    { num: "02", title: "Enter Details", desc: "PAN, income, city — simple form", image: INDIAN_IMAGES.howItWorks.form },
-    { num: "03", title: "Compare Offers", desc: "Choose the best rate from 15+ lenders", image: INDIAN_IMAGES.howItWorks.compare },
-    { num: "04", title: "Money in Account", desc: "Direct disbursal from partner bank", image: INDIAN_IMAGES.howItWorks.disbursal },
+export function HowItWorks({ config }: { config: import("@/lib/cms").SiteConfig }) {
+  if (config.sections?.how_it_works === false) return null;
+  const section = config.how_it_works;
+  const defaultImages = [
+    INDIAN_IMAGES.howItWorks.mobile,
+    INDIAN_IMAGES.howItWorks.form,
+    INDIAN_IMAGES.howItWorks.compare,
+    INDIAN_IMAGES.howItWorks.disbursal,
   ];
+  const steps = (section.steps?.length ? section.steps : []).map((s, i) => ({
+    num: String(i + 1).padStart(2, "0"),
+    title: s.title,
+    desc: s.desc,
+    image: defaultImages[i % defaultImages.length],
+  }));
 
   return (
-    <section id="how-it-works" className="bg-white py-24">
+    <section id="how-it-works" className="py-24">
       <div className="mx-auto max-w-7xl px-4">
         <ScrollReveal variant="up" className="text-center">
           <span className="rounded-full bg-teal-50 px-4 py-1 text-sm font-bold text-teal-600">SIMPLE PROCESS</span>
           <h2 className="mt-4 text-4xl font-black text-slate-900">
-            Getting a Loan Is Now <span className="text-teal-600">Effortless</span>
+            <CmsField path="how_it_works.title" group="Process">{section.title}</CmsField>
           </h2>
+          {section.subtitle && (
+            <CmsField path="how_it_works.subtitle" as="p" className="mt-3 text-slate-500" group="Process">
+              {section.subtitle}
+            </CmsField>
+          )}
         </ScrollReveal>
         <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
           {steps.map((step, i) => (
@@ -406,8 +495,12 @@ export function HowItWorks() {
                 </div>
                 <div className="p-6">
                   <span className="text-3xl font-black text-teal-100">{step.num}</span>
-                  <h3 className="mt-1 text-xl font-bold text-slate-900">{step.title}</h3>
-                  <p className="mt-2 text-slate-500">{step.desc}</p>
+                  <CmsField path={`how_it_works.steps.${i}.title`} as="h3" className="mt-1 text-xl font-bold text-slate-900" group="Process">
+                    {step.title}
+                  </CmsField>
+                  <CmsField path={`how_it_works.steps.${i}.desc`} as="p" className="mt-2 text-slate-500" group="Process">
+                    {step.desc}
+                  </CmsField>
                 </div>
               </div>
             </ScrollRevealAlternate>
