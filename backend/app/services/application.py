@@ -20,11 +20,13 @@ STATUS_FLOW = [
     "offer_selected",
     "kyc_pending",
     "kyc_completed",
+    "partner_handoff",
     "submitted",
     "under_review",
     "approved",
     "disbursed",
     "rejected",
+    "cancelled",
 ]
 
 
@@ -69,6 +71,10 @@ def update_application_status(
         app.disbursal_amount = app.loan_amount
         app.disbursal_date = datetime.now(timezone.utc)
         app.commission_amount = calculate_commission(app.loan_amount)
+        from app.services.kfs import cooling_off_deadline
+
+        if not app.cooling_off_until:
+            app.cooling_off_until = cooling_off_deadline()
     add_status_history(db, app.id, new_status, message, source)
     db.commit()
     db.refresh(app)

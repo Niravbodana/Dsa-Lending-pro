@@ -90,6 +90,11 @@ class LoanApplication(Base):
     disbursal_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     commission_amount: Mapped[float | None] = mapped_column(Float, nullable=True)
     partner_ref_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    workflow_mode: Mapped[str] = mapped_column(String(30), default="internal")
+    partner_slug: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    kfs_accepted: Mapped[bool] = mapped_column(Boolean, default=False)
+    cooling_off_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    processing_fee_pct: Mapped[float | None] = mapped_column(Float, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()

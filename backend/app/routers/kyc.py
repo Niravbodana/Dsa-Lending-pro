@@ -8,7 +8,9 @@ from app.schemas_application import (
     AadhaarOtpRequest,
     AadhaarVerifyRequest,
     BankVerifyRequest,
+    CoolingOffCancelRequest,
     EsignRequest,
+    KfsAcceptRequest,
     KycStepResponse,
     SubmitApplicationRequest,
 )
@@ -19,6 +21,7 @@ from app.services.application import (
     update_application_status,
 )
 from app.services.consent import client_meta, log_consent_event, record_consent
+from app.services.kfs import build_kfs, cooling_off_deadline
 from app.services.otp import generate_otp, get_lead_by_mobile, get_mobile_from_token
 from app.services.partner_submit import submit_to_partner
 from app.services.rate_limit import rate_limit
@@ -115,6 +118,45 @@ def bank_verify(payload: BankVerifyRequest, request: Request, db: Session = Depe
     )
 
 
+@router.get("/kfs/{application_id}")
+def get_kfs(application_id: int, session_token: str, db: Session = Depends(get_db)):
+    mobile, app = _get_app(db, session_token, application_id)
+    lead = get_lead_by_mobile(db, mobile)
+    return build_kfs(app, lead)
+
+
+@router.post("/kfs/accept", response_model=KycStepResponse)
+def accept_kfs(payload: KfsAcceptRequest, request: Request, db: Session = Depends(get_db)):
+    rate_limit(request, key="kyc-kfs", max_hits=10, window_seconds=900)
+    mobile, app = _get_app(db, payload.session_token, payload.application_id)
+
+    if not app.bank_verified:
+        raise HTTPException(status_code=400, detail="Complete bank verification first")
+
+    lead = get_lead_by_mobile(db, mobile)
+    ip, ua = client_meta(request)
+    record_consent(
+        db,
+        consent_type="kfs_accepted",
+        accepted=True,
+        lead_id=lead.id if lead else None,
+        application_id=app.id,
+        mobile=mobile,
+        page_url=payload.page_url or f"/application/{app.id}/kyc",
+        ip_address=ip,
+        user_agent=ua,
+        metadata=f"lender={app.lender_name}, ref={app.application_ref}",
+    )
+    if lead:
+        log_consent_event(db, lead.id, "kfs_accepted", f"{app.application_ref} — {app.lender_name}")
+
+    app.kfs_accepted = True
+    add_status_history(db, app.id, "kfs_accepted", "Key Fact Statement reviewed and accepted")
+    db.commit()
+
+    return KycStepResponse(message="Key Fact Statement accepted", step="kfs", completed=True)
+
+
 @router.post("/esign", response_model=KycStepResponse)
 def esign_complete(payload: EsignRequest, request: Request, db: Session = Depends(get_db)):
     rate_limit(request, key="kyc-esign", max_hits=10, window_seconds=900)
@@ -122,6 +164,8 @@ def esign_complete(payload: EsignRequest, request: Request, db: Session = Depend
 
     if not app.bank_verified:
         raise HTTPException(status_code=400, detail="Complete bank verification first")
+    if not app.kfs_accepted:
+        raise HTTPException(status_code=400, detail="Review and accept the Key Fact Statement first")
 
     lead = get_lead_by_mobile(db, mobile)
     ip, ua = client_meta(request)
@@ -172,6 +216,9 @@ def submit_application(
     update_application_status(
         db, app, "submitted", f"Application forwarded to {app.lender_name}", "platform"
     )
+    if not app.cooling_off_until:
+        app.cooling_off_until = cooling_off_deadline()
+        db.commit()
 
     send_notification(
         db,
@@ -188,6 +235,39 @@ def submit_application(
     )
 
 
+@router.post("/cooling-off/cancel", response_model=KycStepResponse)
+def cancel_cooling_off(payload: CoolingOffCancelRequest, request: Request, db: Session = Depends(get_db)):
+    rate_limit(request, key="kyc-cancel", max_hits=5, window_seconds=3600)
+    mobile, app = _get_app(db, payload.session_token, payload.application_id)
+
+    now = __import__("datetime").datetime.now(__import__("datetime").timezone.utc)
+    until = app.cooling_off_until
+    if until and until.tzinfo is None:
+        until = until.replace(tzinfo=__import__("datetime").timezone.utc)
+
+    if app.status != "disbursed" or not until or now > until:
+        raise HTTPException(
+            status_code=400,
+            detail="Cooling-off cancellation is only available within 3 days of disbursal",
+        )
+
+    update_application_status(
+        db,
+        app,
+        "cancelled",
+        payload.reason or "Customer exercised cooling-off right",
+        "customer",
+    )
+    send_notification(
+        db,
+        mobile,
+        "sms",
+        "loan_cancelled",
+        f"Application {app.application_ref} cancelled within cooling-off period.",
+    )
+    return KycStepResponse(message="Loan cancelled within cooling-off period", step="cancelled", completed=True)
+
+
 @router.get("/status/{application_id}")
 def kyc_status(
     application_id: int,
@@ -196,12 +276,14 @@ def kyc_status(
 ):
     """Resume KYC — returns current step and verified flags."""
     _, app = _get_app(db, session_token, application_id)
-    if app.status in ("submitted", "under_review", "approved", "disbursed", "rejected"):
+    if app.status in ("submitted", "under_review", "approved", "disbursed", "rejected", "cancelled"):
         step = "done"
     elif not app.aadhaar_verified:
         step = "aadhaar"
     elif not app.bank_verified:
         step = "bank"
+    elif not app.kfs_accepted:
+        step = "kfs"
     elif not app.esign_completed:
         step = "esign"
     else:
@@ -211,10 +293,13 @@ def kyc_status(
         "application_ref": app.application_ref,
         "lender_name": app.lender_name,
         "status": app.status,
+        "workflow_mode": getattr(app, "workflow_mode", "internal"),
         "kyc_step": step,
         "aadhaar_verified": app.aadhaar_verified,
         "bank_verified": app.bank_verified,
+        "kfs_accepted": app.kfs_accepted,
         "esign_completed": app.esign_completed,
         "aadhaar_masked": app.aadhaar_masked,
         "address": app.address,
+        "cooling_off_until": app.cooling_off_until.isoformat() if app.cooling_off_until else None,
     }

@@ -42,12 +42,16 @@ def _latest_application(db: Session, lead_id: int) -> LoanApplication | None:
 
 
 def _kyc_step(app: LoanApplication) -> str:
+    if app.status == "partner_handoff":
+        return "done"
     if app.status in ("submitted", "under_review", "approved", "disbursed", "rejected"):
         return "done"
     if not app.aadhaar_verified:
         return "aadhaar"
     if not app.bank_verified:
         return "bank"
+    if not getattr(app, "kfs_accepted", False):
+        return "kfs"
     if not app.esign_completed:
         return "esign"
     return "submit"
@@ -59,6 +63,8 @@ def _workflow_current_step(lead: Lead | None, app: LoanApplication | None) -> st
     if app:
         if app.status == "disbursed":
             return "disbursal"
+        if app.status == "partner_handoff":
+            return "kyc"
         if app.status in ("submitted", "under_review", "approved"):
             return "review"
         kyc = _kyc_step(app)
@@ -66,6 +72,8 @@ def _workflow_current_step(lead: Lead | None, app: LoanApplication | None) -> st
             return "review"
         if kyc == "aadhaar":
             return "kyc"
+        if kyc == "kfs":
+            return "esign"
         return kyc
     return _STATUS_TO_APPLY_STEP.get(lead.status, "details")
 
@@ -100,7 +108,11 @@ def build_journey(db: Session, mobile: str | None) -> dict:
     workflow_step = _workflow_current_step(lead, app)
 
     # Route user to correct page
-    if app and app.status in ("kyc_pending", "kyc_completed") and _kyc_step(app) != "done":
+    if app and app.status == "partner_handoff":
+        slug = getattr(app, "partner_slug", None) or "choiceconnect"
+        next_step = f"/apply/partner/{slug}/handoff"
+        apply_step = "offers"
+    elif app and app.status in ("kyc_pending", "kyc_completed") and _kyc_step(app) != "done":
         next_step = "kyc"
         apply_step = "offers"
     elif app and app.status in ("submitted", "under_review", "approved", "disbursed", "rejected"):

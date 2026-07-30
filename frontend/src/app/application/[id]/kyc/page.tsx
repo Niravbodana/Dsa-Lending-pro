@@ -19,8 +19,10 @@ import {
 } from "@/lib/api";
 import { JourneyWorkflow } from "@/components/loan-journey/JourneyWorkflow";
 import { JourneyStepHeader } from "@/components/JourneyStepHeader";
+import { LspDisclosure } from "@/components/lsp/LspDisclosure";
+import { KfsDocument } from "@/components/lsp/KfsDocument";
 
-type KycStep = "aadhaar" | "aadhaar_otp" | "bank" | "esign" | "submit" | "done";
+type KycStep = "aadhaar" | "aadhaar_otp" | "bank" | "kfs" | "esign" | "submit" | "done";
 
 export default function KycPage() {
   const params = useParams();
@@ -63,9 +65,10 @@ export default function KycPage() {
         setWorkflowStep(journey.workflow_step);
         if (kyc.address) setAddress(kyc.address);
         if (kyc.kyc_step === "done") setStep("done");
-        else if (kyc.kyc_step === "bank") setStep("bank");
-        else if (kyc.kyc_step === "esign") setStep("esign");
         else if (kyc.kyc_step === "submit") setStep("submit");
+        else if (kyc.kyc_step === "esign") setStep("esign");
+        else if (kyc.kyc_step === "kfs") setStep("kfs");
+        else if (kyc.kyc_step === "bank") setStep("bank");
         else if (kyc.aadhaar_verified) setStep("bank");
       } catch {
         /* fresh KYC */
@@ -73,7 +76,7 @@ export default function KycPage() {
     })();
   }, [appId, router]);
 
-  const steps: KycStep[] = ["aadhaar", "bank", "esign", "submit", "done"];
+  const steps: KycStep[] = ["aadhaar", "bank", "kfs", "esign", "submit", "done"];
 
   async function handleAadhaar(e: React.FormEvent) {
     e.preventDefault();
@@ -175,6 +178,10 @@ export default function KycPage() {
       title: "Link your bank account",
       subtitle: "Disbursal happens here — we verify ownership before transferring funds.",
     },
+    kfs: {
+      title: "Review Key Fact Statement",
+      subtitle: "RBI requires you to review fees, APR, and cooling-off rights before signing.",
+    },
     esign: {
       title: "Sign your loan agreement",
       subtitle: "Digital eSign is legally binding. Review terms before you agree.",
@@ -236,7 +243,7 @@ export default function KycPage() {
         </div>
 
         <div className="mb-8 flex justify-between">
-          {["Aadhaar", "Bank", "eSign", "Submit", "Done"].map((label, i) => (
+          {["Aadhaar", "Bank", "KFS", "eSign", "Submit", "Done"].map((label, i) => (
             <div key={label} className="flex flex-col items-center">
               <div
                 className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${
@@ -257,6 +264,8 @@ export default function KycPage() {
           progressPercent={((stepIndex + 1) / steps.length) * 100}
           trustNote="UIDAI & NPCI compliant · End-to-end encrypted"
         />
+
+        <LspDisclosure lenderName={lenderName} className="mb-4" />
 
         <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-neercred">
           {error && (
@@ -347,6 +356,17 @@ export default function KycPage() {
                 Verify Bank Account →
               </button>
             </form>
+          )}
+
+          {step === "kfs" && token && (
+            <KfsDocument
+              applicationId={appId}
+              sessionToken={token}
+              onAccepted={() => {
+                setStep("esign");
+                setWorkflowStep("esign");
+              }}
+            />
           )}
 
           {step === "esign" && (

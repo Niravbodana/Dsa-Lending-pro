@@ -6,12 +6,13 @@ import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { OfferCard } from "@/components/OfferCard";
-import { IconCheckCircle, IconShield } from "@/components/icons";
+import { IconShield } from "@/components/icons";
 import { LoanGuideMascot } from "@/components/loan-guide/LoanGuideMascot";
 import type { GuideField } from "@/components/loan-guide/loanGuideMessages";
 import { JourneyWorkflow } from "@/components/loan-journey/JourneyWorkflow";
 import { JourneyStepHeader } from "@/components/JourneyStepHeader";
 import { OfferComparisonTable } from "@/components/OfferComparisonTable";
+import { EligibilityFactors } from "@/components/lsp/EligibilityFactors";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { OfferCardSkeleton, PageLoadingShell } from "@/components/ui/Skeleton";
 import {
@@ -602,6 +603,9 @@ function ApplyPageInner() {
         page_url: "/apply",
       });
       if (res.workflow_mode === "external_handoff" && (res.handoff_path || res.next_step)) {
+        if (res.application_id) {
+          localStorage.setItem(`app_ref_${res.application_id}`, res.application_ref || "");
+        }
         router.push(res.handoff_path || res.next_step || `/apply/partner/${offer.partner_slug}/handoff`);
         return;
       }
@@ -1044,14 +1048,13 @@ function ApplyPageInner() {
               )}
 
               {!offersFetching && eligibility && (
-                <div className="mb-6 rounded-2xl border border-emerald-100 bg-emerald-50/80 p-4">
-                  <p className="flex items-center gap-2 font-semibold text-emerald-800">
-                    <IconCheckCircle size={18} />
-                    You&apos;re eligible — great news
-                  </p>
-                  <p className="mt-1 text-sm text-emerald-700">
-                    Up to ₹{eligibility.max_loan_amount.toLocaleString("en-IN")} · Match score {eligibility.score}/100
-                  </p>
+                <div className="mb-6">
+                  <EligibilityFactors
+                    score={eligibility.score}
+                    maxAmount={eligibility.max_loan_amount}
+                    factors={eligibility.factors}
+                    message={eligibility.message}
+                  />
                 </div>
               )}
 

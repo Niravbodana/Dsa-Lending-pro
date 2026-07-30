@@ -56,6 +56,9 @@ async def partner_status_webhook(request: Request, db: Session = Depends(get_db)
     if payload.partner_ref_id:
         app.partner_ref_id = payload.partner_ref_id
 
+    if payload.status == "partner_submitted" and app.status == "partner_handoff":
+        app.status = "submitted"
+
     update_application_status(
         db,
         app,

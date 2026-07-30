@@ -57,7 +57,7 @@ export function Footer({ config }: { config?: SiteConfig }) {
             <p className="text-xs font-bold uppercase tracking-wider text-slate-300">Legal</p>
             <ul className="mt-4 space-y-2.5 text-sm">
               <li><Link href="/compliance" className="hover:text-white">RBI LSP</Link></li>
-              <li><Link href="/compliance" className="hover:text-white">Privacy &amp; DPDP</Link></li>
+              <li><Link href="/privacy" className="hover:text-white">Privacy &amp; DPDP</Link></li>
               <li><Link href="/compliance" className="hover:text-white">Terms</Link></li>
               <li><Link href="/compliance" className="hover:text-white">Grievance</Link></li>
             </ul>

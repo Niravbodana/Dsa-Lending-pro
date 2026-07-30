@@ -36,3 +36,16 @@ def run_schema_patches() -> None:
             for column, sql in partner_patches.items():
                 if column not in partner_cols:
                     conn.execute(text(sql))
+
+        if "loan_applications" in inspector.get_table_names():
+            app_cols = {col["name"] for col in inspector.get_columns("loan_applications")}
+            app_patches = {
+                "workflow_mode": "ALTER TABLE loan_applications ADD COLUMN workflow_mode VARCHAR(30) DEFAULT 'internal'",
+                "partner_slug": "ALTER TABLE loan_applications ADD COLUMN partner_slug VARCHAR(80)",
+                "kfs_accepted": "ALTER TABLE loan_applications ADD COLUMN kfs_accepted BOOLEAN DEFAULT 0",
+                "cooling_off_until": "ALTER TABLE loan_applications ADD COLUMN cooling_off_until DATETIME",
+                "processing_fee_pct": "ALTER TABLE loan_applications ADD COLUMN processing_fee_pct FLOAT",
+            }
+            for column, sql in app_patches.items():
+                if column not in app_cols:
+                    conn.execute(text(sql))

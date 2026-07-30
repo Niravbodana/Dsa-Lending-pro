@@ -3,6 +3,7 @@
 import { LoanOffer } from "@/lib/api";
 import { IconCheck } from "@/components/icons";
 import { LenderLogo } from "@/components/LenderLogo";
+import { LspDisclosure } from "@/components/lsp/LspDisclosure";
 
 const chanceLabels = {
   high: { label: "Strong match", className: "bg-emerald-50 text-emerald-700" },
@@ -93,6 +94,8 @@ export function OfferCard({
       </div>
 
       <p className="mt-3 text-xs text-slate-400">Processing fee: {offer.processing_fee}</p>
+
+      <LspDisclosure lenderName={offer.lender_name} compact className="mt-3" />
 
       <button
         type="button"

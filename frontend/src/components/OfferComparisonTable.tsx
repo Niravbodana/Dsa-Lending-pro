@@ -2,6 +2,7 @@
 
 import { LoanOffer } from "@/lib/api";
 import { LenderLogo } from "@/components/LenderLogo";
+import { LspDisclosure } from "@/components/lsp/LspDisclosure";
 import { IconCheckCircle } from "@/components/icons";
 
 function formatCurrency(amount: number) {
@@ -97,6 +98,7 @@ export function OfferComparisonTable({ offers, bestOfferId, onSelect, loading, l
           </tbody>
         </table>
       </div>
+      <LspDisclosure className="mt-2" />
     </div>
   );
 }

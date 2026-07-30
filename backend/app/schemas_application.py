@@ -51,6 +51,25 @@ class EsignRequest(BaseModel):
         return self
 
 
+class KfsAcceptRequest(BaseModel):
+    session_token: str
+    application_id: int
+    accepted: bool
+    page_url: str | None = None
+
+    @model_validator(mode="after")
+    def kfs_required(self) -> "KfsAcceptRequest":
+        if not self.accepted:
+            raise ValueError("KFS acceptance is required before eSign")
+        return self
+
+
+class CoolingOffCancelRequest(BaseModel):
+    session_token: str
+    application_id: int
+    reason: str | None = None
+
+
 class SubmitApplicationRequest(BaseModel):
     session_token: str
     application_id: int
@@ -82,6 +101,10 @@ class ApplicationResponse(BaseModel):
     bank_account: str | None
     disbursal_amount: int | None
     commission_amount: float | None
+    workflow_mode: str | None = None
+    partner_slug: str | None = None
+    kfs_accepted: bool = False
+    cooling_off_until: datetime | None = None
     created_at: datetime
 
     class Config:
@@ -153,7 +176,15 @@ class DashboardProfile(BaseModel):
 
 class WebhookPayload(BaseModel):
     application_ref: str
-    status: Literal["under_review", "approved", "disbursed", "rejected"]
+    status: Literal[
+        "partner_handoff",
+        "partner_submitted",
+        "under_review",
+        "approved",
+        "disbursed",
+        "rejected",
+        "cancelled",
+    ]
     message: str | None = None
     partner_ref_id: str | None = None
     disbursal_amount: int | None = None

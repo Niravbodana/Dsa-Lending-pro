@@ -7,7 +7,8 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { JourneyWorkflow } from "@/components/loan-journey/JourneyWorkflow";
 import { IconCheckCircle, IconShield } from "@/components/icons";
-import { getPartnerHandoff, type PartnerHandoff } from "@/lib/api";
+import { getPartnerHandoff, getJourney, type PartnerHandoff } from "@/lib/api";
+import { LspDisclosure } from "@/components/lsp/LspDisclosure";
 
 const FIELD_LABELS: Record<string, string> = {
   firstName: "First Name",
@@ -31,6 +32,7 @@ export default function PartnerHandoffPage() {
   const [error, setError] = useState("");
   const [synced, setSynced] = useState(false);
   const [showIframe, setShowIframe] = useState(false);
+  const [appRef, setAppRef] = useState("");
 
   useEffect(() => {
     const t = localStorage.getItem("session_token");
@@ -38,9 +40,12 @@ export default function PartnerHandoffPage() {
       router.replace(`/apply?partner=${slug}`);
       return;
     }
-    void getPartnerHandoff(t, slug)
-      .then((data) => {
+    void Promise.all([getPartnerHandoff(t, slug), getJourney(t)])
+      .then(([data, journey]) => {
         setHandoff(data);
+        if (journey.application?.application_ref) {
+          setAppRef(journey.application.application_ref);
+        }
         sessionStorage.setItem("neercred_handoff_prefill", JSON.stringify(data.prefill));
       })
       .catch((e) => setError(e instanceof Error ? e.message : "Failed to load handoff"));
@@ -110,10 +115,17 @@ export default function PartnerHandoffPage() {
             <IconCheckCircle size={20} />
             {handoff!.message}
           </p>
+          {appRef && (
+            <p className="mt-1 font-mono text-sm text-emerald-700">
+              NeerCred ref: {appRef} — track anytime on dashboard
+            </p>
+          )}
           <p className="mt-1 text-sm text-emerald-700">
-            NeerCred par jo details verify hui hain, woh {handoff!.lender_name} form mein auto-sync ho jayengi.
+            Your verified details will auto-fill on {handoff!.lender_name}&apos;s page.
           </p>
         </div>
+
+        <LspDisclosure lenderName={handoff!.lender_name} className="mb-6" />
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,340px)_1fr]">
           {/* Verified prefill panel */}

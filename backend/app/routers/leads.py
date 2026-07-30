@@ -29,6 +29,7 @@ from app.services.partner_store import get_union_required_fields
 from app.services.application import add_status_history, generate_application_ref, send_notification
 from app.services.consent import client_meta, record_consent, record_consent_bundle, log_consent_event
 from app.services.eligibility import EligibilityInput, check_eligibility
+from app.services.bureau import pull_credit_bureau_mock
 from app.services.journey import build_journey
 from app.services.offer_engine import fetch_partner_offers_sync
 from app.services.otp import get_lead_by_mobile, get_mobile_from_token
@@ -113,6 +114,18 @@ def check_lead_eligibility(payload: EligibilityRequest, db: Session = Depends(ge
         )
     )
 
+    bureau = pull_credit_bureau_mock(lead)
+    adjusted_score = min(100, result.score + bureau["score_adjustment"])
+    all_factors = result.factors + bureau["factors"]
+    if bureau["score_adjustment"]:
+        from dataclasses import replace
+
+        result = replace(result, score=adjusted_score, factors=all_factors)
+    elif bureau["factors"]:
+        from dataclasses import replace
+
+        result = replace(result, factors=all_factors)
+
     lead.loan_purpose = payload.loan_purpose
     lead.existing_emi = payload.existing_emi
     lead.eligibility_score = result.score
@@ -122,7 +135,7 @@ def check_lead_eligibility(payload: EligibilityRequest, db: Session = Depends(ge
         ApplicationLog(
             lead_id=lead.id,
             event="eligibility_checked",
-            details=f"score={result.score}, eligible={result.eligible}",
+            details=f"score={result.score}, eligible={result.eligible}, bureau={bureau['reference_id']}",
         )
     )
     db.commit()
@@ -200,11 +213,48 @@ def select_offer(payload: SelectOfferRequest, request: Request, db: Session = De
         )
         slug = (partner.page_slug or partner.partner_id) if partner else "choiceconnect"
         handoff = f"/apply/partner/{slug}/handoff"
+        app_ref = generate_application_ref()
+        application = LoanApplication(
+            lead_id=lead.id,
+            application_ref=app_ref,
+            lender_name=payload.lender_name,
+            offer_id=payload.offer_id,
+            loan_amount=payload.loan_amount,
+            interest_rate=payload.interest_rate,
+            tenure_months=payload.tenure_months,
+            emi=payload.emi,
+            status="partner_handoff",
+            workflow_mode="external_handoff",
+            partner_slug=slug,
+            processing_fee_pct=2.0,
+        )
+        db.add(application)
+        db.flush()
+
+        ip, ua = client_meta(request)
+        record_consent(
+            db,
+            consent_type="lender_data_sharing",
+            accepted=True,
+            lead_id=lead.id,
+            application_id=application.id,
+            mobile=mobile,
+            page_url=payload.page_url or "/apply",
+            metadata=f"lender={payload.lender_name},handoff=1",
+            ip_address=ip,
+            user_agent=ua,
+        )
+        add_status_history(
+            db,
+            application.id,
+            "partner_handoff",
+            f"Redirecting to {payload.lender_name} with verified prefill",
+        )
         db.add(
             ApplicationLog(
                 lead_id=lead.id,
                 event="external_offer_selected",
-                details=f"{payload.lender_name} handoff",
+                details=f"{payload.lender_name} handoff — {app_ref}",
             )
         )
         db.commit()
@@ -213,6 +263,8 @@ def select_offer(payload: SelectOfferRequest, request: Request, db: Session = De
             lead_id=lead.id,
             lender_name=payload.lender_name,
             offer_id=payload.offer_id,
+            application_id=application.id,
+            application_ref=app_ref,
             next_step=handoff,
             handoff_path=handoff,
             workflow_mode="external_handoff",
@@ -229,6 +281,8 @@ def select_offer(payload: SelectOfferRequest, request: Request, db: Session = De
         tenure_months=payload.tenure_months,
         emi=payload.emi,
         status="kyc_pending",
+        workflow_mode="internal",
+        processing_fee_pct=2.0,
     )
     db.add(application)
     db.flush()

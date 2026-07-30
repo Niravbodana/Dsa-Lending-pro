@@ -20,6 +20,8 @@ import {
 } from "@/lib/api";
 import { journeyRedirectPath } from "@/lib/customer-session";
 import { NextActionCard } from "@/components/dashboard/NextActionCard";
+import { ApplicationTimeline } from "@/components/lsp/ApplicationTimeline";
+import { CoolingOffBanner } from "@/components/lsp/CoolingOffBanner";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { PageLoadingShell } from "@/components/ui/Skeleton";
 import { BRAND } from "@/lib/brand";
@@ -130,6 +132,7 @@ const statusConfig: Record<
   { label: string; color: string; bg: string; icon: typeof IconFile }
 > = {
   offer_selected: { label: "Offer Selected", color: "text-neercred-teal", bg: "bg-teal-50", icon: IconSparkles },
+  partner_handoff: { label: "Partner Application", color: "text-indigo-700", bg: "bg-indigo-50", icon: IconSparkles },
   kyc_pending: { label: "KYC Pending", color: "text-amber-700", bg: "bg-amber-50", icon: IconFile },
   kyc_completed: { label: "KYC Done", color: "text-neercred-cyan", bg: "bg-cyan-50", icon: IconCheckCircle },
   submitted: { label: "Submitted", color: "text-neercred-cyan", bg: "bg-cyan-50", icon: IconFile },
@@ -444,13 +447,29 @@ function DashboardContent() {
                           <p className="mt-0.5 text-xs text-slate-500">
                             Ref {app.application_ref} · {app.tenure_months} mo · {formatDate(app.created_at)}
                           </p>
+                          <div className="mt-2">
+                            <ApplicationTimeline
+                              status={app.status}
+                              lenderName={app.lender_name}
+                              applicationRef={app.application_ref}
+                            />
+                          </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 sm:shrink-0">
+                      <div className="flex flex-col items-stretch gap-2 sm:shrink-0 sm:items-end">
+                        <div className="flex items-center gap-3">
                         <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${cfg.bg} ${cfg.color}`}>
                           <StatusIcon size={12} />
                           {cfg.label}
                         </span>
+                        {app.status === "partner_handoff" && app.partner_slug && (
+                          <Link
+                            href={`/apply/partner/${app.partner_slug}/handoff`}
+                            className="rounded-xl bg-indigo-600 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-700"
+                          >
+                            Continue on partner
+                          </Link>
+                        )}
                         {["kyc_pending", "offer_selected"].includes(app.status) && (
                           <Link
                             href={`/application/${app.id}/kyc`}
@@ -465,6 +484,14 @@ function DashboardContent() {
                         >
                           Track
                         </Link>
+                        </div>
+                        {app.status === "disbursed" && app.cooling_off_until && sessionToken && (
+                          <CoolingOffBanner
+                            applicationId={app.id}
+                            sessionToken={sessionToken}
+                            coolingOffUntil={app.cooling_off_until}
+                          />
+                        )}
                       </div>
                     </div>
                   );

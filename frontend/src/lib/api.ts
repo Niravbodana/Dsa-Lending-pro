@@ -245,11 +245,14 @@ export async function getKycStatus(sessionToken: string, applicationId: number) 
     application_ref: string;
     lender_name: string;
     status: string;
+    workflow_mode?: string;
     kyc_step: string;
     aadhaar_verified: boolean;
     bank_verified: boolean;
+    kfs_accepted?: boolean;
     esign_completed: boolean;
     address?: string;
+    cooling_off_until?: string | null;
   }>;
 }
 
@@ -346,6 +349,61 @@ export async function bankVerify(data: {
   return res.json();
 }
 
+export async function getKfs(sessionToken: string, applicationId: number) {
+  const res = await fetch(
+    `${API_BASE}/api/kyc/kfs/${applicationId}?session_token=${encodeURIComponent(sessionToken)}`,
+    { cache: "no-store" },
+  );
+  if (!res.ok) throw new Error((await res.json()).detail || "Failed to load KFS");
+  return res.json();
+}
+
+export async function acceptKfs(sessionToken: string, applicationId: number) {
+  const res = await fetch(`${API_BASE}/api/kyc/kfs/accept`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      session_token: sessionToken,
+      application_id: applicationId,
+      accepted: true,
+    }),
+  });
+  if (!res.ok) throw new Error((await res.json()).detail || "Failed to accept KFS");
+  return res.json();
+}
+
+export async function cancelCoolingOff(sessionToken: string, applicationId: number, reason?: string) {
+  const res = await fetch(`${API_BASE}/api/kyc/cooling-off/cancel`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      session_token: sessionToken,
+      application_id: applicationId,
+      reason,
+    }),
+  });
+  if (!res.ok) throw new Error((await res.json()).detail || "Cancellation failed");
+  return res.json();
+}
+
+export async function exportMyData(sessionToken: string) {
+  const res = await fetch(`${API_BASE}/api/privacy/export`, {
+    headers: sessionHeaders(sessionToken),
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error((await res.json()).detail || "Export failed");
+  return res.json();
+}
+
+export async function requestDataDeletion(sessionToken: string) {
+  const res = await fetch(`${API_BASE}/api/privacy/delete-request`, {
+    method: "POST",
+    headers: sessionHeaders(sessionToken),
+  });
+  if (!res.ok) throw new Error((await res.json()).detail || "Deletion request failed");
+  return res.json() as Promise<{ message: string; requested: boolean; status?: string }>;
+}
+
 export async function esignComplete(data: {
   session_token: string;
   application_id: number;
@@ -388,6 +446,10 @@ export type LoanApplication = {
   bank_verified: boolean;
   esign_completed: boolean;
   disbursal_amount: number | null;
+  workflow_mode?: string;
+  partner_slug?: string | null;
+  kfs_accepted?: boolean;
+  cooling_off_until?: string | null;
   created_at: string;
 };
 
