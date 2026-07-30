@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.deps.session import get_session_token
-from app.models import ApplicationLog, Lead, LoanApplication
+from app.models import ApplicationLog, Lead, LendingPartner, LoanApplication
 from app.schemas import (
     EligibilityRequest,
     EligibilityResponse,
@@ -16,6 +16,7 @@ from app.schemas import (
     OffersResponse,
     PanLookupRequest,
     PanLookupResponse,
+    PartnerHandoffResponse,
     PartnerPreferenceRequest,
     RequiredFieldInfo,
     RequiredFieldsResponse,
@@ -31,6 +32,10 @@ from app.services.eligibility import EligibilityInput, check_eligibility
 from app.services.journey import build_journey
 from app.services.offer_engine import fetch_partner_offers_sync
 from app.services.otp import get_lead_by_mobile, get_mobile_from_token
+from app.services.partner_handoff import (
+    build_choice_connect_prefill,
+    build_handoff_embed_url,
+)
 from app.services.pan_lookup import lookup_pan
 
 router = APIRouter(prefix="/leads", tags=["leads"])
@@ -187,6 +192,32 @@ def select_offer(payload: SelectOfferRequest, request: Request, db: Session = De
     lead.selected_offer_id = payload.offer_id
     lead.status = "offer_selected"
 
+    if payload.offer_id.endswith("-handoff"):
+        partner = (
+            db.query(LendingPartner)
+            .filter(LendingPartner.lender_name == payload.lender_name)
+            .first()
+        )
+        slug = (partner.page_slug or partner.partner_id) if partner else "choiceconnect"
+        handoff = f"/apply/partner/{slug}/handoff"
+        db.add(
+            ApplicationLog(
+                lead_id=lead.id,
+                event="external_offer_selected",
+                details=f"{payload.lender_name} handoff",
+            )
+        )
+        db.commit()
+        return SelectOfferResponse(
+            message=f"Continue with {payload.lender_name} — your verified details will auto-fill",
+            lead_id=lead.id,
+            lender_name=payload.lender_name,
+            offer_id=payload.offer_id,
+            next_step=handoff,
+            handoff_path=handoff,
+            workflow_mode="external_handoff",
+        )
+
     app_ref = generate_application_ref()
     application = LoanApplication(
         lead_id=lead.id,
@@ -249,7 +280,8 @@ def select_offer(payload: SelectOfferRequest, request: Request, db: Session = De
         offer_id=payload.offer_id,
         application_id=application.id,
         application_ref=app_ref,
-        next_step="/application/{id}/kyc",
+        next_step=f"/application/{application.id}/kyc",
+        workflow_mode="internal",
     )
 
 
@@ -316,3 +348,64 @@ def set_partner_preference(payload: PartnerPreferenceRequest, db: Session = Depe
     lead.preferred_partner_slug = payload.partner_slug.strip().lower()
     db.commit()
     return {"message": "Partner preference saved", "partner_slug": lead.preferred_partner_slug}
+
+
+@router.get("/partner-handoff/{slug}", response_model=PartnerHandoffResponse)
+def get_partner_handoff(
+    slug: str,
+    session_token: str = Depends(get_session_token),
+    db: Session = Depends(get_db),
+):
+    mobile = _auth(db, session_token)
+    lead = get_lead_by_mobile(db, mobile)
+    if not lead or not lead.full_name or not lead.pan:
+        raise HTTPException(status_code=400, detail="Complete your profile on NeerCred first")
+
+    partner = (
+        db.query(LendingPartner)
+        .filter(LendingPartner.enabled.is_(True))
+        .filter((LendingPartner.page_slug == slug) | (LendingPartner.partner_id == slug))
+        .first()
+    )
+    if not partner or partner.workflow_mode != "external_handoff":
+        raise HTTPException(status_code=404, detail="External partner not found")
+
+    if not lead.email or not lead.pincode or not lead.date_of_birth:
+        raise HTTPException(
+            status_code=400,
+            detail="Email, PIN code and date of birth required for this partner",
+        )
+
+    prefill = build_choice_connect_prefill(lead, partner)
+    embed_url = build_handoff_embed_url(partner, prefill)
+    external_url = partner.external_lending_url or embed_url
+
+    db.add(
+        ApplicationLog(
+            lead_id=lead.id,
+            event="partner_handoff_prepared",
+            details=f"{partner.lender_name} — prefill ready",
+        )
+    )
+    db.commit()
+
+    return PartnerHandoffResponse(
+        partner_id=partner.partner_id,
+        lender_name=partner.lender_name,
+        workflow_mode=partner.workflow_mode,
+        embed_url=embed_url,
+        external_url=external_url,
+        prefill=prefill,
+        required_on_partner=[
+            "firstName",
+            "lastName",
+            "mobile",
+            "email",
+            "pan",
+            "dob",
+            "occupation",
+            "monthlyIncome",
+            "pincode",
+        ],
+        message="Your verified details are ready for Choice Connect",
+    )

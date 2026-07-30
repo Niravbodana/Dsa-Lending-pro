@@ -98,6 +98,9 @@ class LoanOffer(BaseModel):
     is_best_deal: bool = False
     lender_api_source: str = "mock"
     response_time_ms: int | None = None
+    workflow_mode: str = "internal"
+    partner_slug: str | None = None
+    handoff_path: str | None = None
 
 
 class EligibilityRequest(BaseModel):
@@ -153,9 +156,11 @@ class SelectOfferResponse(BaseModel):
     lead_id: int
     lender_name: str
     offer_id: str
-    application_id: int
-    application_ref: str
+    application_id: int | None = None
+    application_ref: str | None = None
     next_step: str
+    handoff_path: str | None = None
+    workflow_mode: str = "internal"
 
 
 class RequiredFieldInfo(BaseModel):
@@ -253,3 +258,14 @@ class JourneyResponse(BaseModel):
     lead: JourneyLeadInfo | None
     application: JourneyApplicationInfo | None
     can_resume: bool
+
+
+class PartnerHandoffResponse(BaseModel):
+    partner_id: str
+    lender_name: str
+    workflow_mode: str
+    embed_url: str
+    external_url: str
+    prefill: dict
+    required_on_partner: list[str]
+    message: str

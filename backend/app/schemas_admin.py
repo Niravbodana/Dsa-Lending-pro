@@ -132,7 +132,10 @@ class LendingPartnerCreate(BaseModel):
     offers_endpoint_path: str = "/offers"
     auth_header_name: str = "Authorization"
     auth_type: Literal["bearer", "api_key_header"] = "bearer"
-    timeout_seconds: float = 8.0
+    workflow_mode: str = "internal"
+    external_lending_url: str | None = None
+    partner_ref_code: str | None = None
+    external_lead_source: str | None = None
 
 
 class LendingPartnerUpdate(BaseModel):

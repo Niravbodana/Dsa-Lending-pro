@@ -75,6 +75,7 @@ def get_enabled_partner_configs(db: Session) -> list[PartnerConfig]:
     rows = (
         db.query(LendingPartner)
         .filter(LendingPartner.enabled.is_(True))
+        .filter(LendingPartner.workflow_mode != "external_handoff")
         .order_by(LendingPartner.sort_order.asc(), LendingPartner.id.asc())
         .all()
     )
@@ -93,6 +94,7 @@ def get_union_required_fields(db: Session) -> list[str]:
 
 def seed_lending_partners(db: Session) -> None:
     if db.query(LendingPartner).count() > 0:
+        upsert_choice_connect_partner(db)
         return
 
     for index, profile in enumerate(PARTNER_PROFILES):
@@ -124,6 +126,77 @@ def seed_lending_partners(db: Session) -> None:
         )
         db.add(partner)
     db.commit()
+    upsert_choice_connect_partner(db)
+
+
+def upsert_choice_connect_partner(db: Session) -> None:
+    """Choice Connect referral partner — external handoff with auto-prefill."""
+    from app.services.partner_handoff import parse_choice_connect_url
+
+    url = (
+        "https://choiceconnect.in/referral/loan/personal-loan/QzAwOTYxNDk="
+        "?lead_source=Y29ubmVjdF9yZWZlcnJhbF9saW5r"
+    )
+    meta = parse_choice_connect_url(url)
+    row = db.query(LendingPartner).filter(LendingPartner.partner_id == "choiceconnect").first()
+    fields = json.dumps(
+        ["mobile", "full_name", "pan", "date_of_birth", "email", "pincode", "monthly_income", "employment_type", "city"]
+    )
+    features = json.dumps(
+        [
+            "Smart Match from multiple banks & NBFCs",
+            "100% digital — no branch visit",
+            "Instant disbursement",
+            "Credit score safe check",
+        ]
+    )
+    if row:
+        row.lender_name = "Choice Connect"
+        row.lender_logo = "choiceconnect"
+        row.external_lending_url = url
+        row.workflow_mode = "external_handoff"
+        row.partner_ref_code = meta["cba_code"]
+        row.external_lead_source = meta["lead_source"]
+        row.page_slug = "choiceconnect"
+        row.page_title = "Choice Connect Personal Loans"
+        row.page_description = (
+            "Apply via Choice Connect — India's trusted loan marketplace. "
+            "Your NeerCred verified details auto-fill on partner page."
+        )
+        row.mock_interest_rate = 10.49
+        row.mock_tenure_months = 60
+        row.mock_processing_fee = "From 2%"
+        row.mock_features_json = features
+        row.required_fields_json = fields
+        row.enabled = True
+    else:
+        db.add(
+            LendingPartner(
+                partner_id="choiceconnect",
+                lender_name="Choice Connect",
+                lender_logo="choiceconnect",
+                external_lending_url=url,
+                workflow_mode="external_handoff",
+                partner_ref_code=meta["cba_code"],
+                external_lead_source=meta["lead_source"],
+                enabled=True,
+                sort_order=0,
+                required_fields_json=fields,
+                mock_interest_rate=10.49,
+                mock_tenure_months=60,
+                mock_processing_fee="From 2%",
+                mock_features_json=features,
+                mock_amount_offset=0,
+                page_slug="choiceconnect",
+                page_title="Choice Connect Personal Loans",
+                page_description=(
+                    "Apply via Choice Connect — multiple banks & NBFCs on one platform. "
+                    "NeerCred verified profile auto-fills your application."
+                ),
+                timeout_seconds=8.0,
+            )
+        )
+    db.commit()
 
 
 def partner_admin_dict(row: LendingPartner, *, include_secret: bool = False) -> dict:
@@ -152,6 +225,10 @@ def partner_admin_dict(row: LendingPartner, *, include_secret: bool = False) -> 
         "auth_header_name": row.auth_header_name,
         "auth_type": row.auth_type,
         "timeout_seconds": row.timeout_seconds,
+        "external_lending_url": row.external_lending_url,
+        "workflow_mode": getattr(row, "workflow_mode", None) or "internal",
+        "partner_ref_code": row.partner_ref_code,
+        "external_lead_source": row.external_lead_source,
         "created_at": row.created_at,
         "updated_at": row.updated_at,
     }

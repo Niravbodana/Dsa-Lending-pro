@@ -81,6 +81,9 @@ export default async function PartnerDetailPage({ params }: Props) {
           >
             Apply with {partner.lender_name}
           </Link>
+          <p className="mt-3 text-sm text-slate-500">
+            NeerCred par verify karo — phir {partner.lender_name} par details auto-fill ho jayengi.
+          </p>
         </div>
       </div>
       <Footer />

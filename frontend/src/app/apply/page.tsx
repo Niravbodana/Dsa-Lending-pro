@@ -87,6 +87,7 @@ function ApplyPageInner() {
 
   const [requiredFields, setRequiredFields] = useState<RequiredField[]>([]);
   const needs = (key: string) => requiredFields.some((f) => f.key === key);
+  const needsPartnerExtras = preferredPartner === "choiceconnect" || needs("email") || needs("pincode");
 
   const [form, setForm] = useState({
     full_name: "",
@@ -356,8 +357,14 @@ function ApplyPageInner() {
         lender_data_sharing_consent: true,
         page_url: "/apply",
       });
-      localStorage.setItem(`app_ref_${res.application_id}`, res.application_ref);
-      router.push(`/application/${res.application_id}/kyc`);
+      if (res.workflow_mode === "external_handoff" && (res.handoff_path || res.next_step)) {
+        router.push(res.handoff_path || res.next_step || `/apply/partner/${offer.partner_slug}/handoff`);
+        return;
+      }
+      if (res.application_id) {
+        localStorage.setItem(`app_ref_${res.application_id}`, res.application_ref || "");
+        router.push(`/application/${res.application_id}/kyc`);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not select offer. Try again.");
     } finally {
@@ -546,7 +553,28 @@ function ApplyPageInner() {
                     />
                   </div>
                 )}
-                {needs("email") && (
+                {needsPartnerExtras && (
+                  <input
+                    type="email"
+                    placeholder="Email address"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    className={inputClass}
+                    required={preferredPartner === "choiceconnect"}
+                  />
+                )}
+                {needsPartnerExtras && (
+                  <input
+                    type="text"
+                    maxLength={6}
+                    placeholder="PIN code"
+                    value={form.pincode}
+                    onChange={(e) => setForm({ ...form, pincode: e.target.value.replace(/\D/g, "") })}
+                    className={inputClass}
+                    required={preferredPartner === "choiceconnect"}
+                  />
+                )}
+                {needs("email") && !needsPartnerExtras && (
                   <input
                     type="email"
                     placeholder="Email address"
@@ -555,7 +583,7 @@ function ApplyPageInner() {
                     className={inputClass}
                   />
                 )}
-                {needs("pincode") && (
+                {needs("pincode") && !needsPartnerExtras && (
                   <input
                     type="text"
                     maxLength={6}

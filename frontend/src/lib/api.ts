@@ -18,6 +18,9 @@ export type LoanOffer = {
   is_best_deal?: boolean;
   lender_api_source?: string;
   response_time_ms?: number | null;
+  workflow_mode?: string;
+  partner_slug?: string | null;
+  handoff_path?: string | null;
 };
 
 export type EligibilityResult = {
@@ -226,11 +229,34 @@ export async function selectOffer(data: {
   });
   if (!res.ok) throw new Error((await res.json()).detail || "Failed to select offer");
   return res.json() as Promise<{
-    application_id: number;
-    application_ref: string;
+    application_id?: number;
+    application_ref?: string;
     lender_name: string;
     message: string;
+    next_step?: string;
+    handoff_path?: string;
+    workflow_mode?: string;
   }>;
+}
+
+export type PartnerHandoff = {
+  partner_id: string;
+  lender_name: string;
+  workflow_mode: string;
+  embed_url: string;
+  external_url: string;
+  prefill: Record<string, string>;
+  required_on_partner: string[];
+  message: string;
+};
+
+export async function getPartnerHandoff(sessionToken: string, slug: string) {
+  const res = await fetch(`${API_BASE}/api/leads/partner-handoff/${encodeURIComponent(slug)}`, {
+    headers: sessionHeaders(sessionToken),
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error((await res.json()).detail || "Handoff failed");
+  return res.json() as Promise<PartnerHandoff>;
 }
 
 // --- KYC (Phase 3) ---

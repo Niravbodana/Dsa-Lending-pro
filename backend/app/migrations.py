@@ -26,7 +26,13 @@ def run_schema_patches() -> None:
 
         if "lending_partners" in inspector.get_table_names():
             partner_cols = {col["name"] for col in inspector.get_columns("lending_partners")}
-            if "application_endpoint_path" not in partner_cols:
-                conn.execute(
-                    text("ALTER TABLE lending_partners ADD COLUMN application_endpoint_path VARCHAR(120)")
-                )
+            partner_patches = {
+                "application_endpoint_path": "ALTER TABLE lending_partners ADD COLUMN application_endpoint_path VARCHAR(120)",
+                "external_lending_url": "ALTER TABLE lending_partners ADD COLUMN external_lending_url VARCHAR(1000)",
+                "workflow_mode": "ALTER TABLE lending_partners ADD COLUMN workflow_mode VARCHAR(30) DEFAULT 'internal'",
+                "partner_ref_code": "ALTER TABLE lending_partners ADD COLUMN partner_ref_code VARCHAR(120)",
+                "external_lead_source": "ALTER TABLE lending_partners ADD COLUMN external_lead_source VARCHAR(120)",
+            }
+            for column, sql in partner_patches.items():
+                if column not in partner_cols:
+                    conn.execute(text(sql))

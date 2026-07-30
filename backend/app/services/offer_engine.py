@@ -6,7 +6,7 @@ import time
 
 from sqlalchemy.orm import Session
 
-from app.models import Lead
+from app.models import Lead, LendingPartner
 from app.schemas import LoanOffer
 from app.services.partner_store import get_enabled_partner_configs, lead_to_api_payload
 from app.services.partners.base import PartnerAdapter, PartnerConfig
@@ -62,6 +62,54 @@ async def _fetch_from_partner(
         return [], 0, source
 
 
+def _external_partner_offers(db: Session, lead: Lead) -> list[LoanOffer]:
+    """Offers from partners that use external handoff (e.g. Choice Connect)."""
+    rows = (
+        db.query(LendingPartner)
+        .filter(LendingPartner.enabled.is_(True), LendingPartner.workflow_mode == "external_handoff")
+        .order_by(LendingPartner.sort_order.asc())
+        .all()
+    )
+    offers: list[LoanOffer] = []
+    income = float(lead.monthly_income or 0)
+    max_loan = lead.max_loan_amount or min(int(income * 20), 500000)
+    slug = None
+
+    for row in rows:
+        if lead.preferred_partner_slug and row.page_slug != lead.preferred_partner_slug:
+            if row.partner_id != lead.preferred_partner_slug:
+                continue
+        slug = row.page_slug or row.partner_id
+        amount = max(50000, max_loan)
+        rate = row.mock_interest_rate
+        tenure = row.mock_tenure_months
+        emi = _calculate_emi(amount, rate, tenure)
+        features = []
+        if row.mock_features_json:
+            import json
+
+            features = json.loads(row.mock_features_json)
+        offers.append(
+            LoanOffer(
+                offer_id=f"{row.partner_id}-handoff",
+                lender_name=row.lender_name,
+                lender_logo=row.lender_logo,
+                loan_amount=amount,
+                interest_rate=rate,
+                tenure_months=tenure,
+                emi=emi,
+                processing_fee=row.mock_processing_fee,
+                approval_chance="high",
+                features=features or ["Verified profile auto-fill", "Multiple lender offers"],
+                lender_api_source="external_handoff",
+                workflow_mode="external_handoff",
+                partner_slug=slug,
+                handoff_path=f"/apply/partner/{slug}/handoff",
+            )
+        )
+    return offers
+
+
 async def fetch_all_partner_offers(
     db: Session,
     lead: Lead,
@@ -84,6 +132,8 @@ async def fetch_all_partner_offers(
         if offers:
             responded += 1
             all_offers.extend(offers)
+
+    all_offers.extend(_external_partner_offers(db, lead))
 
     all_offers.sort(key=lambda o: (o.interest_rate, -o.loan_amount))
     if all_offers:

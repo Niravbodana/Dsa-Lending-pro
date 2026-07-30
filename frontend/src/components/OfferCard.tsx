@@ -105,7 +105,7 @@ export function OfferCard({
             : "bg-neercred-cta text-white hover:brightness-110"
         }`}
       >
-        {loading ? "Please wait…" : "Select this offer"}
+        {loading ? "Please wait…" : offer.workflow_mode === "external_handoff" ? "Continue with verified profile →" : "Select this offer"}
       </button>
     </div>
   );
