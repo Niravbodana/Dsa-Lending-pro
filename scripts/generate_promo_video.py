@@ -636,7 +636,7 @@ def ensure_logo() -> tuple[Path, Path]:
       <stop stop-color="#0F766E"/><stop offset="1" stop-color="#14B8A6"/>
     </linearGradient>
   </defs>
-  <g transform="translate(12, -14) scale(1.2)">
+  <g transform="translate(12, -17) scale(1.2)">
     <path d="M48 14 A34 34 0 0 0 48 82" stroke="url(#x-ring-blue)" stroke-width="2.8" fill="none" stroke-linecap="round"/>
     <path d="M48 14 A34 34 0 0 1 48 82" stroke="url(#x-ring-gold)" stroke-width="2.8" fill="none" stroke-linecap="round"/>
     <path d="M34 30 L34 66" stroke="url(#x-blue)" stroke-width="7.5" stroke-linecap="round"/>
