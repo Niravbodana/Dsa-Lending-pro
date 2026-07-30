@@ -53,21 +53,28 @@ export function DynamicHero({ config, heroOverlay }: Props) {
     >
       {remote ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={src} alt={HERO_IMAGE.alt} className="absolute inset-0 h-full w-full object-cover object-[70%_center] sm:object-[center_right]" />
+        <img
+          src={src}
+          alt={HERO_IMAGE.alt}
+          className="absolute inset-0 h-full w-full object-cover object-[72%_28%] sm:object-[center_30%]"
+        />
       ) : (
         <Image
           src={src}
           alt={HERO_IMAGE.alt}
           fill
           priority
+          quality={95}
           sizes="100vw"
-          className="object-cover object-[70%_center] sm:object-[center_right]"
+          className="object-cover object-[72%_28%] sm:object-[center_30%]"
         />
       )}
       <div
         className="absolute inset-0"
         style={{
-          background: heroOverlay || "var(--hero-overlay, linear-gradient(to right, rgba(224,242,254,0.95) 32%, rgba(255,255,255,0.85) 48%, rgba(255,255,255,0.15) 100%))",
+          background:
+            heroOverlay ||
+            "var(--hero-overlay, linear-gradient(to right, rgba(224,242,254,0.92) 30%, rgba(255,255,255,0.72) 46%, rgba(255,255,255,0.08) 100%))",
         }}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-white/20 via-transparent to-transparent lg:hidden" />
@@ -155,31 +162,7 @@ export function DynamicHero({ config, heroOverlay }: Props) {
         </div>
 
         <div className="relative hidden min-h-[280px] lg:block">
-          {h.approval_card_amount && (
-            <div className="absolute left-4 top-8 glass-panel rounded-2xl px-4 py-3">
-              <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">
-                {h.approval_card_label || "Loan Disbursed"}
-              </p>
-              <p className="text-2xl font-black text-teal-700">
-                <CmsField path="hero.approval_card_amount" draggable>
-                  {h.approval_card_amount}
-                </CmsField>
-              </p>
-            </div>
-          )}
-          {h.testimonial_quote && (
-            <div className="absolute right-0 top-4 max-w-[240px] glass-panel rounded-2xl p-4 text-xs leading-relaxed text-slate-600">
-              &ldquo;
-              <CmsField path="hero.testimonial_quote" draggable>
-                {h.testimonial_quote}
-              </CmsField>
-              &rdquo;
-              {h.testimonial_author && (
-                <p className="mt-2 font-semibold text-slate-800">— {h.testimonial_author}</p>
-              )}
-            </div>
-          )}
-          <div className="absolute bottom-8 right-0">
+          <div className="absolute bottom-6 right-2">
             <HeroRoiCard
               roiRate={h.roi_badge || REFERENCE_HERO.roiRate}
               roiLabel={h.roi_badge_label || REFERENCE_HERO.roiLabel}

@@ -117,39 +117,30 @@ export function PremiumHero() {
 
         <Reveal delay={0.15} className="relative flex justify-center lg:justify-end">
           <motion.div style={{ x: sx, y: sy }} className="relative w-full max-w-lg">
-            <div className="relative overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl">
+            <div className="relative overflow-hidden rounded-[2rem] border border-white/15 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.55)] ring-1 ring-white/10">
               <Image
                 src={hero.heroImage}
                 alt={hero.heroAlt}
-                width={900}
-                height={1100}
-                className="h-[380px] w-full object-cover sm:h-[440px] lg:h-[520px]"
+                width={2400}
+                height={1600}
+                quality={95}
+                className="h-[380px] w-full object-cover object-[center_28%] sm:h-[440px] lg:h-[520px]"
                 priority
+                sizes="(max-width: 1024px) 100vw, 50vw"
               />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0A0F1C]/60 via-transparent to-transparent" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0A0F1C]/45 via-transparent to-transparent" />
             </div>
 
             <motion.div
-              animate={{ y: [0, -8, 0] }}
+              animate={{ y: [0, -6, 0] }}
               transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute -bottom-4 right-4 sm:right-6"
+              className="absolute bottom-5 right-5 sm:bottom-6 sm:right-6"
             >
-              <GlassCard dark className="w-[210px] p-4">
-                <p className="text-[11px] font-medium text-slate-400">{hero.rateCard.label}</p>
-                <p className="mt-1 text-3xl font-extrabold text-teal-300">{hero.rateCard.rate}</p>
-                <p className="mt-1 text-xs text-slate-500">{hero.rateCard.note}</p>
-              </GlassCard>
-            </motion.div>
-
-            <motion.div
-              animate={{ y: [0, 6, 0] }}
-              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-              className="absolute -left-2 top-8 hidden sm:block"
-            >
-              <GlassCard dark className="px-4 py-3">
-                <p className="text-xs font-semibold text-teal-300">✓ KYC verified</p>
-                <p className="text-[10px] text-slate-500">256-bit encrypted</p>
-              </GlassCard>
+              <div className="w-[220px] rounded-2xl border border-white/40 bg-white/90 p-4 shadow-[0_20px_50px_-12px_rgba(15,23,42,0.4)] backdrop-blur-2xl ring-1 ring-black/5">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{hero.rateCard.label}</p>
+                <p className="mt-1 text-[1.85rem] font-extrabold leading-none tracking-tight text-teal-600">{hero.rateCard.rate}</p>
+                <p className="mt-2 text-xs font-medium text-slate-500">{hero.rateCard.note}</p>
+              </div>
             </motion.div>
           </motion.div>
         </Reveal>

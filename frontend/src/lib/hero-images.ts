@@ -1,7 +1,11 @@
+/** Hi-res wedding couple hero — faces stay clear, overlays sit at bottom edge */
+export const HERO_WEDDING_SRC =
+  "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&w=2400&q=95&fit=crop";
+
 /** Single homepage hero image + reference copy */
 export const HERO_IMAGE = {
-  src: "https://images.unsplash.com/photo-1600880292203-4edc55e4f5c6?auto=format&w=960&h=1100&fit=crop&q=85",
-  alt: "Indian couple smiling and checking loan offers on smartphone at home",
+  src: HERO_WEDDING_SRC,
+  alt: "Indian wedding couple celebrating their special day",
 };
 
 export const HERO_PRIMARY_IMAGE = HERO_IMAGE.src;

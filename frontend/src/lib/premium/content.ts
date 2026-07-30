@@ -37,8 +37,8 @@ export const premiumContent = {
       note: "Lowest EMI plans available",
     },
     heroImage:
-      "https://images.unsplash.com/photo-1600880292203-4edc55e4f5c6?auto=format&w=900&h=1100&fit=crop&q=85",
-    heroAlt: "Indian professionals reviewing digital loan options together",
+      "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&w=2400&q=95&fit=crop",
+    heroAlt: "Indian wedding couple celebrating their special day",
   },
   trustStrip: {
     title: "Trusted by ambitious Indians nationwide",

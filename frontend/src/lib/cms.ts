@@ -1,4 +1,5 @@
 import { INDIAN_IMAGES } from "@/lib/indian-images";
+import { HERO_WEDDING_SRC } from "@/lib/hero-images";
 
 export type StatItem = { value: string; label: string };
 
@@ -173,14 +174,13 @@ export const FALLBACK_CONFIG: SiteConfig = {
     ],
     cta_primary: "Get My Loan Offer",
     cta_secondary: "View Interest Rates",
-    image_url: INDIAN_IMAGES.hero.customer,
-    testimonial_quote:
-      "Shaadi ke liye apply kiya tha — teen lenders ka offer ek screen par mila. KYC ghar baithe ho gayi, 48 ghante mein paise account mein aa gaye.",
-    testimonial_author: "Priya Sharma, Pune",
-    approval_card_label: "Loan Disbursed",
-    approval_card_amount: "₹4,80,000",
+    image_url: HERO_WEDDING_SRC,
+    testimonial_quote: "",
+    testimonial_author: "",
+    approval_card_label: "",
+    approval_card_amount: "",
     roi_badge: "10.99%",
-    roi_badge_label: "From",
+    roi_badge_label: "Starting Interest Rate",
   },
   stats: [
     { value: "₹10L+", label: "Max Loan" },
@@ -418,7 +418,7 @@ export const FALLBACK_CONFIG: SiteConfig = {
     background: "glass-blue",
     hero_overlay: "sky-glass",
     glass_intensity: "high",
-    hero_background: "/hero-wedding-couple.png",
+    hero_background: HERO_WEDDING_SRC,
   },
   sections: {
     urgency_bar: false,
