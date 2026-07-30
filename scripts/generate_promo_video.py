@@ -21,7 +21,7 @@ FRAMES_DIR = OUT / "frames"
 W, H = 1080, 1920
 FPS = 30
 VOICE = "hi-IN-MadhurNeural"
-RATE = "+10%"
+RATE = "+6%"
 PITCH = "+0Hz"
 
 BRAND = {
@@ -48,7 +48,7 @@ SCENES = [
         "step": "1",
         "headline": "Mobile + OTP",
         "sub": "Turant verify · 100% secure",
-        "vo": "Neer Cred par mobile daalo, OTP se verify karo.",
+        "vo": "Neer Cred par apna mobile number daalo, OTP se verify karo.",
         "accent": "teal",
         "photo": "scene-mobile.png",
     },
@@ -217,28 +217,37 @@ def render_scene(scene: dict, logo_path: Path | None, photo_path: Path | None) -
     card = (90, 360, 990, 1380)
 
     if scene.get("brand_close") and logo_path and logo_path.exists():
-        # Close: only original logo, no duplicate text
+        # Close: original horizontal logo on white card — no duplicate brand text
         logo = Image.open(logo_path).convert("RGBA")
-        # Trim transparent/empty margins
         bbox = logo.getbbox()
         if bbox:
             logo = logo.crop(bbox)
-        target_w = 820
+
+        card_w, card_h = 920, 340
+        card_x = (W - card_w) // 2
+        card_y = 620
+        card = Image.new("RGBA", (card_w, card_h), (0, 0, 0, 0))
+        cdraw = ImageDraw.Draw(card)
+        cdraw.rounded_rectangle([0, 0, card_w - 1, card_h - 1], radius=32, fill=(255, 255, 255, 255))
+        # soft shadow
+        shadow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        sdraw = ImageDraw.Draw(shadow)
+        for i in range(18, 0, -1):
+            sdraw.rounded_rectangle(
+                [card_x - i, card_y + i, card_x + card_w + i, card_y + card_h + i],
+                radius=32 + i, fill=(0, 0, 0, 12),
+            )
+        img = Image.alpha_composite(img.convert("RGBA"), shadow).convert("RGB")
+
+        target_w = card_w - 120
         scale = target_w / logo.width
         nw, nh = int(logo.width * scale), int(logo.height * scale)
         logo = logo.resize((nw, nh), Image.Resampling.LANCZOS)
+        lx = card_x + (card_w - nw) // 2
+        ly = card_y + (card_h - nh) // 2
 
-        # Radial spotlight behind logo
-        spot = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-        sd = ImageDraw.Draw(spot)
-        for r in range(500, 0, -8):
-            a = int(35 * (1 - r / 500))
-            sd.ellipse([W // 2 - r, 720 - r // 2, W // 2 + r, 720 + r // 2], fill=(*hex_to_rgb(BRAND["teal"]), a))
-        img = Image.alpha_composite(img.convert("RGBA"), spot).convert("RGB")
-
-        lx = (W - nw) // 2
-        ly = 560
         img_rgba = img.convert("RGBA")
+        img_rgba.paste(card, (card_x, card_y), card)
         img_rgba.paste(logo, (lx, ly), logo)
         img = img_rgba.convert("RGB")
         draw = ImageDraw.Draw(img)
@@ -246,12 +255,12 @@ def render_scene(scene: dict, logo_path: Path | None, photo_path: Path | None) -
         sub_font = load_font(36)
         sub = scene["sub"]
         sw = draw.textlength(sub, font=sub_font)
-        draw.text(((W - sw) / 2, 1180), sub, fill=hex_to_rgb(BRAND["slate"]), font=sub_font)
+        draw.text(((W - sw) / 2, 1040), sub, fill=hex_to_rgb(BRAND["slate"]), font=sub_font)
 
         rbi_font = load_font(30)
         rbi = "RBI LSP Registered Platform"
         rw = draw.textlength(rbi, font=rbi_font)
-        draw.text(((W - rw) / 2, 1260), rbi, fill=hex_to_rgb(BRAND["gold"]), font=rbi_font)
+        draw.text(((W - rw) / 2, 1110), rbi, fill=hex_to_rgb(BRAND["gold"]), font=rbi_font)
     elif photo_path and photo_path.exists():
         paste_photo_card(img, photo_path, accent, card)
         draw = ImageDraw.Draw(img)
@@ -280,11 +289,16 @@ async def synth_vo(scene: dict, out_path: Path) -> float:
     communicate = edge_tts.Communicate(scene["vo"], VOICE, rate=RATE, pitch=PITCH)
     await communicate.save(str(out_path))
 
-    # Polish voice: warmth + clarity
+    # Polish voice: clearer diction, brighter presence
     polished = out_path.with_suffix(".polished.mp3")
     run([
         "ffmpeg", "-y", "-i", str(out_path),
-        "-af", "highpass=f=80,lowpass=f=12000,compand=0.3|0.8:6:-70/-60/-20.3/-9.2/0:2:0:0, volume=1.08",
+        "-af",
+        "highpass=f=110,"
+        "equalizer=f=1800:width_type=h:width=1200:g=2.5,"
+        "equalizer=f=3200:width_type=h:width=1800:g=3.5,"
+        "compand=0.2|0.9:6:-70/-55/-20/-10/-3/0:2:0:0,"
+        "volume=1.18",
         str(polished),
     ])
     polished.replace(out_path)
@@ -299,44 +313,21 @@ async def synth_vo(scene: dict, out_path: Path) -> float:
 
 def ensure_logo() -> Path:
     logo = SCENES_DIR / "neercred-logo-original.png"
-    # Inline SVG avoids file-encoding issues with special chars in brand assets
-    svg_content = """<svg width="200" height="220" viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="s-bg" x1="40" y1="20" x2="160" y2="140" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#0A0F1C"/><stop offset="1" stop-color="#134E4A"/>
-    </linearGradient>
-    <linearGradient id="s-bar" x1="70" y1="100" x2="130" y2="50" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#2DD4BF"/><stop offset="1" stop-color="#14B8A6"/>
-    </linearGradient>
-    <linearGradient id="s-cred" x1="40" y1="0" x2="160" y2="0" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#2DD4BF"/><stop offset="1" stop-color="#14B8A6"/>
-    </linearGradient>
-  </defs>
-  <rect x="50" y="16" width="100" height="100" rx="26" fill="url(#s-bg)"/>
-  <rect x="72" y="78" width="10" height="28" rx="4" fill="url(#s-bar)" opacity="0.6"/>
-  <rect x="88" y="66" width="10" height="40" rx="4" fill="url(#s-bar)" opacity="0.8"/>
-  <rect x="104" y="52" width="10" height="54" rx="4" fill="url(#s-bar)"/>
-  <circle cx="100" cy="36" r="4" fill="#C9A962"/>
-  <text x="100" y="158" text-anchor="middle" font-family="system-ui,sans-serif" font-size="32" font-weight="700">
-    <tspan fill="#F8FAFC">Neer</tspan><tspan fill="url(#s-cred)">Cred</tspan>
-  </text>
-  <text x="100" y="182" text-anchor="middle" font-family="system-ui,sans-serif" font-size="9" font-weight="600" fill="#94A3B8" letter-spacing="2.8">DREAM BIG · BORROW SMART</text>
-  <text x="100" y="202" text-anchor="middle" font-family="system-ui,sans-serif" font-size="8" font-weight="500" fill="#64748B" letter-spacing="2">RBI LSP MARKETPLACE</text>
-</svg>"""
+    svg_path = ROOT / "frontend/public/neercred-logo-header.svg"
+    svg_content = svg_path.read_text(encoding="utf-8", errors="replace")
     html = OUT / "render-logo.html"
     html.write_text(
         f"""<!DOCTYPE html>
 <html><head><meta charset="utf-8"><style>
 *{{margin:0;padding:0}}body{{
-  width:1200px;height:1200px;
-  background:radial-gradient(ellipse at center,#0f172a 0%,#0B1220 72%);
-  display:flex;align-items:center;justify-content:center}}
-svg{{width:760px;height:auto}}
+  width:1400px;height:500px;background:#FFFFFF;
+  display:flex;align-items:center;justify-content:center;padding:40px}}
+svg{{width:1100px;height:auto}}
 </style></head><body>{svg_content}</body></html>"""
     )
     run([
         "npx", "playwright", "screenshot", "--browser", "chromium",
-        f"file://{html}", str(logo), "--viewport-size=1200,1200",
+        f"file://{html}", str(logo), "--viewport-size=1400,500",
     ], cwd=ROOT / "frontend")
     return logo
 
@@ -344,18 +335,12 @@ svg{{width:760px;height:auto}}
 def build_scene_clip(scene_img: Path, vo_path: Path, vo_duration: float, idx: int) -> Path:
     clip = OUT / f"clip_{idx:02d}.mp4"
     dur = vo_duration + 0.2
-    frames = int(dur * FPS)
-    # Subtle Ken Burns zoom for premium feel
     run([
         "ffmpeg", "-y",
         "-loop", "1", "-i", str(scene_img),
         "-i", str(vo_path),
         "-filter_complex",
-        (
-            f"[0:v]scale=1120:2000:force_original_aspect_ratio=increase,crop=1080:1920,"
-            f"zoompan=z='min(1.0+0.00055*on,1.06)':x='(iw-ow)/2':y='(ih-oh)/2':"
-            f"d={frames}:s={W}x{H}:fps={FPS},setsar=1[v]"
-        ),
+        f"[0:v]scale={W}:{H}:force_original_aspect_ratio=decrease,pad={W}:{H}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps={FPS}[v]",
         "-map", "[v]", "-map", "1:a",
         "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "18",
         "-c:a", "aac", "-b:a", "192k",
