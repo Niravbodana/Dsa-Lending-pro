@@ -415,25 +415,35 @@ body {
   }
 }
 
-/* Inline mascot — beside form card, small on mobile */
+/* Inline mascot — compact, beside apply step tabs */
 .loan-guide-root--inline {
-  bottom: auto;
-  right: 0;
+  width: 52px;
+  margin-top: 2px;
 }
 .loan-guide-wrap--inline {
   flex-direction: column-reverse;
-  align-items: flex-end;
-  gap: 0.25rem;
+  align-items: center;
+  gap: 0.15rem;
+  max-width: 52px;
+  animation: none;
+}
+.loan-guide-wrap--inline .loan-guide-character {
+  transform: scale(1);
 }
 .loan-guide-bubble--inline {
-  max-width: 140px;
-  margin-bottom: -4px;
+  max-width: 88px;
+  margin-bottom: -2px;
+  margin-right: 0;
 }
 .loan-guide-bubble--inline .loan-guide-bubble-cloud {
-  padding: 0.35rem 0.5rem;
-  border-radius: 12px;
+  padding: 0.28rem 0.4rem;
+  border-radius: 10px;
+  border-width: 1.5px;
 }
 .loan-guide-bubble--inline .loan-guide-bubble-tail {
-  right: 18px;
-  bottom: -6px;
+  right: 50%;
+  margin-right: -5px;
+  bottom: -5px;
+  width: 10px;
+  height: 10px;
 }

@@ -95,7 +95,7 @@ export function LoanGuideMascot({ step, activeField, show, variant = "floating" 
 
   const isInline = variant === "inline";
   const rootClass = isInline
-    ? "loan-guide-root loan-guide-root--inline pointer-events-none absolute -bottom-2 -right-1 z-20 sm:-right-3"
+    ? "loan-guide-root loan-guide-root--inline pointer-events-none relative shrink-0"
     : "loan-guide-root pointer-events-none fixed inset-x-0 bottom-4 z-40 flex justify-end px-3 sm:bottom-6 sm:px-6";
 
   return (
@@ -104,7 +104,7 @@ export function LoanGuideMascot({ step, activeField, show, variant = "floating" 
         {/* Cloud thought bubble */}
         <div className={`loan-guide-bubble ${isInline ? "loan-guide-bubble--inline" : ""}`} role="status" aria-live="polite">
           <div className="loan-guide-bubble-cloud">
-            <p className={`whitespace-pre-line font-semibold leading-snug text-slate-800 ${isInline ? "text-[10px]" : "text-sm"}`}>
+            <p className={`whitespace-pre-line font-semibold leading-snug text-slate-800 ${isInline ? "text-[9px] leading-tight" : "text-sm"}`}>
               {bubbleText}
             </p>
           </div>
@@ -125,7 +125,7 @@ export function LoanGuideMascot({ step, activeField, show, variant = "floating" 
         >
           <svg
             viewBox="0 0 200 240"
-            className={isInline ? "h-[72px] w-[60px]" : "h-[140px] w-[116px] sm:h-[168px] sm:w-[140px]"}
+            className={isInline ? "h-[46px] w-[38px]" : "h-[140px] w-[116px] sm:h-[168px] sm:w-[140px]"}
             aria-hidden
           >
             <defs>

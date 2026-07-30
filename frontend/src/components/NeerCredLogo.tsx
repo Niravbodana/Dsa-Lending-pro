@@ -8,15 +8,41 @@ type NeerCredLogoProps = {
 };
 
 const SOURCES = {
-  header: "/neercred-logo-header.svg",
-  full: "/neercred-logo.svg",
   icon: "/neercred-icon.svg",
   stacked: "/neercred-logo-stacked.svg",
-  wordmark: "/brand/neercred-horizontal.svg",
   dark: "/brand/neercred-stacked.svg",
 } as const;
 
-/** Official NeerCred logo — transparent SVG lockups (no missing PNG) */
+function OneLineLockup({
+  size = 44,
+  dark = false,
+  className = "",
+}: {
+  size?: number;
+  dark?: boolean;
+  className?: string;
+}) {
+  const iconSize = Math.round(size * 0.82);
+  const fontSize = Math.round(size * 0.52);
+
+  return (
+    <span className={`inline-flex items-center gap-2 whitespace-nowrap ${className}`}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={SOURCES.icon}
+        alt=""
+        className="shrink-0 rounded-[22%]"
+        style={{ width: iconSize, height: iconSize }}
+      />
+      <span className="font-bold leading-none tracking-tight" style={{ fontSize }}>
+        <span className={dark ? "text-white" : "text-neercred-navy"}>Neer</span>
+        <span className={dark ? "text-teal-300" : "text-neercred-teal"}>Cred</span>
+      </span>
+    </span>
+  );
+}
+
+/** Official NeerCred logo — icon + wordmark always on one line */
 export function NeerCredLogo({
   variant = "full",
   size,
@@ -36,23 +62,21 @@ export function NeerCredLogo({
     );
   }
 
-  let src: string = SOURCES.full;
-  if (dark) src = SOURCES.dark;
-  else if (variant === "header") src = SOURCES.header;
-  else if (variant === "stacked") src = SOURCES.stacked;
-  else if (variant === "wordmark") src = SOURCES.wordmark;
+  if (variant === "stacked" && !dark) {
+    const height = size ?? 64;
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={SOURCES.stacked}
+        alt={`${BRAND.appName} — ${BRAND.logoTagline}`}
+        className={`h-auto w-auto bg-transparent object-contain object-left ${className}`}
+        style={className ? undefined : { height, width: "auto", maxWidth: 200 }}
+      />
+    );
+  }
 
-  const height = size ?? (variant === "header" ? 72 : 64);
-
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={src}
-      alt={`${BRAND.appName} — ${BRAND.logoTagline}`}
-      className={`h-auto w-auto bg-transparent object-contain object-left ${className}`}
-      style={className ? undefined : { height, width: "auto", maxWidth: 240 }}
-    />
-  );
+  const lockupSize = size ?? (variant === "header" ? 44 : 52);
+  return <OneLineLockup size={lockupSize} dark={dark} className={className} />;
 }
 
-export const NEERCRED_LOGO_SRC = SOURCES.full;
+export const NEERCRED_LOGO_SRC = SOURCES.icon;

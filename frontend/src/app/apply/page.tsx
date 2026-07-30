@@ -408,23 +408,32 @@ function ApplyPageInner() {
           </div>
         )}
 
-        <div className="mb-8">
-          <div className="mb-3 flex justify-between text-xs font-medium text-slate-500">
-            {STEP_LABELS.map((label, i) => (
-              <span key={label} className={i <= stepIndex ? "text-neercred-teal" : ""}>
-                {label}
-              </span>
-            ))}
+        <div className="mb-8 flex items-start gap-2 sm:gap-3">
+          <div className="min-w-0 flex-1">
+            <div className="mb-3 flex justify-between text-xs font-medium text-slate-500">
+              {STEP_LABELS.map((label, i) => (
+                <span key={label} className={i <= stepIndex ? "text-neercred-teal" : ""}>
+                  {label}
+                </span>
+              ))}
+            </div>
+            <div className="h-1.5 overflow-hidden rounded-full bg-slate-200">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-neercred-teal to-neercred-cyan transition-all duration-500"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
           </div>
-          <div className="h-1.5 overflow-hidden rounded-full bg-slate-200">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-neercred-teal to-neercred-cyan transition-all duration-500"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
+
+          <LoanGuideMascot
+            step={step}
+            activeField={activeField}
+            show={step !== "offers" || offers.length === 0}
+            variant="inline"
+          />
         </div>
 
-        <div className="relative rounded-3xl border border-slate-200/80 bg-white p-6 shadow-neercred sm:p-8">
+        <div className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-neercred sm:p-8">
           {error && (
             <div className="mb-5 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
               {error}
@@ -775,13 +784,6 @@ function ApplyPageInner() {
               </div>
             </div>
           )}
-
-          <LoanGuideMascot
-            step={step}
-            activeField={activeField}
-            show={step !== "offers" || offers.length === 0}
-            variant="inline"
-          />
         </div>
 
         <p className="mt-6 flex items-center justify-center gap-2 text-center text-xs text-slate-400">
