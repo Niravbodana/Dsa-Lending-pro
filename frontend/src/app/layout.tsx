@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Geist } from "next/font/google";
+import { Poppins, Geist } from "next/font/google";
 import "./globals.css";
 import { BRAND } from "@/lib/brand";
 import { CookieConsent } from "@/components/CookieConsent";
@@ -9,19 +9,19 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
-const plusJakarta = Plus_Jakarta_Sans({
-  variable: "--font-plus-jakarta",
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
-  title: `${BRAND.appName} | Premium Digital Lending Marketplace`,
+  title: `${BRAND.appName} | ${BRAND.legalName} — Personal Loan in Minutes`,
   description:
-    "NeerCred — compare curated personal loans from RBI-partnered lenders. Instant eligibility, digital KYC, transparent rates up to ₹10,00,000.",
+    "NeerCred by Neer Loan Solutions — compare personal loan offers from top partner banks & NBFCs. Up to ₹5,00,000, instant eligibility, RBI LSP compliant.",
   icons: {
-    icon: "/brand/neercred-icon.svg",
-    apple: "/brand/neercred-icon.svg",
+    icon: "/neercred-icon.svg",
+    apple: "/neercred-icon.svg",
   },
 };
 
@@ -32,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${plusJakarta.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${poppins.variable} antialiased`}>
         {children}
         <CookieConsent />
       </body>
