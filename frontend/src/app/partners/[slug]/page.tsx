@@ -76,7 +76,7 @@ export default async function PartnerDetailPage({ params }: Props) {
           </div>
 
           <Link
-            href="/apply"
+            href={`/apply?partner=${partner.page_slug || slug}`}
             className="mt-10 inline-block rounded-2xl bg-gradient-to-r from-teal-600 to-cyan-600 px-10 py-4 text-lg font-bold text-white shadow-lg"
           >
             Apply with {partner.lender_name}

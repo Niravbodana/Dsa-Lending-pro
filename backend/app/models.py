@@ -27,6 +27,7 @@ class Lead(Base):
     status: Mapped[str] = mapped_column(String(30), default="otp_verified")
     selected_lender: Mapped[str | None] = mapped_column(String(100), nullable=True)
     selected_offer_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    preferred_partner_slug: Mapped[str | None] = mapped_column(String(80), nullable=True, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
@@ -191,6 +192,7 @@ class LendingPartner(Base):
     page_title: Mapped[str | None] = mapped_column(String(200), nullable=True)
     page_description: Mapped[str | None] = mapped_column(Text, nullable=True)
     offers_endpoint_path: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    application_endpoint_path: Mapped[str | None] = mapped_column(String(120), nullable=True)
     auth_header_name: Mapped[str | None] = mapped_column(String(80), nullable=True)
     auth_type: Mapped[str | None] = mapped_column(String(30), nullable=True)
     timeout_seconds: Mapped[float] = mapped_column(Float, default=8.0)

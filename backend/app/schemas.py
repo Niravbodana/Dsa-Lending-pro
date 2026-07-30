@@ -168,3 +168,88 @@ class RequiredFieldInfo(BaseModel):
 class RequiredFieldsResponse(BaseModel):
     fields: list[RequiredFieldInfo]
     partners_count: int
+
+
+class PanLookupRequest(BaseModel):
+    session_token: str
+    pan: str = Field(..., min_length=10, max_length=10)
+
+    @field_validator("pan")
+    @classmethod
+    def validate_pan(cls, value: str) -> str:
+        pan = value.upper()
+        if not (
+            len(pan) == 10
+            and pan[:5].isalpha()
+            and pan[5:9].isdigit()
+            and pan[9].isalpha()
+        ):
+            raise ValueError("Invalid PAN format")
+        return pan
+
+
+class PanLookupResponse(BaseModel):
+    pan: str
+    full_name: str
+    date_of_birth: str
+    gender: Literal["male", "female", "other"]
+    verified: bool
+    source: str = "mock"
+
+
+class PartnerPreferenceRequest(BaseModel):
+    session_token: str
+    partner_slug: str = Field(..., min_length=1, max_length=80)
+
+
+class WorkflowStepInfo(BaseModel):
+    id: str
+    label: str
+    phase: str
+
+
+class JourneyApplicationInfo(BaseModel):
+    id: int
+    application_ref: str
+    lender_name: str
+    status: str
+    loan_amount: int
+    interest_rate: float
+    tenure_months: int
+    emi: int
+    aadhaar_verified: bool
+    bank_verified: bool
+    esign_completed: bool
+    kyc_step: str
+
+
+class JourneyLeadInfo(BaseModel):
+    id: int | None = None
+    mobile: str
+    full_name: str | None = None
+    pan: str | None = None
+    monthly_income: float | None = None
+    employment_type: str | None = None
+    city: str | None = None
+    date_of_birth: str | None = None
+    email: str | None = None
+    pincode: str | None = None
+    gender: str | None = None
+    loan_purpose: str | None = None
+    existing_emi: float | None = None
+    status: str | None = None
+    eligibility_score: int | None = None
+    max_loan_amount: int | None = None
+    preferred_partner_slug: str | None = None
+    selected_lender: str | None = None
+
+
+class JourneyResponse(BaseModel):
+    authenticated: bool
+    next_step: str
+    apply_step: str
+    workflow_step: str
+    workflow: list[WorkflowStepInfo]
+    lead: JourneyLeadInfo | None
+    application: JourneyApplicationInfo | None
+    can_resume: bool

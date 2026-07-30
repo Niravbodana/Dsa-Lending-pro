@@ -13,8 +13,11 @@ import {
   aadhaarVerify,
   bankVerify,
   esignComplete,
+  getJourney,
+  getKycStatus,
   submitApplication,
 } from "@/lib/api";
+import { JourneyWorkflow } from "@/components/loan-journey/JourneyWorkflow";
 
 type KycStep = "aadhaar" | "aadhaar_otp" | "bank" | "esign" | "submit" | "done";
 
@@ -35,6 +38,8 @@ export default function KycPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [appRef, setAppRef] = useState("");
+  const [lenderName, setLenderName] = useState("");
+  const [workflowStep, setWorkflowStep] = useState("kyc");
 
   useEffect(() => {
     const t = localStorage.getItem("session_token");
@@ -45,6 +50,26 @@ export default function KycPage() {
     }
     setToken(t);
     if (ref) setAppRef(ref);
+
+    void (async () => {
+      try {
+        const [kyc, journey] = await Promise.all([
+          getKycStatus(t, appId),
+          getJourney(t),
+        ]);
+        setAppRef(kyc.application_ref);
+        setLenderName(kyc.lender_name);
+        setWorkflowStep(journey.workflow_step);
+        if (kyc.address) setAddress(kyc.address);
+        if (kyc.kyc_step === "done") setStep("done");
+        else if (kyc.kyc_step === "bank") setStep("bank");
+        else if (kyc.kyc_step === "esign") setStep("esign");
+        else if (kyc.kyc_step === "submit") setStep("submit");
+        else if (kyc.aadhaar_verified) setStep("bank");
+      } catch {
+        /* fresh KYC */
+      }
+    })();
   }, [appId, router]);
 
   const steps: KycStep[] = ["aadhaar", "bank", "esign", "submit", "done"];
@@ -71,6 +96,7 @@ export default function KycPage() {
     try {
       await aadhaarVerify({ session_token: token, application_id: appId, otp: aadhaarOtp });
       setStep("bank");
+      setWorkflowStep("bank");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Invalid OTP");
     } finally {
@@ -91,6 +117,7 @@ export default function KycPage() {
         address,
       });
       setStep("esign");
+      setWorkflowStep("esign");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed");
     } finally {
@@ -110,6 +137,7 @@ export default function KycPage() {
         page_url: `/application/${appId}/kyc`,
       });
       setStep("submit");
+      setWorkflowStep("submit");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed");
     } finally {
@@ -123,6 +151,7 @@ export default function KycPage() {
     try {
       await submitApplication({ session_token: token, application_id: appId });
       setStep("done");
+      setWorkflowStep("review");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed");
     } finally {
@@ -149,12 +178,34 @@ export default function KycPage() {
             <div>
               <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold">Phase 3 — KYC &amp; eSign</span>
               {appRef && <p className="mt-2 font-mono text-sm text-teal-200">Ref: {appRef}</p>}
-              <p className="mt-1 text-sm text-slate-300">Secure Aadhaar, bank verification &amp; digital signing</p>
+              <p className="mt-1 text-sm text-slate-300">
+                {lenderName
+                  ? `All steps with ${lenderName} — inside NeerCred, no external redirect`
+                  : "Secure Aadhaar, bank verification & digital signing"}
+              </p>
             </div>
           </div>
         </div>
 
       <div className="mx-auto max-w-2xl px-4 py-10">
+        <div className="mb-6">
+          <JourneyWorkflow
+            steps={[
+              { id: "mobile", label: "Mobile", phase: "apply" },
+              { id: "otp", label: "Verify", phase: "apply" },
+              { id: "details", label: "Profile", phase: "apply" },
+              { id: "offers", label: "Offers", phase: "apply" },
+              { id: "kyc", label: "KYC", phase: "kyc" },
+              { id: "bank", label: "Bank", phase: "kyc" },
+              { id: "esign", label: "eSign", phase: "kyc" },
+              { id: "submit", label: "Submit", phase: "kyc" },
+              { id: "review", label: "Review", phase: "lender" },
+              { id: "disbursal", label: "Disbursal", phase: "lender" },
+            ]}
+            currentStepId={workflowStep}
+            compact
+          />
+        </div>
 
         <div className="mb-8 flex justify-between">
           {["Aadhaar", "Bank", "eSign", "Submit", "Done"].map((label, i) => (

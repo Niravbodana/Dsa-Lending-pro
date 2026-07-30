@@ -1,23 +1,31 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { OfferCard } from "@/components/OfferCard";
 import { IconCheckCircle, IconShield } from "@/components/icons";
+import { LoanGuideMascot } from "@/components/loan-guide/LoanGuideMascot";
+import type { GuideField } from "@/components/loan-guide/loanGuideMessages";
+import { JourneyWorkflow } from "@/components/loan-journey/JourneyWorkflow";
 import {
   checkEligibility,
   EligibilityResult,
   fetchOffers,
+  getJourney,
   getRequiredFields,
   LoanOffer,
+  panLookup,
   RequiredField,
   selectOffer,
   sendOtp,
+  setPartnerPreference,
   submitDetails,
   verifyOtp,
+  type JourneyState,
+  type WorkflowStep,
 } from "@/lib/api";
 import { CONSENT_VERSIONS } from "@/lib/consent";
 
@@ -27,30 +35,27 @@ type SortBy = "rate" | "amount" | "emi";
 const STEPS: Step[] = ["mobile", "otp", "details", "offers"];
 const STEP_LABELS = ["Mobile", "Verify", "Profile", "Offers"];
 
-const STEP_TIPS: Record<Step, { title: string; hint: string }> = {
-  mobile: {
-    title: "Start in under a minute",
-    hint: "Use your Aadhaar-linked mobile number for smoother KYC later.",
-  },
-  otp: {
-    title: "Secure verification",
-    hint: "OTP is valid for a few minutes. Never share it with anyone.",
-  },
-  details: {
-    title: "One profile, multiple offers",
-    hint: "We only ask what partner lenders need. Your data stays encrypted.",
-  },
-  offers: {
-    title: "Compare and choose calmly",
-    hint: "We highlight the best rate and lowest EMI — pick what fits your budget.",
-  },
-};
+const DEFAULT_WORKFLOW: WorkflowStep[] = [
+  { id: "mobile", label: "Mobile", phase: "apply" },
+  { id: "otp", label: "Verify OTP", phase: "apply" },
+  { id: "details", label: "Profile", phase: "apply" },
+  { id: "offers", label: "Offers", phase: "apply" },
+  { id: "kyc", label: "KYC", phase: "kyc" },
+  { id: "bank", label: "Bank", phase: "kyc" },
+  { id: "esign", label: "eSign", phase: "kyc" },
+  { id: "submit", label: "Submit", phase: "kyc" },
+  { id: "review", label: "Review", phase: "lender" },
+  { id: "disbursal", label: "Disbursal", phase: "lender" },
+];
 
 const inputClass =
   "w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-slate-900 outline-none transition focus:border-neercred-teal focus:ring-2 focus:ring-neercred-teal/20";
 
-export default function ApplyPage() {
+function ApplyPageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const partnerSlug = searchParams.get("partner")?.toLowerCase() ?? "";
+
   const [step, setStep] = useState<Step>("mobile");
   const [mobile, setMobile] = useState("");
   const [otp, setOtp] = useState("");
@@ -58,9 +63,18 @@ export default function ApplyPage() {
   const [sessionToken, setSessionToken] = useState("");
   const [offers, setOffers] = useState<LoanOffer[]>([]);
   const [loading, setLoading] = useState(false);
+  const [booting, setBooting] = useState(true);
   const [error, setError] = useState("");
+  const [resumeMsg, setResumeMsg] = useState("");
   const [eligibility, setEligibility] = useState<EligibilityResult | null>(null);
   const [sortBy, setSortBy] = useState<SortBy>("rate");
+  const [activeField, setActiveField] = useState<GuideField>(null);
+  const [panLoading, setPanLoading] = useState(false);
+  const [panVerified, setPanVerified] = useState(false);
+  const [workflow, setWorkflow] = useState<WorkflowStep[]>(DEFAULT_WORKFLOW);
+  const [workflowStep, setWorkflowStep] = useState("mobile");
+  const [preferredPartner, setPreferredPartner] = useState(partnerSlug);
+
   const [smsConsent, setSmsConsent] = useState(false);
   const [privacyConsent, setPrivacyConsent] = useState(false);
   const [termsConsent, setTermsConsent] = useState(false);
@@ -73,12 +87,6 @@ export default function ApplyPage() {
 
   const [requiredFields, setRequiredFields] = useState<RequiredField[]>([]);
   const needs = (key: string) => requiredFields.some((f) => f.key === key);
-
-  useEffect(() => {
-    void getRequiredFields()
-      .then((res) => setRequiredFields(res.fields))
-      .catch(() => setRequiredFields([]));
-  }, []);
 
   const [form, setForm] = useState({
     full_name: "",
@@ -93,6 +101,100 @@ export default function ApplyPage() {
     loan_purpose: "personal" as "personal" | "medical" | "wedding" | "travel" | "business" | "education",
     existing_emi: "",
   });
+
+  const hydrateFromJourney = useCallback(async (journey: JourneyState, token: string) => {
+    if (journey.workflow?.length) setWorkflow(journey.workflow);
+    setWorkflowStep(journey.workflow_step);
+
+    if (journey.lead) {
+      const l = journey.lead;
+      if (l.mobile) setMobile(l.mobile);
+      setForm((f) => ({
+        ...f,
+        full_name: l.full_name || f.full_name,
+        pan: l.pan || f.pan,
+        date_of_birth: l.date_of_birth || f.date_of_birth,
+        email: l.email || f.email,
+        pincode: l.pincode || f.pincode,
+        gender: (l.gender as typeof f.gender) || f.gender,
+        monthly_income: l.monthly_income ? String(l.monthly_income) : f.monthly_income,
+        employment_type: (l.employment_type as typeof f.employment_type) || f.employment_type,
+        city: l.city || f.city,
+        loan_purpose: (l.loan_purpose as typeof f.loan_purpose) || f.loan_purpose,
+        existing_emi: l.existing_emi ? String(l.existing_emi) : f.existing_emi,
+      }));
+      if (l.pan) setPanVerified(true);
+      if (l.preferred_partner_slug) setPreferredPartner(l.preferred_partner_slug);
+    }
+
+    if (journey.next_step === "kyc" && journey.application) {
+      setResumeMsg(`Welcome back! Continue KYC with ${journey.application.lender_name}.`);
+      router.replace(`/application/${journey.application.id}/kyc`);
+      return;
+    }
+    if (journey.next_step === "dashboard") {
+      setResumeMsg("You have an active application. Opening dashboard…");
+      router.replace("/dashboard");
+      return;
+    }
+
+    const applyStep = journey.apply_step as Step;
+    if (applyStep && STEPS.includes(applyStep)) {
+      setStep(applyStep);
+      if (applyStep === "offers" && token) {
+        try {
+          const offersRes = await fetchOffers(token);
+          setOffers(offersRes.offers);
+          if (journey.lead?.eligibility_score) {
+            setEligibility({
+              eligible: true,
+              score: journey.lead.eligibility_score,
+              max_loan_amount: journey.lead.max_loan_amount || 0,
+              recommended_tenure: 36,
+              debt_to_income_ratio: 0,
+              message: "Welcome back — your offers are ready.",
+              factors: [],
+            });
+          }
+        } catch {
+          setStep("details");
+        }
+      }
+      if (journey.can_resume) {
+        setResumeMsg("Welcome back! We've restored your progress — continue where you left off.");
+      }
+    }
+  }, [router]);
+
+  useEffect(() => {
+    void getRequiredFields()
+      .then((res) => setRequiredFields(res.fields))
+      .catch(() => setRequiredFields([]));
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("session_token") || "";
+    if (token) setSessionToken(token);
+
+    void (async () => {
+      try {
+        const journey = await getJourney(token || undefined);
+        if (token && journey.authenticated) {
+          await hydrateFromJourney(journey, token);
+          if (partnerSlug && token) {
+            await setPartnerPreference(token, partnerSlug).catch(() => {});
+            setPreferredPartner(partnerSlug);
+          }
+        } else if (partnerSlug) {
+          setPreferredPartner(partnerSlug);
+        }
+      } catch {
+        /* fresh start */
+      } finally {
+        setBooting(false);
+      }
+    })();
+  }, [hydrateFromJourney, partnerSlug]);
 
   const stepIndex = STEPS.indexOf(step);
   const progress = ((stepIndex + 1) / STEPS.length) * 100;
@@ -119,6 +221,26 @@ export default function ApplyPage() {
     return map;
   }, [offers]);
 
+  async function handlePanBlur() {
+    if (form.pan.length !== 10 || !sessionToken || panVerified) return;
+    setPanLoading(true);
+    setError("");
+    try {
+      const res = await panLookup(sessionToken, form.pan);
+      setForm((f) => ({
+        ...f,
+        full_name: res.full_name,
+        date_of_birth: res.date_of_birth,
+        gender: res.gender,
+      }));
+      setPanVerified(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "PAN verification failed");
+    } finally {
+      setPanLoading(false);
+    }
+  }
+
   async function handleSendOtp(e: React.FormEvent) {
     e.preventDefault();
     if (!smsConsent) {
@@ -131,6 +253,7 @@ export default function ApplyPage() {
       const res = await sendOtp(mobile, true);
       setDevOtp(res.dev_otp || null);
       setStep("otp");
+      setWorkflowStep("otp");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not send OTP. Try again.");
     } finally {
@@ -146,7 +269,11 @@ export default function ApplyPage() {
       const res = await verifyOtp(mobile, otp);
       setSessionToken(res.session_token);
       localStorage.setItem("session_token", res.session_token);
+      if (preferredPartner) {
+        await setPartnerPreference(res.session_token, preferredPartner).catch(() => {});
+      }
       setStep("details");
+      setWorkflowStep("details");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Incorrect OTP. Please try again.");
     } finally {
@@ -174,7 +301,7 @@ export default function ApplyPage() {
         email: form.email || undefined,
         pincode: form.pincode || undefined,
         gender: form.gender || undefined,
-        page_url: "/apply",
+        page_url: preferredPartner ? `/apply?partner=${preferredPartner}` : "/apply",
         consents: {
           dpdp_data_processing: dpdpConsent,
           privacy_policy: privacyConsent,
@@ -202,6 +329,7 @@ export default function ApplyPage() {
       const offersRes = await fetchOffers(sessionToken);
       setOffers(offersRes.offers);
       setStep("offers");
+      setWorkflowStep("offers");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     } finally {
@@ -237,18 +365,41 @@ export default function ApplyPage() {
     }
   }
 
-  const tip = STEP_TIPS[step];
+  if (booting) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-slate-50">
+        <p className="animate-pulse text-slate-500">Restoring your journey…</p>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-teal-50/30">
       <Header />
 
       <div className="mx-auto max-w-2xl px-4 py-8 sm:py-12">
-        <div className="mb-8 text-center">
+        <div className="mb-6 text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neercred-teal">NeerCred Apply</p>
           <h1 className="mt-2 text-2xl font-bold text-neercred-navy sm:text-3xl">Your loan, step by step</h1>
-          <p className="mt-2 text-sm text-slate-500">Light, secure, and guided from OTP to offer selection.</p>
+          <p className="mt-2 text-sm text-slate-500">
+            {preferredPartner
+              ? `Applying via partner — all steps on NeerCred, no repeat forms.`
+              : "Light, secure, and guided from OTP to disbursal."}
+          </p>
         </div>
+
+        <div className="mb-6 hidden sm:block">
+          <JourneyWorkflow steps={workflow} currentStepId={workflowStep} />
+        </div>
+        <div className="mb-6 sm:hidden">
+          <JourneyWorkflow steps={workflow} currentStepId={workflowStep} compact />
+        </div>
+
+        {resumeMsg && (
+          <div className="mb-4 rounded-xl border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-800">
+            {resumeMsg}
+          </div>
+        )}
 
         <div className="mb-8">
           <div className="mb-3 flex justify-between text-xs font-medium text-slate-500">
@@ -266,12 +417,7 @@ export default function ApplyPage() {
           </div>
         </div>
 
-        <div className="mb-6 rounded-2xl border border-teal-100 bg-teal-50/50 px-5 py-4">
-          <p className="font-semibold text-neercred-navy">{tip.title}</p>
-          <p className="mt-1 text-sm text-slate-600">{tip.hint}</p>
-        </div>
-
-        <div className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-neercred sm:p-8">
+        <div className="relative rounded-3xl border border-slate-200/80 bg-white p-6 shadow-neercred sm:p-8">
           {error && (
             <div className="mb-5 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
               {error}
@@ -289,6 +435,7 @@ export default function ApplyPage() {
                 placeholder="10-digit mobile"
                 value={mobile}
                 onChange={(e) => setMobile(e.target.value.replace(/\D/g, ""))}
+                onFocus={() => setActiveField("mobile")}
                 className={`${inputClass} mt-6 text-lg`}
                 required
               />
@@ -297,6 +444,7 @@ export default function ApplyPage() {
                   type="checkbox"
                   checked={smsConsent}
                   onChange={(e) => setSmsConsent(e.target.checked)}
+                  onFocus={() => setActiveField("sms_consent")}
                   className="mt-1 accent-neercred-teal"
                 />
                 <span>I agree to receive OTP via SMS for verification (DPDP Act 2023).</span>
@@ -327,6 +475,7 @@ export default function ApplyPage() {
                 placeholder="• • • • • •"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+                onFocus={() => setActiveField("otp")}
                 className={`${inputClass} mt-6 text-center text-2xl tracking-[0.4em]`}
                 required
               />
@@ -350,26 +499,41 @@ export default function ApplyPage() {
           {step === "details" && (
             <form onSubmit={handleSubmitDetails}>
               <h2 className="text-xl font-bold text-neercred-navy">Your profile</h2>
-              <p className="mt-1 text-sm text-slate-500">Tell us a little — we&apos;ll fetch personalised offers next.</p>
+              <p className="mt-1 text-sm text-slate-500">
+                Enter PAN — name &amp; details auto-fill. Only minimal fields needed.
+              </p>
               <div className="mt-6 space-y-4">
+                <div>
+                  <input
+                    type="text"
+                    maxLength={10}
+                    placeholder="PAN number (auto-fills name)"
+                    value={form.pan}
+                    onChange={(e) => {
+                      setPanVerified(false);
+                      setForm({ ...form, pan: e.target.value.toUpperCase() });
+                    }}
+                    onFocus={() => setActiveField("pan")}
+                    onBlur={() => void handlePanBlur()}
+                    className={`${inputClass} uppercase`}
+                    required
+                  />
+                  {panLoading && <p className="mt-1 text-xs text-neercred-teal">Fetching PAN details…</p>}
+                  {panVerified && (
+                    <p className="mt-1 text-xs text-emerald-600">✓ PAN verified — details auto-filled</p>
+                  )}
+                </div>
                 <input
                   type="text"
                   placeholder="Full name (as per PAN)"
                   value={form.full_name}
                   onChange={(e) => setForm({ ...form, full_name: e.target.value })}
+                  onFocus={() => setActiveField("full_name")}
                   className={inputClass}
                   required
+                  readOnly={panVerified}
                 />
-                <input
-                  type="text"
-                  maxLength={10}
-                  placeholder="PAN number"
-                  value={form.pan}
-                  onChange={(e) => setForm({ ...form, pan: e.target.value.toUpperCase() })}
-                  className={`${inputClass} uppercase`}
-                  required
-                />
-                {needs("date_of_birth") && (
+                {(needs("date_of_birth") || panVerified) && (
                   <div>
                     <label className="text-sm font-medium text-slate-700">Date of birth</label>
                     <input
@@ -378,6 +542,7 @@ export default function ApplyPage() {
                       onChange={(e) => setForm({ ...form, date_of_birth: e.target.value })}
                       className={`${inputClass} mt-1`}
                       required
+                      readOnly={panVerified}
                     />
                   </div>
                 )}
@@ -388,7 +553,6 @@ export default function ApplyPage() {
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
                     className={inputClass}
-                    required
                   />
                 )}
                 {needs("pincode") && (
@@ -399,17 +563,13 @@ export default function ApplyPage() {
                     value={form.pincode}
                     onChange={(e) => setForm({ ...form, pincode: e.target.value.replace(/\D/g, "") })}
                     className={inputClass}
-                    required
                   />
                 )}
                 {needs("gender") && (
                   <select
                     value={form.gender}
-                    onChange={(e) =>
-                      setForm({ ...form, gender: e.target.value as typeof form.gender })
-                    }
+                    onChange={(e) => setForm({ ...form, gender: e.target.value as typeof form.gender })}
                     className={inputClass}
-                    required
                   >
                     <option value="">Select gender</option>
                     <option value="male">Male</option>
@@ -422,6 +582,7 @@ export default function ApplyPage() {
                   placeholder="Monthly income (₹)"
                   value={form.monthly_income}
                   onChange={(e) => setForm({ ...form, monthly_income: e.target.value })}
+                  onFocus={() => setActiveField("monthly_income")}
                   className={inputClass}
                   required
                   min={15000}
@@ -431,6 +592,7 @@ export default function ApplyPage() {
                   onChange={(e) =>
                     setForm({ ...form, employment_type: e.target.value as typeof form.employment_type })
                   }
+                  onFocus={() => setActiveField("employment_type")}
                   className={inputClass}
                 >
                   <option value="salaried">Salaried</option>
@@ -442,6 +604,7 @@ export default function ApplyPage() {
                   placeholder="City"
                   value={form.city}
                   onChange={(e) => setForm({ ...form, city: e.target.value })}
+                  onFocus={() => setActiveField("city")}
                   className={inputClass}
                   required
                 />
@@ -452,6 +615,7 @@ export default function ApplyPage() {
                     onChange={(e) =>
                       setForm({ ...form, loan_purpose: e.target.value as typeof form.loan_purpose })
                     }
+                    onFocus={() => setActiveField("loan_purpose")}
                     className={`${inputClass} mt-1`}
                   >
                     <option value="personal">Personal</option>
@@ -469,13 +633,17 @@ export default function ApplyPage() {
                     placeholder="0"
                     value={form.existing_emi}
                     onChange={(e) => setForm({ ...form, existing_emi: e.target.value })}
+                    onFocus={() => setActiveField("existing_emi")}
                     className={`${inputClass} mt-1`}
                     min={0}
                   />
                 </div>
               </div>
 
-              <div className="mt-6 space-y-3 rounded-2xl border border-slate-100 bg-slate-50/80 p-4 text-sm text-slate-600">
+              <div
+                className="mt-6 space-y-3 rounded-2xl border border-slate-100 bg-slate-50/80 p-4 text-sm text-slate-600"
+                onFocus={() => setActiveField("consent")}
+              >
                 <p className="flex items-center gap-2 font-semibold text-slate-800">
                   <IconShield size={16} className="text-neercred-teal" />
                   Consent
@@ -525,7 +693,7 @@ export default function ApplyPage() {
           )}
 
           {step === "offers" && (
-            <div>
+            <div onFocus={() => setActiveField("offers")}>
               {eligibility && (
                 <div className="mb-6 rounded-2xl border border-emerald-100 bg-emerald-50/80 p-4">
                   <p className="flex items-center gap-2 font-semibold text-emerald-800">
@@ -535,20 +703,15 @@ export default function ApplyPage() {
                   <p className="mt-1 text-sm text-emerald-700">
                     Up to ₹{eligibility.max_loan_amount.toLocaleString("en-IN")} · Score {eligibility.score}/100
                   </p>
-                  {eligibility.factors?.length > 0 && (
-                    <ul className="mt-2 space-y-1 text-xs text-emerald-700">
-                      {eligibility.factors.slice(0, 2).map((f) => (
-                        <li key={f}>· {f}</li>
-                      ))}
-                    </ul>
-                  )}
                 </div>
               )}
 
               <div className="flex flex-wrap items-end justify-between gap-4">
                 <div>
                   <h2 className="text-xl font-bold text-neercred-navy">Your offers</h2>
-                  <p className="text-sm text-slate-500">{offers.length} personalised options from partner lenders</p>
+                  <p className="text-sm text-slate-500">
+                    {offers.length} options — KYC &amp; disbursal on NeerCred, no repeat forms
+                  </p>
                 </div>
                 <select
                   value={sortBy}
@@ -568,7 +731,7 @@ export default function ApplyPage() {
                   onChange={(e) => setLenderConsent(e.target.checked)}
                   className="mt-1 accent-neercred-teal"
                 />
-                <span>I consent to share my application with the lender I select, for loan processing only.</span>
+                <span>I consent to share my application with the lender I select — processed inside NeerCred.</span>
               </label>
 
               <div className="mt-6 space-y-5">
@@ -584,15 +747,36 @@ export default function ApplyPage() {
               </div>
             </div>
           )}
+
+          <LoanGuideMascot
+            step={step}
+            activeField={activeField}
+            show={step !== "offers" || offers.length === 0}
+            variant="inline"
+          />
         </div>
 
         <p className="mt-6 flex items-center justify-center gap-2 text-center text-xs text-slate-400">
           <IconShield size={14} />
-          RBI LSP platform · 256-bit encryption · No hidden charges
+          RBI LSP platform · 256-bit encryption · End-to-end on NeerCred
         </p>
       </div>
 
       <Footer />
     </main>
+  );
+}
+
+export default function ApplyPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-screen items-center justify-center bg-slate-50">
+          <p className="animate-pulse text-slate-500">Loading…</p>
+        </main>
+      }
+    >
+      <ApplyPageInner />
+    </Suspense>
   );
 }

@@ -111,6 +111,103 @@ export async function fetchOffers(sessionToken: string) {
   }>;
 }
 
+export type WorkflowStep = { id: string; label: string; phase: string };
+
+export type JourneyState = {
+  authenticated: boolean;
+  next_step: string;
+  apply_step: string;
+  workflow_step: string;
+  workflow: WorkflowStep[];
+  lead: {
+    id?: number;
+    mobile: string;
+    full_name?: string | null;
+    pan?: string | null;
+    monthly_income?: number | null;
+    employment_type?: string | null;
+    city?: string | null;
+    date_of_birth?: string | null;
+    email?: string | null;
+    pincode?: string | null;
+    gender?: string | null;
+    loan_purpose?: string | null;
+    existing_emi?: number | null;
+    status?: string | null;
+    eligibility_score?: number | null;
+    max_loan_amount?: number | null;
+    preferred_partner_slug?: string | null;
+    selected_lender?: string | null;
+  } | null;
+  application: {
+    id: number;
+    application_ref: string;
+    lender_name: string;
+    status: string;
+    loan_amount: number;
+    interest_rate: number;
+    tenure_months: number;
+    emi: number;
+    aadhaar_verified: boolean;
+    bank_verified: boolean;
+    esign_completed: boolean;
+    kyc_step: string;
+  } | null;
+  can_resume: boolean;
+};
+
+export async function getJourney(sessionToken?: string): Promise<JourneyState> {
+  const headers: Record<string, string> = {};
+  if (sessionToken) headers.Authorization = `Bearer ${sessionToken}`;
+  const res = await fetch(`${API_BASE}/api/leads/journey`, { headers, cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to load journey");
+  return res.json();
+}
+
+export async function panLookup(sessionToken: string, pan: string) {
+  const res = await fetch(`${API_BASE}/api/leads/pan-lookup`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ session_token: sessionToken, pan }),
+  });
+  if (!res.ok) throw new Error((await res.json()).detail || "PAN lookup failed");
+  return res.json() as Promise<{
+    pan: string;
+    full_name: string;
+    date_of_birth: string;
+    gender: "male" | "female" | "other";
+    verified: boolean;
+  }>;
+}
+
+export async function setPartnerPreference(sessionToken: string, partnerSlug: string) {
+  const res = await fetch(`${API_BASE}/api/leads/partner-preference`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ session_token: sessionToken, partner_slug: partnerSlug }),
+  });
+  if (!res.ok) throw new Error((await res.json()).detail || "Failed to save partner");
+  return res.json();
+}
+
+export async function getKycStatus(sessionToken: string, applicationId: number) {
+  const res = await fetch(
+    `${API_BASE}/api/kyc/status/${applicationId}?session_token=${encodeURIComponent(sessionToken)}`,
+    { cache: "no-store" },
+  );
+  if (!res.ok) throw new Error((await res.json()).detail || "Failed to load KYC status");
+  return res.json() as Promise<{
+    application_ref: string;
+    lender_name: string;
+    status: string;
+    kyc_step: string;
+    aadhaar_verified: boolean;
+    bank_verified: boolean;
+    esign_completed: boolean;
+    address?: string;
+  }>;
+}
+
 export async function selectOffer(data: {
   session_token: string;
   offer_id: string;

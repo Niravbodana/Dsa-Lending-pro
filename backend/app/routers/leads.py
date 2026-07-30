@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -8,21 +8,30 @@ from app.schemas import (
     EligibilityRequest,
     EligibilityResponse,
     EligibilityResult,
+    JourneyApplicationInfo,
+    JourneyLeadInfo,
+    JourneyResponse,
     LeadDetailsRequest,
     LeadResponse,
     OffersResponse,
+    PanLookupRequest,
+    PanLookupResponse,
+    PartnerPreferenceRequest,
     RequiredFieldInfo,
     RequiredFieldsResponse,
     SelectOfferRequest,
     SelectOfferResponse,
+    WorkflowStepInfo,
 )
 from app.services.partner_fields import FIELD_CATALOG
 from app.services.partner_store import get_union_required_fields
 from app.services.application import add_status_history, generate_application_ref, send_notification
-from app.services.consent import record_consent, record_consent_bundle, log_consent_event
+from app.services.consent import client_meta, record_consent, record_consent_bundle, log_consent_event
 from app.services.eligibility import EligibilityInput, check_eligibility
+from app.services.journey import build_journey
 from app.services.offer_engine import fetch_partner_offers_sync
 from app.services.otp import get_lead_by_mobile, get_mobile_from_token
+from app.services.pan_lookup import lookup_pan
 
 router = APIRouter(prefix="/leads", tags=["leads"])
 
@@ -261,3 +270,49 @@ def get_required_fields(db: Session = Depends(get_db)):
 
     count = db.query(LendingPartner).filter(LendingPartner.enabled.is_(True)).count()
     return RequiredFieldsResponse(fields=fields, partners_count=count)
+
+
+@router.get("/journey", response_model=JourneyResponse)
+def get_journey(
+    authorization: str | None = Header(None),
+    session_token: str | None = Query(None),
+    db: Session = Depends(get_db),
+):
+    token = None
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.removeprefix("Bearer ").strip() or None
+    elif session_token:
+        token = session_token
+    mobile = get_mobile_from_token(db, token) if token else None
+    data = build_journey(db, mobile)
+    return JourneyResponse(
+        authenticated=data["authenticated"],
+        next_step=data["next_step"],
+        apply_step=data["apply_step"],
+        workflow_step=data["workflow_step"],
+        workflow=[WorkflowStepInfo(**s) for s in data["workflow"]],
+        lead=JourneyLeadInfo(**data["lead"]) if data["lead"] else None,
+        application=JourneyApplicationInfo(**data["application"]) if data["application"] else None,
+        can_resume=data["can_resume"],
+    )
+
+
+@router.post("/pan-lookup", response_model=PanLookupResponse)
+def pan_lookup(payload: PanLookupRequest, db: Session = Depends(get_db)):
+    _auth(db, payload.session_token)
+    try:
+        result = lookup_pan(payload.pan)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    return PanLookupResponse(**result)
+
+
+@router.post("/partner-preference")
+def set_partner_preference(payload: PartnerPreferenceRequest, db: Session = Depends(get_db)):
+    mobile = _auth(db, payload.session_token)
+    lead = get_lead_by_mobile(db, mobile)
+    if not lead:
+        raise HTTPException(status_code=404, detail="Lead not found")
+    lead.preferred_partner_slug = payload.partner_slug.strip().lower()
+    db.commit()
+    return {"message": "Partner preference saved", "partner_slug": lead.preferred_partner_slug}

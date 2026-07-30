@@ -20,6 +20,7 @@ from app.services.application import (
 )
 from app.services.consent import client_meta, log_consent_event, record_consent
 from app.services.otp import generate_otp, get_lead_by_mobile, get_mobile_from_token
+from app.services.partner_submit import submit_to_partner
 from app.services.rate_limit import rate_limit
 
 router = APIRouter(prefix="/kyc", tags=["kyc"])
@@ -163,6 +164,11 @@ def submit_application(
     if not app.esign_completed:
         raise HTTPException(status_code=400, detail="Complete all KYC steps first")
 
+    lead = get_lead_by_mobile(db, mobile)
+    partner_ref = submit_to_partner(db, lead, app) if lead else None
+    if partner_ref:
+        app.partner_ref_id = partner_ref
+
     update_application_status(
         db, app, "submitted", f"Application forwarded to {app.lender_name}", "platform"
     )
@@ -180,3 +186,35 @@ def submit_application(
         step="submitted",
         completed=True,
     )
+
+
+@router.get("/status/{application_id}")
+def kyc_status(
+    application_id: int,
+    session_token: str,
+    db: Session = Depends(get_db),
+):
+    """Resume KYC — returns current step and verified flags."""
+    _, app = _get_app(db, session_token, application_id)
+    if app.status in ("submitted", "under_review", "approved", "disbursed", "rejected"):
+        step = "done"
+    elif not app.aadhaar_verified:
+        step = "aadhaar"
+    elif not app.bank_verified:
+        step = "bank"
+    elif not app.esign_completed:
+        step = "esign"
+    else:
+        step = "submit"
+    return {
+        "application_id": app.id,
+        "application_ref": app.application_ref,
+        "lender_name": app.lender_name,
+        "status": app.status,
+        "kyc_step": step,
+        "aadhaar_verified": app.aadhaar_verified,
+        "bank_verified": app.bank_verified,
+        "esign_completed": app.esign_completed,
+        "aadhaar_masked": app.aadhaar_masked,
+        "address": app.address,
+    }
