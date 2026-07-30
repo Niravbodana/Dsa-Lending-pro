@@ -28,9 +28,13 @@ BRAND = {
     "navy": "#0B1220",
     "teal": "#0F766E",
     "mint": "#14B8A6",
+    "cyan": "#0891B2",
     "gold": "#D4A017",
     "white": "#F8FAFC",
-    "slate": "#94A3B8",
+    "slate": "#64748B",
+    "sky": "#E0F2FE",
+    "ice": "#F0F9FF",
+    "glass": "#F8FCFF",
 }
 
 SCENES = [
@@ -64,7 +68,7 @@ SCENES = [
     {
         "id": "offers",
         "step": "3",
-        "headline": "15+ Lenders",
+        "headline": "50+ Partners",
         "sub": "Best rate · Best EMI",
         "vo": "Offers compare karo... best EMI yahin.",
         "accent": "gold",
@@ -123,24 +127,45 @@ def load_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont | ImageFo
     return ImageFont.load_default()
 
 
-def draw_gradient(img: Image.Image, top: str, bottom: str) -> None:
+def draw_site_gradient(img: Image.Image) -> None:
+    """Website-matching light sky gradient."""
+    stops = [
+        (0.0, "#DBEAFE"),
+        (0.22, "#E0F2FE"),
+        (0.48, "#F0F9FF"),
+        (0.72, "#ECFEFF"),
+        (1.0, "#F8FAFC"),
+    ]
     draw = ImageDraw.Draw(img)
-    t, b = hex_to_rgb(top), hex_to_rgb(bottom)
     for y in range(H):
-        ratio = y / H
-        c = tuple(int(t[i] + (b[i] - t[i]) * ratio) for i in range(3))
-        draw.line([(0, y), (W, y)], fill=c)
+        ratio = y / (H - 1)
+        for i in range(len(stops) - 1):
+            r0, c0 = stops[i]
+            r1, c1 = stops[i + 1]
+            if r0 <= ratio <= r1 or (i == len(stops) - 2 and ratio >= r1):
+                span = r1 - r0 or 1
+                t = (ratio - r0) / span
+                c0r, c1r = hex_to_rgb(c0), hex_to_rgb(c1)
+                c = tuple(int(c0r[j] + (c1r[j] - c0r[j]) * t) for j in range(3))
+                draw.line([(0, y), (W, y)], fill=c)
+                break
 
 
 def add_premium_orbs(img: Image.Image, accent: str) -> Image.Image:
     overlay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     draw = ImageDraw.Draw(overlay)
     rgb = hex_to_rgb(BRAND[accent])
-    orbs = [(160, 300, 340, 40), (920, 700, 380, 35), (540, 1300, 420, 28), (300, 1600, 260, 22)]
-    for cx, cy, r, alpha in orbs:
+    cyan = hex_to_rgb(BRAND["cyan"])
+    orbs = [
+        (160, 300, 340, 18, rgb),
+        (920, 700, 380, 16, cyan),
+        (540, 1300, 420, 14, rgb),
+        (300, 1600, 260, 12, cyan),
+    ]
+    for cx, cy, r, alpha, color in orbs:
         for i in range(r, 0, -10):
             a = int(alpha * (1 - i / r))
-            draw.ellipse([cx - i, cy - i, cx + i, cy + i], fill=(*rgb, a))
+            draw.ellipse([cx - i, cy - i, cx + i, cy + i], fill=(*color, a))
     return Image.alpha_composite(img.convert("RGBA"), overlay).convert("RGB")
 
 
@@ -181,16 +206,17 @@ def wrap_text_lines(text: str, font: ImageFont.ImageFont, max_w: int) -> list[st
 
 
 def draw_footer_bar(draw: ImageDraw.ImageDraw, accent: str) -> None:
-    """Footer text fully inside premium border — auto-fit font."""
+    """Glass footer bar — website light theme."""
     box = (60, 1755, W - 60, 1860)
     teal = hex_to_rgb(BRAND["teal"])
     gold = hex_to_rgb(BRAND["gold"])
+    navy = hex_to_rgb(BRAND["navy"])
     inner_w = box[2] - box[0] - 48
 
-    draw.rounded_rectangle(box, radius=30, fill="#0A1628", outline=teal, width=2)
+    draw.rounded_rectangle(box, radius=30, fill="#FFFFFF", outline=teal, width=2)
     draw.rounded_rectangle([box[0] + 6, box[1] + 6, box[2] - 6, box[3] - 6], radius=26, outline=gold, width=1)
 
-    bar = "Rates from 10.99%  ·  100% Digital  ·  Compare 15+ Lenders"
+    bar = "Rates from 10.99%  ·  100% Digital  ·  50+ Partners"
     font = fit_font_size(bar, inner_w, 24, 17, bold=True)
     lines = wrap_text_lines(bar, font, inner_w)
     if len(lines) > 2:
@@ -202,7 +228,7 @@ def draw_footer_bar(draw: ImageDraw.ImageDraw, accent: str) -> None:
     start_y = box[1] + (box[3] - box[1] - total_h) // 2 + 2
     for i, line in enumerate(lines):
         lw = draw.textlength(line, font=font)
-        draw.text((box[0] + (box[2] - box[0] - lw) // 2, start_y + i * line_h), line, fill=hex_to_rgb(BRAND["white"]), font=font)
+        draw.text((box[0] + (box[2] - box[0] - lw) // 2, start_y + i * line_h), line, fill=navy, font=font)
 
 
 def draw_premium_frame(
@@ -232,7 +258,7 @@ def draw_premium_frame(
     # Main borders drawn directly
     draw.rounded_rectangle([x1, y1, x2, y2], radius=radius, outline=teal_rgb, width=5)
     draw.rounded_rectangle([x1 + 6, y1 + 6, x2 - 6, y2 - 6], radius=radius - 5, outline=gold_rgb, width=2)
-    draw.rounded_rectangle([x1 + 12, y1 + 12, x2 - 12, y2 - 12], radius=radius - 10, outline="#2A3A4A", width=1)
+    draw.rounded_rectangle([x1 + 12, y1 + 12, x2 - 12, y2 - 12], radius=radius - 10, outline="#BAE6FD", width=1)
 
     # Corner L-brackets (premium fintech detail)
     cl = 28
@@ -264,7 +290,7 @@ def paste_photo_card(
     if not no_border:
         glow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
         gdraw = ImageDraw.Draw(glow)
-        for gp, alpha in [(36, 16), (20, 26), (10, 38)]:
+        for gp, alpha in [(36, 10), (20, 16), (10, 22)]:
             gdraw.rounded_rectangle(
                 [x1 - gp, y1 - gp, x2 + gp, y2 + gp],
                 radius=56 + gp, fill=(*accent_rgb, alpha),
@@ -337,18 +363,18 @@ def paste_transparent_logo(
     py = y
     base_rgba = base.convert("RGBA")
 
-    # Subtle gold ambient glow (premium, not a box)
+    # Soft teal ambient glow on light background
     glow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     gdraw = ImageDraw.Draw(glow)
     cx, cy = W // 2, py + nh // 2
     for r in range(140, 0, -5):
-        a = int(22 * (1 - r / 140))
-        gdraw.ellipse([cx - r, cy - r // 2, cx + r, cy + r // 2], fill=(*hex_to_rgb(BRAND["gold"]), a))
+        a = int(16 * (1 - r / 140))
+        gdraw.ellipse([cx - r, cy - r // 2, cx + r, cy + r // 2], fill=(*hex_to_rgb(BRAND["teal"]), a))
     base_rgba = Image.alpha_composite(base_rgba, glow)
 
-    # Soft drop shadow
+    # Soft drop shadow for light theme
     sa = logo.split()[3]
-    shadow_alpha = sa.point(lambda p: int(p * 0.35))
+    shadow_alpha = sa.point(lambda p: int(p * 0.18))
     shadow_img = Image.new("RGBA", (nw, nh), (0, 0, 0, 255))
     shadow_img.putalpha(shadow_alpha)
     shadow_img = shadow_img.filter(ImageFilter.GaussianBlur(6))
@@ -404,18 +430,19 @@ def render_step5_fullbleed(
 
 
 def render_premium_close(img: Image.Image, logo_path: Path, accent: str) -> Image.Image:
-    """Last scene — huge transparent logo, premium glow, no box."""
+    """Last scene — huge logo on light website gradient."""
     gold = hex_to_rgb(BRAND["gold"])
     teal = hex_to_rgb(BRAND["teal"])
+    navy = hex_to_rgb(BRAND["navy"])
     base = img.convert("RGBA")
 
     spot = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     sd = ImageDraw.Draw(spot)
     for r in range(760, 0, -6):
-        a = int(55 * max(0, 1 - r / 760))
-        sd.ellipse([W // 2 - r, H // 2 - 120 - r // 2, W // 2 + r, H // 2 - 120 + r // 2], fill=(*gold, a // 3))
+        a = int(28 * max(0, 1 - r / 760))
+        sd.ellipse([W // 2 - r, H // 2 - 120 - r // 2, W // 2 + r, H // 2 - 120 + r // 2], fill=(*gold, a // 2))
     for r in range(600, 0, -6):
-        a = int(40 * max(0, 1 - r / 600))
+        a = int(22 * max(0, 1 - r / 600))
         sd.ellipse([W // 2 - r, H // 2 - 100 - r // 2, W // 2 + r, H // 2 - 100 + r // 2], fill=(*teal, a // 2))
     base = Image.alpha_composite(base, spot)
 
@@ -431,7 +458,7 @@ def render_premium_close(img: Image.Image, logo_path: Path, accent: str) -> Imag
 
     px, py = (W - nw) // 2, 520
     sa = logo.split()[3]
-    shadow_alpha = sa.point(lambda p: int(p * 0.4))
+    shadow_alpha = sa.point(lambda p: int(p * 0.15))
     shadow_img = Image.new("RGBA", (nw, nh), (0, 0, 0, 255))
     shadow_img.putalpha(shadow_alpha)
     shadow_img = shadow_img.filter(ImageFilter.GaussianBlur(10))
@@ -443,9 +470,9 @@ def render_premium_close(img: Image.Image, logo_path: Path, accent: str) -> Imag
     rbi_font = load_font(34, bold=True)
     rw = draw.textlength(rbi, font=rbi_font)
     ry = py + nh + 56
-    draw.line([120, ry + 20, W // 2 - rw // 2 - 18, ry + 20], fill=(*gold, 180), width=2)
-    draw.line([W // 2 + rw // 2 + 18, ry + 20, W - 120, ry + 20], fill=(*gold, 180), width=2)
-    draw.text(((W - rw) / 2, ry), rbi, fill=gold, font=rbi_font)
+    draw.line([120, ry + 20, W // 2 - rw // 2 - 18, ry + 20], fill=(*teal, 160), width=2)
+    draw.line([W // 2 + rw // 2 + 18, ry + 20, W - 120, ry + 20], fill=(*teal, 160), width=2)
+    draw.text(((W - rw) / 2, ry), rbi, fill=navy, font=rbi_font)
 
     return base.convert("RGB")
 
@@ -457,17 +484,22 @@ def render_scene(
     center_logo_path: Path | None = None,
 ) -> Image.Image:
     accent = scene["accent"]
-    img = Image.new("RGB", (W, H), BRAND["navy"])
-    draw_gradient(img, "#070D18", "#0F172A")
+    img = Image.new("RGB", (W, H), BRAND["ice"])
+    draw_site_gradient(img)
     img = add_premium_orbs(img, accent)
     draw = ImageDraw.Draw(img)
 
-    # Top step pill
+    # Top step pill with soft shadow
     if scene.get("step"):
         pill_font = load_font(34, bold=True)
         label = f"STEP {scene['step']}"
         tw = draw.textlength(label, font=pill_font)
         px, py = (W - tw) / 2 - 40, 100
+        shadow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        sdraw = ImageDraw.Draw(shadow)
+        sdraw.rounded_rectangle([px + 2, py + 4, px + tw + 82, py + 62], radius=29, fill=(15, 118, 110, 40))
+        img = Image.alpha_composite(img.convert("RGBA"), shadow).convert("RGB")
+        draw = ImageDraw.Draw(img)
         draw.rounded_rectangle([px, py, px + tw + 80, py + 58], radius=29, fill=hex_to_rgb(BRAND[accent]))
         draw.text((px + 40, py + 10), label, fill=hex_to_rgb(BRAND["white"]), font=pill_font)
 
@@ -614,7 +646,7 @@ def ensure_logo() -> tuple[Path, Path]:
     <path d="M48 9.5 L49.8 13.8 L54.4 13.8 L50.8 16.6 L52.2 21 L48 18.4 L43.8 21 L45.2 16.6 L41.6 13.8 L46.2 13.8 Z" fill="url(#c-gold)"/>
   </g>
   <text x="108" y="58" font-family="Poppins, system-ui, sans-serif" font-size="48" font-weight="700" letter-spacing="-0.5">
-    <tspan fill="#F8FAFC">Neer</tspan><tspan fill="url(#c-cred)">Cred</tspan>
+    <tspan fill="#0B1220">Neer</tspan><tspan fill="url(#c-cred)">Cred</tspan>
   </text>
 </svg>"""
 
@@ -645,9 +677,9 @@ def ensure_logo() -> tuple[Path, Path]:
     <path d="M48 9.5 L49.8 13.8 L54.4 13.8 L50.8 16.6 L52.2 21 L48 18.4 L43.8 21 L45.2 16.6 L41.6 13.8 L46.2 13.8 Z" fill="url(#x-gold)"/>
   </g>
   <text x="128" y="72" font-family="Poppins, system-ui, sans-serif" font-size="62" font-weight="700" letter-spacing="-0.5">
-    <tspan fill="#F8FAFC">Neer</tspan><tspan fill="url(#x-cred)">Cred</tspan>
+    <tspan fill="#0B1220">Neer</tspan><tspan fill="url(#x-cred)">Cred</tspan>
   </text>
-  <text x="128" y="118" font-family="Poppins, system-ui, sans-serif" font-size="18" font-weight="600" fill="#94A3B8" letter-spacing="3.5">DREAM BIG. BORROW SMART.</text>
+  <text x="128" y="118" font-family="Poppins, system-ui, sans-serif" font-size="18" font-weight="600" fill="#64748B" letter-spacing="3.5">DREAM BIG. BORROW SMART.</text>
 </svg>"""
 
     for path, svg, vp in [

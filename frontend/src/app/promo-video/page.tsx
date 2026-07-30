@@ -29,10 +29,10 @@ export default function PromoVideoPage() {
   }, []);
 
   return (
-    <div className="min-h-dvh bg-[#070D18] text-white">
+    <div className="min-h-dvh bg-gradient-to-b from-[#DBEAFE] via-[#F0F9FF] to-[#F8FAFC] text-[#0B1220]">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-24 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-teal-500/10 blur-3xl" />
-        <div className="absolute bottom-32 right-0 h-64 w-64 rounded-full bg-amber-400/10 blur-3xl" />
+        <div className="absolute -top-24 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-teal-400/15 blur-3xl" />
+        <div className="absolute bottom-32 right-0 h-64 w-64 rounded-full bg-amber-300/20 blur-3xl" />
       </div>
 
       <div className="relative mx-auto flex min-h-dvh max-w-md flex-col px-5 pb-8 pt-6">
@@ -40,17 +40,17 @@ export default function PromoVideoPage() {
           <Link href="/" className="flex items-center gap-2">
             <Image src="/neercred-logo-header.svg" alt={BRAND.appName} width={148} height={42} priority />
           </Link>
-          <span className="rounded-full border border-teal-500/30 bg-teal-500/10 px-3 py-1 text-xs font-semibold text-teal-300">
-            30 sec promo
+          <span className="rounded-full border border-teal-600/20 bg-white/70 px-3 py-1 text-xs font-semibold text-teal-700 shadow-sm">
+            30 sec · 50+ Partners
           </span>
         </div>
 
         <div className="mb-4 text-center">
           <h1 className="text-2xl font-bold tracking-tight">NeerCred Promo Video</h1>
-          <p className="mt-2 text-sm text-slate-400">Full HD · 9:16 · Hindi voice · Piano BGM</p>
+          <p className="mt-2 text-sm text-slate-600">Full HD · 9:16 · Hindi voice · Light premium theme</p>
         </div>
 
-        <div className="overflow-hidden rounded-3xl border border-teal-500/30 bg-black shadow-[0_0_60px_rgba(20,184,166,0.12)]">
+        <div className="overflow-hidden rounded-3xl border border-teal-600/25 bg-white shadow-[0_8px_32px_-12px_rgba(14,116,144,0.18)]">
           <video
             ref={videoRef}
             className="aspect-[9/16] w-full bg-black object-cover"
@@ -79,9 +79,9 @@ export default function PromoVideoPage() {
           Direct Save (Android)
         </a>
 
-        <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
-          <p className="font-semibold text-white">iPhone par save kaise karein?</p>
-          <p className="mt-2 leading-relaxed text-slate-400">
+        <div className="mt-5 rounded-2xl border border-slate-200 bg-white/80 p-4 text-sm text-slate-600 shadow-sm">
+          <p className="font-semibold text-[#0B1220]">iPhone par save kaise karein?</p>
+          <p className="mt-2 leading-relaxed">
             Video play karo, phir share icon dabao ya video par long-press karke &quot;Save Video&quot; choose karo.
           </p>
         </div>
