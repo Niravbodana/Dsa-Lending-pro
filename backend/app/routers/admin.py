@@ -71,7 +71,7 @@ def verify_admin(
 def admin_login(payload: AdminLoginRequest, request: Request, db: Session = Depends(get_db)):
     rate_limit(request, key="admin-login", max_hits=10, window_seconds=900)
 
-    if payload.password != settings.admin_password:
+    if payload.password.strip() != settings.admin_password:
         raise HTTPException(status_code=401, detail="Invalid admin password")
 
     token = secrets.token_urlsafe(32)

@@ -104,8 +104,8 @@ export default function AdminPage() {
       const res = await adminLogin(password);
       localStorage.setItem("admin_token", res.token);
       setToken(res.token);
-    } catch {
-      setError("Galat password. Dobara try karein.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Galat password. Dobara try karein.");
     }
   }
 
@@ -161,9 +161,13 @@ export default function AdminPage() {
           >
             Sign in to console →
           </button>
-          <Link href="/" className="mt-5 block text-center text-sm text-slate-500 transition hover:text-teal-400">
+          <Link href="/" className="mt-4 block text-center text-sm text-slate-500 transition hover:text-teal-400">
             ← Back to customer site
           </Link>
+          <p className="mt-3 text-center text-xs text-slate-500">
+            Dev password: <code className="rounded bg-slate-800 px-1.5 py-0.5 font-mono text-teal-400">admin123</code>
+            {" "}(change via <code className="font-mono">ADMIN_PASSWORD</code> in backend/.env)
+          </p>
         </form>
       </div>
     );

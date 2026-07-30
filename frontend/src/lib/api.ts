@@ -1,4 +1,6 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+import { getApiBase } from "@/lib/api-base";
+
+const API_BASE = getApiBase();
 
 function sessionHeaders(token: string) {
   return { Authorization: `Bearer ${token}` };
@@ -157,9 +159,31 @@ export type JourneyState = {
     kyc_step: string;
   } | null;
   can_resume: boolean;
+  /** Present when session token resolves to a verified mobile */
+  mobile?: string | null;
 };
 
+function withJourneyMobile(journey: JourneyState, mobile: string): JourneyState {
+  return {
+    ...journey,
+    authenticated: true,
+    mobile,
+    lead: journey.lead
+      ? { ...journey.lead, mobile: journey.lead.mobile || mobile }
+      : { mobile },
+  };
+}
+
 export async function getJourney(sessionToken?: string): Promise<JourneyState> {
+  if (sessionToken) {
+    try {
+      const me = await getAuthMe(sessionToken);
+      return withJourneyMobile(me.journey, me.mobile);
+    } catch {
+      // Expired or invalid token — fall through to anonymous journey
+    }
+  }
+
   const headers: Record<string, string> = {};
   if (sessionToken) headers.Authorization = `Bearer ${sessionToken}`;
   const res = await fetch(`${API_BASE}/api/leads/journey`, { headers, cache: "no-store" });
@@ -498,12 +522,24 @@ function adminHeaders(token: string) {
 }
 
 export async function adminLogin(password: string) {
-  const res = await fetch(`${API_BASE}/api/admin/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ password }),
-  });
-  if (!res.ok) throw new Error("Invalid password");
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}/api/admin/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: password.trim() }),
+    });
+  } catch {
+    throw new Error(
+      "Cannot reach API server. Start backend: cd backend && uvicorn app.main:app --reload --port 8000",
+    );
+  }
+  if (!res.ok) {
+    const body = (await res.json().catch(() => ({}))) as { detail?: string };
+    if (res.status === 429) throw new Error(body.detail || "Too many login attempts. Wait a few minutes.");
+    if (res.status === 401) throw new Error(body.detail || "Invalid admin password");
+    throw new Error(body.detail || `Login failed (${res.status})`);
+  }
   return res.json() as Promise<{ token: string }>;
 }
 

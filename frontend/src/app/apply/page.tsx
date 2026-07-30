@@ -32,6 +32,12 @@ import {
   type WorkflowStep,
 } from "@/lib/api";
 import { CONSENT_VERSIONS } from "@/lib/consent";
+import {
+  clearDraftMobile,
+  clearStoredSessionToken,
+  getDraftMobile,
+  setDraftMobile,
+} from "@/lib/customer-session";
 
 type Step = "mobile" | "otp" | "details" | "offers";
 type SortBy = "rate" | "amount" | "emi";
@@ -276,7 +282,8 @@ function ApplyPageInner() {
 
     if (journey.lead) {
       const l = journey.lead;
-      if (l.mobile) setMobile(l.mobile);
+      const resolvedMobile = journey.mobile ?? l.mobile;
+      if (resolvedMobile) setMobile(resolvedMobile);
       setForm((f) => ({
         ...f,
         full_name: l.full_name || f.full_name,
@@ -346,6 +353,9 @@ function ApplyPageInner() {
   }, []);
 
   useEffect(() => {
+    const draft = getDraftMobile();
+    if (draft) setMobile(draft);
+
     const token = localStorage.getItem("session_token") || "";
     if (token) setSessionToken(token);
 
@@ -353,16 +363,19 @@ function ApplyPageInner() {
       try {
         const journey = await getJourney(token || undefined);
         if (token && journey.authenticated) {
+          clearDraftMobile();
           await hydrateFromJourney(journey, token);
           if (partnerSlug && token) {
             await setPartnerPreference(token, partnerSlug).catch(() => {});
             setPreferredPartner(partnerSlug);
           }
+        } else if (token && !journey.authenticated) {
+          clearStoredSessionToken();
         } else if (partnerSlug) {
           setPreferredPartner(partnerSlug);
         }
       } catch {
-        /* fresh start */
+        if (token) clearStoredSessionToken();
       } finally {
         setBooting(false);
       }
@@ -443,6 +456,7 @@ function ApplyPageInner() {
     setLoading(true);
     try {
       const res = await sendOtp(mobile, true);
+      setDraftMobile(mobile);
       setDevOtp(res.dev_otp || null);
       setStep("otp");
       setWorkflowStep("otp");
@@ -461,6 +475,7 @@ function ApplyPageInner() {
       const res = await verifyOtp(mobile, otp);
       setSessionToken(res.session_token);
       localStorage.setItem("session_token", res.session_token);
+      clearDraftMobile();
       window.dispatchEvent(new Event("neercred:session"));
       if (preferredPartner) {
         await setPartnerPreference(res.session_token, preferredPartner).catch(() => {});

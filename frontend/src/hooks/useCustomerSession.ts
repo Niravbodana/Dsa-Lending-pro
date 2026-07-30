@@ -45,7 +45,7 @@ export function useCustomerSession() {
   return {
     loading,
     isAuthenticated: Boolean(journey?.authenticated),
-    mobile: journey?.lead?.mobile ?? null,
+    mobile: journey?.mobile ?? journey?.lead?.mobile ?? null,
     journey,
     refresh,
     logout,
