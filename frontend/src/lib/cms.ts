@@ -158,6 +158,7 @@ export type SiteConfig = {
 };
 
 import { getApiBase } from "@/lib/api-base";
+import { resolveCmsImageUrl } from "@/lib/resolve-image";
 
 const API_BASE = getApiBase();
 
@@ -464,7 +465,7 @@ export function mergeConfigFromApi(raw: Partial<SiteConfig>): SiteConfig {
 }
 
 function mergeConfig(raw: Partial<SiteConfig>): SiteConfig {
-  return {
+  const merged = {
     ...FALLBACK_CONFIG,
     ...raw,
     hero: { ...FALLBACK_CONFIG.hero, ...raw?.hero },
@@ -532,6 +533,68 @@ function mergeConfig(raw: Partial<SiteConfig>): SiteConfig {
     sections: { ...FALLBACK_CONFIG.sections, ...raw?.sections },
     element_styles: { ...FALLBACK_CONFIG.element_styles, ...raw?.element_styles },
     custom_blocks: raw?.custom_blocks?.length ? raw.custom_blocks : FALLBACK_CONFIG.custom_blocks,
+  };
+
+  return resolveConfigImages(merged);
+}
+
+function resolveConfigImages(config: SiteConfig): SiteConfig {
+  return {
+    ...config,
+    hero: {
+      ...config.hero,
+      image_url: resolveCmsImageUrl(config.hero.image_url),
+    },
+    theme: {
+      ...config.theme,
+      hero_background: config.theme.hero_background
+        ? resolveCmsImageUrl(config.theme.hero_background)
+        : config.theme.hero_background,
+    },
+    dream_section: {
+      ...config.dream_section,
+      cards: config.dream_section.cards.map((card) => ({
+        ...card,
+        image: resolveCmsImageUrl(card.image),
+      })),
+    },
+    testimonials_section: {
+      ...config.testimonials_section,
+      items: config.testimonials_section.items.map((item) => ({
+        ...item,
+        image: resolveCmsImageUrl(item.image),
+      })),
+    },
+    cta_band: {
+      ...config.cta_band,
+      image: resolveCmsImageUrl(config.cta_band.image),
+    },
+    loan_products: {
+      ...config.loan_products,
+      cards: config.loan_products.cards.map((card) => ({
+        ...card,
+        image: resolveCmsImageUrl(card.image),
+      })),
+    },
+    trust_gallery: {
+      ...config.trust_gallery,
+      images: config.trust_gallery.images.map(resolveCmsImageUrl),
+    },
+    lifestyle_showcase: {
+      ...config.lifestyle_showcase,
+      blocks: config.lifestyle_showcase.blocks.map((block) => ({
+        ...block,
+        image: resolveCmsImageUrl(block.image),
+      })),
+    },
+    app_download: {
+      ...config.app_download,
+      image: resolveCmsImageUrl(config.app_download.image),
+    },
+    refer_banner: {
+      ...config.refer_banner,
+      image: resolveCmsImageUrl(config.refer_banner.image),
+    },
   };
 }
 

@@ -5,6 +5,9 @@ from urllib.parse import urlparse
 ALLOWED_IMAGE_HOSTS = frozenset(
     {
         "images.unsplash.com",
+        "plus.unsplash.com",
+        "images.pexels.com",
+        "cdn.pixabay.com",
     }
 )
 
