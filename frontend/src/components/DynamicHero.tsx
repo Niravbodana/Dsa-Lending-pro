@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { HeroRoiCard } from "@/components/HeroPhotoCarousel";
 import { IconBolt, IconCheckCircle, IconClock, IconShield } from "@/components/icons";
 import { HERO_IMAGE, HERO_WEDDING_SRC, REFERENCE_HERO } from "@/lib/hero-images";
@@ -29,6 +31,15 @@ function isRemote(src: string): boolean {
 export function DynamicHero({ config, heroOverlay }: Props) {
   const h = config.hero;
   const ctx = useVisualEditor();
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  });
+  const imageY = useTransform(scrollYProgress, [0, 1], ["0%", "22%"]);
+  const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "8%"]);
+  const imageScale = useTransform(scrollYProgress, [0, 1], [1.04, 1.12]);
+
   const src = heroSrc(h.image_url || config.theme?.hero_background);
   const remote = isRemote(src);
 
@@ -49,27 +60,30 @@ export function DynamicHero({ config, heroOverlay }: Props) {
 
   return (
     <section
+      ref={sectionRef}
       className="relative min-h-[540px] overflow-hidden lg:min-h-[600px]"
       onClick={() => ctx?.active && ctx.select("hero.image_url")}
     >
-      {remote ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={src}
-          alt={HERO_IMAGE.alt}
-          className="hero-ken-burns absolute inset-0 h-full w-full object-cover object-[72%_28%] sm:object-[center_30%]"
-        />
-      ) : (
-        <Image
-          src={src}
-          alt={HERO_IMAGE.alt}
-          fill
-          priority
-          quality={95}
-          sizes="100vw"
-          className="hero-ken-burns object-cover object-[72%_28%] sm:object-[center_30%]"
-        />
-      )}
+      <motion.div className="absolute inset-0 will-change-transform" style={{ y: imageY, scale: imageScale }}>
+        {remote ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={src}
+            alt={HERO_IMAGE.alt}
+            className="hero-ken-burns h-full w-full object-cover object-[72%_28%] sm:object-[center_30%]"
+          />
+        ) : (
+          <Image
+            src={src}
+            alt={HERO_IMAGE.alt}
+            fill
+            priority
+            quality={95}
+            sizes="100vw"
+            className="hero-ken-burns object-cover object-[72%_28%] sm:object-[center_30%]"
+          />
+        )}
+      </motion.div>
       <div className="hero-shimmer pointer-events-none absolute inset-0" />
       <div
         className="absolute inset-0"
@@ -81,7 +95,10 @@ export function DynamicHero({ config, heroOverlay }: Props) {
       />
       <div className="absolute inset-0 bg-gradient-to-t from-white/20 via-transparent to-transparent lg:hidden" />
 
-      <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-8 px-4 py-10 lg:grid-cols-[1fr_0.85fr] lg:gap-10 lg:py-16">
+      <motion.div
+        className="relative z-10 mx-auto grid max-w-7xl items-center gap-8 px-4 py-10 lg:grid-cols-[1fr_0.85fr] lg:gap-10 lg:py-16"
+        style={{ y: contentY }}
+      >
         <div>
           <div
             className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-[11px] font-bold uppercase tracking-wide"
@@ -174,7 +191,7 @@ export function DynamicHero({ config, heroOverlay }: Props) {
             />
           </div>
         </div>
-      </div>
+      </motion.div>
 
       <div className="relative z-10 flex justify-end px-4 pb-8 lg:hidden">
         <HeroRoiCard

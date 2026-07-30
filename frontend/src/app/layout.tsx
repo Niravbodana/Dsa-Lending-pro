@@ -3,6 +3,7 @@ import { Poppins, Geist } from "next/font/google";
 import "./globals.css";
 import { BRAND } from "@/lib/brand";
 import { CookieConsent } from "@/components/CookieConsent";
+import { PremiumProviders } from "@/components/PremiumProviders";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,8 +33,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${poppins.variable} antialiased`}>
-        {children}
+      <body className={`${geistSans.variable} ${poppins.variable} premium-body antialiased`}>
+        <PremiumProviders>{children}</PremiumProviders>
         <CookieConsent />
       </body>
     </html>

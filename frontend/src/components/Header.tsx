@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useLenis } from "lenis/react";
 import { NeerCredLogo } from "@/components/NeerCredLogo";
 import { IconMenu, IconX, IconSmartphone } from "@/components/icons";
 import { REF } from "@/lib/reference-theme";
@@ -21,11 +22,20 @@ const navLinks = [
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  const lenis = useLenis();
   const { isAuthenticated, journey, logout, loading: sessionLoading } = useCustomerSession();
 
   const continueHref = journey ? journeyRedirectPath(journey) : "/apply";
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 16);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const handleLogout = useCallback(async () => {
     await logout();
@@ -36,12 +46,19 @@ export function Header() {
   const goHome = useCallback(() => {
     setMenuOpen(false);
     if (pathname === "/") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (lenis) lenis.scrollTo(0, { duration: 1.1 });
+      else window.scrollTo({ top: 0, behavior: "smooth" });
     }
-  }, [pathname]);
+  }, [pathname, lenis]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white">
+    <header
+      className={`sticky top-0 z-50 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        scrolled
+          ? "border-white/50 bg-white/75 py-2 shadow-[0_8px_32px_-12px_rgba(14,116,144,0.18)] backdrop-blur-2xl"
+          : "border-slate-200/80 bg-white/90 py-2.5 backdrop-blur-md lg:py-3"
+      }`}
+    >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-2.5 lg:gap-3 lg:py-3">
         <Link href="/" onClick={goHome} aria-label="NeerCred — Go to homepage" className="shrink-0">
           <NeerCredLogo variant="header" className="h-10 sm:h-11" />
