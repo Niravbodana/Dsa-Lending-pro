@@ -167,6 +167,24 @@ export async function getJourney(sessionToken?: string): Promise<JourneyState> {
   return res.json();
 }
 
+export async function getAuthMe(sessionToken: string) {
+  const res = await fetch(`${API_BASE}/api/auth/me`, {
+    headers: sessionHeaders(sessionToken),
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error("Session expired");
+  return res.json() as Promise<{ mobile: string; authenticated: boolean; journey: JourneyState }>;
+}
+
+export async function logoutCustomer(sessionToken: string) {
+  const res = await fetch(`${API_BASE}/api/auth/logout`, {
+    method: "POST",
+    headers: sessionHeaders(sessionToken),
+  });
+  if (!res.ok) throw new Error("Logout failed");
+  return res.json() as Promise<{ message: string; logged_out: boolean }>;
+}
+
 export async function panLookup(sessionToken: string, pan: string) {
   const res = await fetch(`${API_BASE}/api/leads/pan-lookup`, {
     method: "POST",

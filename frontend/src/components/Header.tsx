@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState, useCallback } from "react";
 import { NeerCredLogo } from "@/components/NeerCredLogo";
 import { IconMenu, IconX, IconSmartphone } from "@/components/icons";
 import { REF } from "@/lib/reference-theme";
+import { useCustomerSession } from "@/hooks/useCustomerSession";
+import { journeyRedirectPath } from "@/lib/customer-session";
 
 const navLinks = [
   { href: "/loans", label: "Loans" },
@@ -20,6 +22,16 @@ const navLinks = [
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  const { isAuthenticated, journey, logout, loading: sessionLoading } = useCustomerSession();
+
+  const continueHref = journey ? journeyRedirectPath(journey) : "/apply";
+
+  const handleLogout = useCallback(async () => {
+    await logout();
+    setMenuOpen(false);
+    router.push("/");
+  }, [logout, router]);
 
   const goHome = useCallback(() => {
     setMenuOpen(false);
@@ -59,6 +71,36 @@ export function Header() {
             <IconSmartphone size={16} />
             App
           </Link>
+          {!sessionLoading && isAuthenticated ? (
+            <>
+              <Link
+                href={continueHref}
+                className="hidden rounded-full border border-teal-200 bg-teal-50 px-4 py-2 text-sm font-semibold text-teal-800 transition hover:bg-teal-100 sm:inline-flex"
+              >
+                Continue
+              </Link>
+              <Link
+                href="/dashboard"
+                className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-400"
+              >
+                Dashboard
+              </Link>
+              <button
+                type="button"
+                onClick={() => void handleLogout()}
+                className="hidden rounded-full px-3 py-2 text-sm font-medium text-slate-500 hover:text-slate-800 sm:inline-flex"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/login"
+              className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-400"
+            >
+              Login
+            </Link>
+          )}
           <Link
             href="/apply"
             className="rounded-full px-5 py-2.5 text-sm font-bold text-white transition hover:brightness-110"
@@ -93,6 +135,27 @@ export function Header() {
                 {link.label}
               </Link>
             ))}
+            {isAuthenticated ? (
+              <>
+                <Link href={continueHref} onClick={() => setMenuOpen(false)} className="rounded-lg px-3 py-2.5 text-sm font-semibold text-teal-700">
+                  Continue application
+                </Link>
+                <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700">
+                  Dashboard
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => void handleLogout()}
+                  className="rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-500"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link href="/login" onClick={() => setMenuOpen(false)} className="rounded-lg px-3 py-2.5 text-sm font-semibold text-teal-700">
+                Login
+              </Link>
+            )}
           </div>
         </nav>
       )}

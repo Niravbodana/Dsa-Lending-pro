@@ -1,11 +1,19 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Header, Request
 from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.database import get_db
-from app.schemas import SendOtpRequest, SendOtpResponse, VerifyOtpRequest, VerifyOtpResponse
+from app.schemas import (
+    AuthMeResponse,
+    LogoutResponse,
+    SendOtpRequest,
+    SendOtpResponse,
+    VerifyOtpRequest,
+    VerifyOtpResponse,
+)
 from app.services.consent import client_meta, record_consent
-from app.services.otp import create_session_token, send_otp, verify_otp
+from app.services.journey import build_journey
+from app.services.otp import create_session_token, get_mobile_from_token, revoke_session_token, send_otp, verify_otp
 from app.services.rate_limit import rate_limit, rate_limit_key
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -48,3 +56,30 @@ def api_verify_otp(payload: VerifyOtpRequest, request: Request, db: Session = De
         verified=True,
         session_token=token,
     )
+
+
+def _token_from_header(authorization: str | None) -> str | None:
+    if authorization and authorization.startswith("Bearer "):
+        return authorization.removeprefix("Bearer ").strip() or None
+    return None
+
+
+@router.get("/me")
+def api_me(authorization: str | None = Header(None), db: Session = Depends(get_db)):
+    token = _token_from_header(authorization)
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    mobile = get_mobile_from_token(db, token)
+    if not mobile:
+        raise HTTPException(status_code=401, detail="Session expired")
+    journey = build_journey(db, mobile)
+    return {"mobile": mobile, "authenticated": True, "journey": journey}
+
+
+@router.post("/logout", response_model=LogoutResponse)
+def api_logout(authorization: str | None = Header(None), db: Session = Depends(get_db)):
+    token = _token_from_header(authorization)
+    if not token:
+        return LogoutResponse(message="Already logged out", logged_out=True)
+    revoke_session_token(db, token)
+    return LogoutResponse(message="Logged out successfully", logged_out=True)

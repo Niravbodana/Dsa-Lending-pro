@@ -37,6 +37,16 @@ class VerifyOtpResponse(BaseModel):
     session_token: str
 
 
+class AuthMeResponse(BaseModel):
+    mobile: str
+    authenticated: bool = True
+
+
+class LogoutResponse(BaseModel):
+    message: str
+    logged_out: bool
+
+
 class LeadDetailsRequest(BaseModel):
     session_token: str
     full_name: str = Field(..., min_length=2, max_length=120)

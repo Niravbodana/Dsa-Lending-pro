@@ -10,11 +10,14 @@ import { NeerCredLogo } from "@/components/NeerCredLogo";
 import { OfferCard } from "@/components/OfferCard";
 import { LenderLogo } from "@/components/LenderLogo";
 import {
+  fetchOffers,
   getApplications,
   getDashboardProfile,
+  getJourney,
   type LoanApplication,
   type LoanOffer,
 } from "@/lib/api";
+import { journeyRedirectPath } from "@/lib/customer-session";
 import { BRAND } from "@/lib/brand";
 import { INDIAN_IMAGES } from "@/lib/indian-images";
 import {
@@ -141,6 +144,8 @@ function DashboardContent() {
   const [offers, setOffers] = useState<LoanOffer[]>([]);
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState("");
+  const [continueHref, setContinueHref] = useState("/apply");
+  const [continueLabel, setContinueLabel] = useState("Continue application");
 
   useEffect(() => {
     if (isDemo) {
@@ -153,17 +158,27 @@ function DashboardContent() {
 
     const token = localStorage.getItem("session_token");
     if (!token) {
-      router.push("/apply");
+      router.push("/login");
       return;
     }
 
-    Promise.all([getDashboardProfile(token), getApplications(token)])
-      .then(([profile, apps]) => {
+    Promise.all([getDashboardProfile(token), getApplications(token), getJourney(token)])
+      .then(([profile, apps, journey]) => {
         setUserName(profile.full_name?.split(" ")[0] || "there");
         setApplications(apps);
+        setContinueHref(journeyRedirectPath(journey));
+        if (journey.next_step === "kyc") setContinueLabel("Continue KYC");
+        else if (journey.next_step === "offers") setContinueLabel("View loan offers");
+        else setContinueLabel("Continue application");
+
+        if (journey.next_step === "offers" || journey.apply_step === "offers") {
+          return fetchOffers(token)
+            .then((res) => setOffers(res.offers))
+            .catch(() => setOffers([]));
+        }
         setOffers([]);
       })
-      .catch(() => router.push("/apply"))
+      .catch(() => router.push("/login"))
       .finally(() => setLoading(false));
   }, [router, isDemo]);
 
@@ -216,13 +231,22 @@ function DashboardContent() {
                 <p className="mt-2 max-w-lg text-sm text-slate-300 sm:text-base">
                   Track applications, compare offers, and manage your loan journey — all in one premium dashboard.
                 </p>
-                <Link
-                  href="/apply"
-                  className="mt-6 inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-neercred-gold to-amber-500 px-6 py-3.5 text-sm font-bold text-neercred-navy shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl"
-                >
-                  <IconSparkles size={16} />
-                  New Application
-                </Link>
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <Link
+                    href={continueHref}
+                    className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-neercred-teal to-cyan-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg transition-all hover:scale-[1.02]"
+                  >
+                    <IconArrowRight size={16} />
+                    {continueLabel}
+                  </Link>
+                  <Link
+                    href="/apply"
+                    className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/10 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition hover:bg-white/15"
+                  >
+                    <IconSparkles size={16} />
+                    New Application
+                  </Link>
+                </div>
               </div>
 
               <div className="relative hidden w-full max-w-xs shrink-0 lg:block xl:max-w-sm">

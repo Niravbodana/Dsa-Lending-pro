@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { HeroRoiCard } from "@/components/HeroPhotoCarousel";
 import { IconBolt, IconCheckCircle, IconClock, IconShield } from "@/components/icons";
-import { HERO_IMAGE, REFERENCE_HERO } from "@/lib/hero-images";
+import { HERO_IMAGE, HERO_WEDDING_SRC, REFERENCE_HERO } from "@/lib/hero-images";
 import { REF } from "@/lib/reference-theme";
 import type { SiteConfig } from "@/lib/cms";
 import { CmsField } from "@/components/cms/CmsField";
@@ -18,8 +18,8 @@ type Props = {
 };
 
 function heroSrc(url: string | undefined): string {
-  if (url && url.trim()) return url;
-  return HERO_IMAGE.src;
+  if (url && url.trim() && !url.includes("hero-wedding-couple.png")) return url;
+  return HERO_WEDDING_SRC;
 }
 
 function isRemote(src: string): boolean {
@@ -57,7 +57,7 @@ export function DynamicHero({ config, heroOverlay }: Props) {
         <img
           src={src}
           alt={HERO_IMAGE.alt}
-          className="absolute inset-0 h-full w-full object-cover object-[72%_28%] sm:object-[center_30%]"
+          className="hero-ken-burns absolute inset-0 h-full w-full object-cover object-[72%_28%] sm:object-[center_30%]"
         />
       ) : (
         <Image
@@ -67,15 +67,16 @@ export function DynamicHero({ config, heroOverlay }: Props) {
           priority
           quality={95}
           sizes="100vw"
-          className="object-cover object-[72%_28%] sm:object-[center_30%]"
+          className="hero-ken-burns object-cover object-[72%_28%] sm:object-[center_30%]"
         />
       )}
+      <div className="hero-shimmer pointer-events-none absolute inset-0" />
       <div
         className="absolute inset-0"
         style={{
           background:
             heroOverlay ||
-            "var(--hero-overlay, linear-gradient(to right, rgba(224,242,254,0.92) 30%, rgba(255,255,255,0.72) 46%, rgba(255,255,255,0.08) 100%))",
+            "var(--hero-overlay, linear-gradient(to right, rgba(224,242,254,0.93) 28%, rgba(255,255,255,0.78) 44%, rgba(255,255,255,0.12) 100%))",
         }}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-white/20 via-transparent to-transparent lg:hidden" />

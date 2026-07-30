@@ -43,6 +43,15 @@ def get_mobile_from_token(db: Session, token: str) -> str | None:
     return session.mobile
 
 
+def revoke_session_token(db: Session, token: str) -> bool:
+    session = db.query(UserSession).filter(UserSession.token == token).first()
+    if not session:
+        return False
+    db.delete(session)
+    db.commit()
+    return True
+
+
 def send_otp(db: Session, mobile: str) -> tuple[str | None, int]:
     otp = generate_otp()
     expires_at = datetime.now(timezone.utc) + timedelta(seconds=settings.otp_expiry_seconds)

@@ -43,6 +43,133 @@ body {
     radial-gradient(ellipse 50% 40% at 50% 100%, rgba(45, 212, 191, 0.08), transparent 55%);
 }
 
+/* —— Professional ambient background (homepage) —— */
+.site-ambient-bg {
+  background: linear-gradient(165deg, #dbeafe 0%, #e0f2fe 28%, #f0f9ff 55%, #f8fafc 100%);
+}
+
+.site-ambient-mesh {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(ellipse 55% 45% at 20% 20%, rgba(45, 212, 191, 0.14), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 80% 10%, rgba(56, 189, 248, 0.16), transparent 50%),
+    radial-gradient(ellipse 60% 50% at 60% 90%, rgba(14, 116, 144, 0.1), transparent 55%);
+  animation: ambientMeshDrift 22s ease-in-out infinite alternate;
+}
+
+.site-ambient-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(48px);
+  opacity: 0.55;
+  will-change: transform;
+}
+
+.site-ambient-orb--1 {
+  top: 8%;
+  left: -5%;
+  width: 28rem;
+  height: 28rem;
+  background: rgba(45, 212, 191, 0.35);
+  animation: ambientOrb1 18s ease-in-out infinite;
+}
+
+.site-ambient-orb--2 {
+  top: 35%;
+  right: -8%;
+  width: 32rem;
+  height: 32rem;
+  background: rgba(56, 189, 248, 0.28);
+  animation: ambientOrb2 24s ease-in-out infinite;
+}
+
+.site-ambient-orb--3 {
+  bottom: 5%;
+  left: 30%;
+  width: 24rem;
+  height: 24rem;
+  background: rgba(15, 118, 110, 0.2);
+  animation: ambientOrb3 20s ease-in-out infinite;
+}
+
+.site-ambient-shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.12) 48%,
+    rgba(255, 255, 255, 0.22) 50%,
+    rgba(255, 255, 255, 0.12) 52%,
+    transparent 60%
+  );
+  background-size: 220% 100%;
+  animation: ambientShimmer 14s ease-in-out infinite;
+}
+
+/* Hero wedding photo — subtle Ken Burns */
+.hero-ken-burns {
+  animation: heroKenBurns 28s ease-in-out infinite alternate;
+  transform-origin: center center;
+}
+
+.hero-shimmer {
+  background: linear-gradient(
+    120deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.06) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  animation: heroShimmer 10s ease-in-out infinite;
+}
+
+@keyframes ambientMeshDrift {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(2%, 3%) scale(1.04); }
+}
+
+@keyframes ambientOrb1 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(24px, 18px); }
+}
+
+@keyframes ambientOrb2 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-20px, 28px); }
+}
+
+@keyframes ambientOrb3 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(16px, -14px); }
+}
+
+@keyframes ambientShimmer {
+  0% { background-position: 120% 0; }
+  100% { background-position: -120% 0; }
+}
+
+@keyframes heroKenBurns {
+  0% { transform: scale(1) translate(0, 0); }
+  100% { transform: scale(1.06) translate(-1%, -0.5%); }
+}
+
+@keyframes heroShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-ambient-mesh,
+  .site-ambient-orb,
+  .site-ambient-shimmer,
+  .hero-ken-burns,
+  .hero-shimmer {
+    animation: none !important;
+  }
+}
+
 @layer utilities {
   .gradient-hero {
     background: linear-gradient(135deg, #0b1220 0%, #0f766e 40%, #0d9488 70%, #0891b2 100%);

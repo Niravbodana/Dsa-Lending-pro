@@ -35,6 +35,7 @@ import { AIChatWidget } from "@/components/AIChatWidget";
 import { FALLBACK_CONFIG, fetchSiteConfig, type SiteConfig } from "@/lib/cms";
 import { SiteConfigProvider } from "@/lib/visual-editor/SiteConfigContext";
 import { themeStyleVars } from "@/lib/site-theme";
+import { ProfessionalBackground } from "@/components/ProfessionalBackground";
 
 type Props = {
   previewConfig?: SiteConfig;
@@ -90,6 +91,7 @@ export function HomePage({ previewConfig, isPreview = false, visualEdit = false 
 
   return (
     <SiteConfigProvider config={config}>
+    <ProfessionalBackground />
     <main
       className="premium-site-bg min-h-screen pb-20 font-[family-name:var(--font-poppins)] md:pb-0"
       style={{ ...themeVars, background: "var(--site-bg)" }}

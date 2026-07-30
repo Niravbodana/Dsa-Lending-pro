@@ -64,10 +64,11 @@ const PROFILE_SUB_LABELS: Record<ProfileSubStep, string> = {
 };
 
 function buildProfileSubSteps(
-  needs: (key: string) => boolean,
+  requiredFields: RequiredField[],
   needsPartnerExtras: boolean,
   panVerified: boolean,
 ): ProfileSubStep[] {
+  const needs = (key: string) => requiredFields.some((f) => f.key === key);
   const steps: ProfileSubStep[] = ["pan", "name"];
   if (needs("date_of_birth") || panVerified) steps.push("dob");
   if (needsPartnerExtras) {
@@ -79,6 +80,56 @@ function buildProfileSubSteps(
   if (needs("gender")) steps.push("gender");
   steps.push("income", "employment", "city", "purpose", "emi", "consent");
   return steps;
+}
+
+function resolveProfileStepIndex(
+  steps: ProfileSubStep[],
+  lead: {
+    pan?: string | null;
+    full_name?: string | null;
+    date_of_birth?: string | null;
+    email?: string | null;
+    pincode?: string | null;
+    gender?: string | null;
+    monthly_income?: number | null;
+    city?: string | null;
+  } | null | undefined,
+): number {
+  if (!lead) return 0;
+  for (let i = 0; i < steps.length; i++) {
+    const s = steps[i];
+    switch (s) {
+      case "pan":
+        if (!lead.pan || lead.pan.length !== 10) return i;
+        break;
+      case "name":
+        if (!lead.full_name?.trim()) return i;
+        break;
+      case "dob":
+        if (!lead.date_of_birth) return i;
+        break;
+      case "email":
+        if (!lead.email?.includes("@")) return i;
+        break;
+      case "pincode":
+        if (!lead.pincode || lead.pincode.length !== 6) return i;
+        break;
+      case "gender":
+        if (!lead.gender) return i;
+        break;
+      case "income":
+        if (!lead.monthly_income || lead.monthly_income < 15000) return i;
+        break;
+      case "city":
+        if (!lead.city?.trim()) return i;
+        break;
+      case "consent":
+        return i;
+      default:
+        break;
+    }
+  }
+  return Math.max(0, steps.length - 1);
 }
 
 function validateProfileStep(
@@ -193,7 +244,7 @@ function ApplyPageInner() {
   const needsPartnerExtras = preferredPartner === "choiceconnect" || needs("email") || needs("pincode");
 
   const profileSubSteps = useMemo(
-    () => buildProfileSubSteps(needs, needsPartnerExtras, panVerified),
+    () => buildProfileSubSteps(requiredFields, needsPartnerExtras, panVerified),
     [needsPartnerExtras, panVerified, requiredFields],
   );
   const currentProfileStep = profileSubSteps[profileStepIndex] ?? "pan";
@@ -251,7 +302,11 @@ function ApplyPageInner() {
     const applyStep = journey.apply_step as Step;
     if (applyStep && STEPS.includes(applyStep)) {
       setStep(applyStep);
-      if (applyStep === "details") setProfileStepIndex(0);
+      if (applyStep === "details" && journey.lead) {
+        const extras = journey.lead.preferred_partner_slug === "choiceconnect";
+        const subSteps = buildProfileSubSteps([], extras, Boolean(journey.lead.pan));
+        setProfileStepIndex(resolveProfileStepIndex(subSteps, journey.lead));
+      }
       if (applyStep === "offers" && token) {
         try {
           const offersRes = await fetchOffers(token);
@@ -380,6 +435,7 @@ function ApplyPageInner() {
       const res = await verifyOtp(mobile, otp);
       setSessionToken(res.session_token);
       localStorage.setItem("session_token", res.session_token);
+      window.dispatchEvent(new Event("neercred:session"));
       if (preferredPartner) {
         await setPartnerPreference(res.session_token, preferredPartner).catch(() => {});
       }
