@@ -23,7 +23,7 @@ const securityHeaders = [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' https://images.unsplash.com data: blob:",
+      "img-src 'self' https://images.unsplash.com https://plus.unsplash.com https://images.pexels.com https://cdn.pixabay.com data: blob:",
       isDev
         ? `connect-src 'self' ${apiOrigin} http://localhost:8000 http://127.0.0.1:8000 ws://localhost:* ws://127.0.0.1:*`
         : `connect-src 'self' ${apiOrigin}`,
@@ -38,10 +38,10 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com",
-      },
+      { protocol: "https", hostname: "images.unsplash.com" },
+      { protocol: "https", hostname: "plus.unsplash.com" },
+      { protocol: "https", hostname: "images.pexels.com" },
+      { protocol: "https", hostname: "cdn.pixabay.com" },
     ],
   },
   async rewrites() {
