@@ -18,6 +18,7 @@ import {
   type MouseEvent as ReactMouseEvent,
   type ReactNode,
 } from "react";
+import { resolveCmsImageUrl } from "@/lib/resolve-image";
 import {
   pathToGroup,
   pathToLabel,
@@ -107,7 +108,7 @@ function CmsFieldActive({
   }
 
   if (type === "image" || type === "url") {
-    const src = value || (typeof children === "string" ? children : "");
+    const src = resolveCmsImageUrl(value || (typeof children === "string" ? children : ""));
     return (
       <button
         type="button"
@@ -197,7 +198,7 @@ export function CmsField({
     (typeof rest.children === "string" ? rest.children : "");
 
   if (type === "image" || type === "url") {
-    const src = display || "";
+    const src = resolveCmsImageUrl(display || "");
     if (!src) return null;
     return (
       // eslint-disable-next-line @next/next/no-img-element

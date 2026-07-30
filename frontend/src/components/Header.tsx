@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useCallback, useEffect } from "react";
-import { useLenis } from "lenis/react";
 import { NeerCredLogo } from "@/components/NeerCredLogo";
 import { IconMenu, IconX, IconSmartphone } from "@/components/icons";
 import { REF } from "@/lib/reference-theme";
@@ -25,7 +24,6 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
-  const lenis = useLenis();
   const { isAuthenticated, journey, logout, loading: sessionLoading } = useCustomerSession();
 
   const continueHref = journey ? journeyRedirectPath(journey) : "/apply";
@@ -46,10 +44,9 @@ export function Header() {
   const goHome = useCallback(() => {
     setMenuOpen(false);
     if (pathname === "/") {
-      if (lenis) lenis.scrollTo(0, { duration: 1.1 });
-      else window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo({ top: 0, behavior: "instant" });
     }
-  }, [pathname, lenis]);
+  }, [pathname]);
 
   return (
     <header

@@ -13,24 +13,24 @@ const VARIANTS: Record<
   { hidden: Record<string, string | number>; visible: Record<string, string | number> }
 > = {
   up: {
-    hidden: { opacity: 0, y: 52, filter: "blur(8px)" },
-    visible: { opacity: 1, y: 0, filter: "blur(0px)" },
+    hidden: { opacity: 0, y: 24 },
+    visible: { opacity: 1, y: 0 },
   },
   left: {
-    hidden: { opacity: 0, x: -64, filter: "blur(6px)" },
-    visible: { opacity: 1, x: 0, filter: "blur(0px)" },
+    hidden: { opacity: 0, x: -28 },
+    visible: { opacity: 1, x: 0 },
   },
   right: {
-    hidden: { opacity: 0, x: 64, filter: "blur(6px)" },
-    visible: { opacity: 1, x: 0, filter: "blur(0px)" },
+    hidden: { opacity: 0, x: 28 },
+    visible: { opacity: 1, x: 0 },
   },
   scale: {
-    hidden: { opacity: 0, scale: 0.94, filter: "blur(4px)" },
-    visible: { opacity: 1, scale: 1, filter: "blur(0px)" },
+    hidden: { opacity: 0, scale: 0.97 },
+    visible: { opacity: 1, scale: 1 },
   },
   fade: {
-    hidden: { opacity: 0, filter: "blur(10px)" },
-    visible: { opacity: 1, filter: "blur(0px)" },
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
   },
 };
 
@@ -39,7 +39,7 @@ export function ScrollReveal({
   className = "",
   variant = "up",
   delay = 0,
-  duration = 0.9,
+  duration = 0.35,
 }: {
   children: ReactNode;
   className?: string;

@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 from app.models import SiteConfig
 from app.services.cms_defaults import DEFAULT_SITE_CONFIG
+from app.services.image_urls import resolve_config_images
 
 CONFIG_ROW_ID = 1
 DRAFT_ROW_ID = 2
@@ -54,8 +55,8 @@ def _save_row(db: Session, row_id: int, config: dict) -> dict:
 def get_site_config(db: Session) -> dict:
     stored = _load_row(db, CONFIG_ROW_ID)
     if stored is None:
-        return get_default_config()
-    return deep_merge(get_default_config(), stored)
+        return resolve_config_images(get_default_config())
+    return resolve_config_images(deep_merge(get_default_config(), stored))
 
 
 def save_site_config(db: Session, config: dict) -> dict:
@@ -66,7 +67,7 @@ def get_draft_config(db: Session) -> dict:
     stored = _load_row(db, DRAFT_ROW_ID)
     if stored is None:
         return copy.deepcopy(get_site_config(db))
-    return deep_merge(get_default_config(), stored)
+    return resolve_config_images(deep_merge(get_default_config(), stored))
 
 
 def save_draft_config(db: Session, config: dict) -> dict:
