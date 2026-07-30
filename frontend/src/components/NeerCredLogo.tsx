@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { BRAND } from "@/lib/brand";
 
 type NeerCredLogoProps = {
@@ -8,48 +7,52 @@ type NeerCredLogoProps = {
   className?: string;
 };
 
-/** Official brand lockup — user-provided PNG (icon + NeerCred + tagline) */
-const LOCKUP_SRC = "/neercred-logo-lockup.png";
-const ICON_SRC = "/neercred-icon.svg";
-
-const DIMENSIONS = {
-  lockup: { width: 1536, height: 1024 },
-  icon: { width: 96, height: 96 },
+const SOURCES = {
+  header: "/neercred-logo-header.svg",
+  full: "/neercred-logo.svg",
+  icon: "/neercred-icon.svg",
+  stacked: "/neercred-logo-stacked.svg",
+  wordmark: "/brand/neercred-horizontal.svg",
+  dark: "/brand/neercred-stacked.svg",
 } as const;
 
+/** Official NeerCred logo — transparent SVG lockups (no missing PNG) */
 export function NeerCredLogo({
   variant = "full",
   size,
+  dark = false,
   className = "",
 }: NeerCredLogoProps) {
   if (variant === "icon") {
     const iconSize = size ?? 40;
     return (
-      <Image
-        src={ICON_SRC}
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={SOURCES.icon}
         alt=""
-        width={DIMENSIONS.icon.width}
-        height={DIMENSIONS.icon.height}
         className={`shrink-0 rounded-[22%] ${className}`}
         style={{ width: iconSize, height: iconSize }}
-        priority
       />
     );
   }
 
-  const height = size ?? 64;
+  let src: string = SOURCES.full;
+  if (dark) src = SOURCES.dark;
+  else if (variant === "header") src = SOURCES.header;
+  else if (variant === "stacked") src = SOURCES.stacked;
+  else if (variant === "wordmark") src = SOURCES.wordmark;
+
+  const height = size ?? (variant === "header" ? 72 : 64);
 
   return (
-    <span className="inline-flex items-center">
-      <Image
-        src={LOCKUP_SRC}
-        alt={`${BRAND.appName} — ${BRAND.logoTagline}`}
-        width={DIMENSIONS.lockup.width}
-        height={DIMENSIONS.lockup.height}
-        className={`h-auto w-auto object-contain object-left ${className}`}
-        style={className ? undefined : { height, width: "auto", maxWidth: 240 }}
-        priority
-      />
-    </span>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      alt={`${BRAND.appName} — ${BRAND.logoTagline}`}
+      className={`h-auto w-auto bg-transparent object-contain object-left ${className}`}
+      style={className ? undefined : { height, width: "auto", maxWidth: 240 }}
+    />
   );
 }
+
+export const NEERCRED_LOGO_SRC = SOURCES.full;

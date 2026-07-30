@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { HeroRoiCard } from "@/components/HeroPhotoCarousel";
 import { IconBolt, IconCheckCircle, IconClock, IconShield } from "@/components/icons";
 import { HERO_IMAGE, REFERENCE_HERO } from "@/lib/hero-images";
@@ -139,15 +140,17 @@ export function DynamicHero({ config, heroOverlay }: Props) {
           </ul>
 
           <div className="mt-9 flex flex-wrap items-center gap-4">
-            <span
-              className="inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-base font-bold text-white shadow-md"
+            <Link
+              href="/apply"
+              className="inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-base font-bold text-white shadow-md transition hover:brightness-110"
               style={{ backgroundColor: REF.teal, boxShadow: `0 10px 24px -8px ${REF.teal}66` }}
             >
               <CmsField path="hero.cta_primary">{ctaPrimary}</CmsField>
               <span aria-hidden>→</span>
-            </span>
-            <span
-              className="inline-flex items-center gap-2.5 rounded-full border-2 bg-white/90 px-7 py-3.5 text-base font-semibold backdrop-blur-sm"
+            </Link>
+            <Link
+              href="/#how-it-works"
+              className="inline-flex items-center gap-2.5 rounded-full border-2 bg-white/90 px-7 py-3.5 text-base font-semibold backdrop-blur-sm transition hover:border-teal-300"
               style={{ borderColor: "#CBD5E1", color: REF.navy }}
             >
               <span
@@ -157,7 +160,7 @@ export function DynamicHero({ config, heroOverlay }: Props) {
                 ▶
               </span>
               <CmsField path="hero.cta_secondary">{ctaSecondary}</CmsField>
-            </span>
+            </Link>
           </div>
         </div>
 
