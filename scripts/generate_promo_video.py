@@ -754,6 +754,10 @@ async def main() -> None:
     workspace.parent.mkdir(exist_ok=True)
     workspace.write_bytes(output.read_bytes())
 
+    public_video = ROOT / "frontend" / "public" / "videos" / "neercred-promo-30s.mp4"
+    public_video.parent.mkdir(parents=True, exist_ok=True)
+    public_video.write_bytes(output.read_bytes())
+
     print(f"\n✅ Premium video ready: {output}")
     print(f"   30s | 1080x1920 | AI photos + original logo")
 
