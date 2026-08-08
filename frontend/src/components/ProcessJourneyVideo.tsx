@@ -45,7 +45,7 @@ export function ProcessJourneyVideo() {
             <h2 className="mt-5 text-4xl font-black leading-tight tracking-tight md:text-5xl">
               See the Full Loan Process
               <span className="mt-2 block bg-gradient-to-r from-teal-300 via-cyan-300 to-amber-300 bg-clip-text text-transparent">
-                in 30 Seconds
+                Step by Step
               </span>
             </h2>
 
@@ -83,7 +83,7 @@ export function ProcessJourneyVideo() {
               </Link>
             </div>
 
-            <p className="mt-6 text-xs text-slate-500">30 sec · Hindi voice · RBI LSP compliant platform</p>
+            <p className="mt-6 text-xs text-slate-500">Full workflow · Female Hindi voice · RBI LSP compliant platform</p>
           </ScrollReveal>
 
           <ScrollReveal variant="right" delay={120} className="mx-auto w-full max-w-[380px] lg:mx-0 lg:max-w-none">
