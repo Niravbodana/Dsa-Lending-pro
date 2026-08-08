@@ -6,7 +6,9 @@ import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 
 const VIDEO_SRC = "/videos/neercred-promo-30s.mp4";
-const FILE_NAME = "NeerCred-Promo-30s.mp4";
+const VIDEO_16X9 = "/videos/neercred-promo-kreditbee-16x9.mp4";
+const FILE_NAME = "NeerCred-Promo-Full-Workflow.mp4";
+const FILE_NAME_16X9 = "NeerCred-Promo-16x9-Website.mp4";
 
 export default function PromoVideoPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -41,13 +43,13 @@ export default function PromoVideoPage() {
             <Image src="/neercred-logo-header.svg" alt={BRAND.appName} width={148} height={42} priority />
           </Link>
           <span className="rounded-full border border-teal-600/20 bg-white/70 px-3 py-1 text-xs font-semibold text-teal-700 shadow-sm">
-            30 sec · 50+ Partners
+            Full Workflow · 50+ Partners
           </span>
         </div>
 
         <div className="mb-4 text-center">
           <h1 className="text-2xl font-bold tracking-tight">NeerCred Promo Video</h1>
-          <p className="mt-2 text-sm text-slate-600">Full HD · 9:16 · Hindi voice · Light premium theme</p>
+          <p className="mt-2 text-sm text-slate-600">Full HD · 9:16 mobile + 16:9 website · Female Hindi voice · Piano BGM</p>
         </div>
 
         <div className="overflow-hidden rounded-3xl border border-teal-600/25 bg-white shadow-[0_8px_32px_-12px_rgba(14,116,144,0.18)]">
@@ -71,13 +73,28 @@ export default function PromoVideoPage() {
           Download Full Video
         </button>
 
-        <a
-          href={VIDEO_SRC}
-          download={FILE_NAME}
-          className="mt-3 flex w-full items-center justify-center rounded-2xl border border-amber-400/40 bg-amber-400/10 px-6 py-3.5 text-base font-semibold text-amber-200 transition hover:bg-amber-400/15"
+        <button
+          type="button"
+          onClick={async () => {
+            try {
+              const res = await fetch(VIDEO_16X9);
+              const blob = await res.blob();
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = FILE_NAME_16X9;
+              document.body.appendChild(a);
+              a.click();
+              a.remove();
+              URL.revokeObjectURL(url);
+            } catch {
+              window.open(VIDEO_16X9, "_blank");
+            }
+          }}
+          className="mt-3 flex w-full items-center justify-center rounded-2xl border border-amber-400/40 bg-amber-400/10 px-6 py-3.5 text-base font-semibold text-amber-800 transition hover:bg-amber-400/15"
         >
-          Direct Save (Android)
-        </a>
+          Download 16:9 Website Version
+        </button>
 
         <div className="mt-5 rounded-2xl border border-slate-200 bg-white/80 p-4 text-sm text-slate-600 shadow-sm">
           <p className="font-semibold text-[#0B1220]">iPhone par save kaise karein?</p>
