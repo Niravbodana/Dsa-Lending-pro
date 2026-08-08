@@ -1,0 +1,20 @@
+{
+  "name": "Neer Loan Solutions",
+  "install": "sudo apt-get update && sudo apt-get install -y python3.12-venv && cd backend && python3 -m venv .venv && ./.venv/bin/pip install --upgrade pip && ./.venv/bin/pip install -r requirements.txt && { [ -f .env ] || cp .env.example .env; } && cd ../frontend && npm ci",
+  "terminals": [
+    {
+      "name": "backend",
+      "command": "cd backend && source .venv/bin/activate && uvicorn app.main:app --reload --port 8000",
+      "description": "FastAPI backend (SQLite dev DB, mock OTP) on http://localhost:8000"
+    },
+    {
+      "name": "frontend",
+      "command": "cd frontend && npm run dev",
+      "description": "Next.js dev server on http://localhost:3000 (proxies /backend/* to the API)"
+    }
+  ],
+  "ports": [
+    { "name": "frontend", "port": 3000 },
+    { "name": "backend", "port": 8000 }
+  ]
+}
