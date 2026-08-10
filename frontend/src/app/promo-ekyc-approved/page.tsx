@@ -29,7 +29,7 @@ export default function PromoEkycApprovedPage() {
         <h1 className="mt-3 text-2xl font-extrabold leading-tight text-white sm:text-3xl">
           Your Aadhaar eKYC
           <br />
-          Approved! 🎉
+          Verified! 🎉
         </h1>
         <p className="mt-4 text-sm leading-relaxed text-slate-300">
           Verified securely on your lending partner&apos;s platform — not on NeerCred.

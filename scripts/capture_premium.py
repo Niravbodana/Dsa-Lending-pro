@@ -24,9 +24,10 @@ CLEAN_JS = """() => {
   document.querySelectorAll(
     '.loan-guide-root, [class*="cookie"], [class*="Cookie"], [aria-label*="Cookie"]'
   ).forEach(e => e.remove());
-  document.querySelectorAll('p').forEach(el => {
+  document.querySelectorAll('p, span, div').forEach(el => {
     const t = (el.textContent || '').trim();
     if (t.startsWith('Dev mode OTP') && t.length < 80) el.style.display = 'none';
+    if (/RBI|LSP registered|RBI-regulated|RBI LSP/i.test(t) && t.length < 120) el.style.display = 'none';
   });
 }"""
 

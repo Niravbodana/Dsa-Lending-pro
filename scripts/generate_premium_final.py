@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""NeerCred Premium Promo v11 — original logo, approved scene, premium audio."""
+"""NeerCred Premium Promo v14 — brand style guide compliant."""
 
 from __future__ import annotations
 
@@ -28,30 +28,31 @@ W, H = 1920, 1080
 FPS = 30
 VOICE = "en-IN-NeerjaNeural"
 PHONE_W, PHONE_H = 400, 866
-PHONE_X_RATIO = 0.645  # nudge mockup right for better fit
+PHONE_X_RATIO = 0.655
 
+# NeerCred Brand & Video Style Guide (dev.neercred.com)
 SCENES = [
     {
         "id": "intro", "screen": "01-homepage.png", "step": "WELCOME",
-        "title": "NeerCred", "subtitle": "Dream Big. Borrow Smart.",
-        "bullets": ["15+ trusted lender partners", "Compare rates in minutes", "100% digital journey"],
-        "vo": "Hey there! Welcome to NeerCred. India's friendliest place to find the right personal loan for you.",
-        "vo_hi": "Welcome to NeerCred.\nYour personal loan marketplace.",
+        "title": "NeerCred", "subtitle": "Dream Big · Borrow Smart",
+        "bullets": ["Digital Lending Aggregator", "Purity & Trust", "100% digital journey"],
+        "vo": "Welcome to NeerCred — your digital lending aggregator. Dream big, borrow smart, and discover eligible loan offers from trusted partners.",
+        "vo_hi": "Welcome to NeerCred.\nDream Big · Borrow Smart.",
     },
     {
         "id": "home", "screen": "01-homepage.png", "step": "EXPLORE",
         "title": "One Platform.\nEvery Goal.",
-        "subtitle": "Loans live today — up to ₹20 Lakhs",
-        "bullets": ["Compare HDFC, ICICI, Bajaj and more", "Fully online — no branch visits", "Rates from 10.99%"],
-        "vo": "Whether it's a wedding, a home upgrade, or that dream trip... one platform brings every option to you.",
-        "vo_hi": "One platform, every goal.\nUp to twenty lakhs — fully digital.",
+        "subtitle": "Eligible offers up to ₹20 Lakhs · indicative",
+        "bullets": ["Compare HDFC, ICICI, Bajaj & more", "Fully online — no branch visits", "Rates from 10.99% p.a.*"],
+        "vo": "Whether it's a wedding, a home upgrade, or that dream trip — one platform brings every eligible option to you.",
+        "vo_hi": "One platform, every goal.\nEligible offers — fully digital.",
     },
     {
         "id": "apply", "screen": "02-apply-email.png", "step": "APPLY",
         "title": "Email\nVerification",
         "subtitle": "Secure OTP in your inbox",
         "bullets": ["Quick email verification", "Encrypted and private", "No spam, ever"],
-        "vo": "Enter your email address and we'll send a secure OTP straight to your inbox. Quick, easy, and completely safe.",
+        "vo": "Enter your email and we'll send a secure OTP straight to your inbox. Quick, easy, and completely safe.",
         "vo_hi": "Enter your email.\nOTP to your inbox.\nQuick and secure.",
     },
     {
@@ -59,7 +60,7 @@ SCENES = [
         "title": "OTP\nConfirmed",
         "subtitle": "Instant email verification",
         "bullets": ["6-digit secure OTP", "Session protected", "Continue in one tap"],
-        "vo": "Check your email, enter the OTP, and you're in. Takes less than a minute — we promise.",
+        "vo": "Check your email, enter the OTP, and you're in. Takes less than a minute.",
         "vo_hi": "Enter OTP from email.\nLess than a minute.",
     },
     {
@@ -73,46 +74,65 @@ SCENES = [
     {
         "id": "offers", "screen": "09-offers.png", "step": "COMPARE",
         "title": "Best Offers.\nOne Screen.",
-        "subtitle": "Lowest rate · Lowest EMI",
+        "subtitle": "Compare eligible rates · indicative EMI",
         "bullets": ["50+ partner offers", "Transparent fees", "Select in one tap"],
-        "vo": "Now the fun part — compare offers from multiple lenders side by side. Pick the best rate and EMI that works for you.",
-        "vo_hi": "Compare lender offers.\nBest rates on one screen.\nSelect in one tap.",
+        "vo": "Now compare eligible offers from multiple lenders side by side. Pick the rate and EMI that works best for you.",
+        "vo_hi": "Compare eligible offers.\nBest rates on one screen.",
     },
     {
-        "id": "kyc", "layout": "celebration", "step": "KYC",
+        "id": "kyc", "layout": "celebration", "animation": "ekyc", "step": "KYC",
         "title": "Aadhaar\neKYC",
         "subtitle": "Verified on lender platform",
-        "bullets": ["Lender-side secure verification", "Instant approval", "Not on NeerCred app"],
-        "vo": "Your Aadhaar eKYC is verified on your lender's secure platform. Approved in seconds!",
-        "vo_hi": "Aadhaar eKYC approved!\nLender platform.\nVerified in seconds.",
+        "bullets": ["Lender-side secure verification", "Fast digital process", "Not on NeerCred app"],
+        "vo": "Your Aadhaar eKYC is completed on your lender's secure platform. Verified and ready to go!",
+        "vo_hi": "Aadhaar eKYC verified!\nLender platform.\nDone in seconds.",
     },
     {
         "id": "dashboard", "screen": "11-dashboard.png", "step": "DASHBOARD",
         "title": "Welcome Back,\nRamprakash",
-        "subtitle": "Real-time loan dashboard",
-        "bullets": ["Live application status", "Pre-approved offers", "Track every step"],
+        "subtitle": "Track your loan journey",
+        "bullets": ["Live application status", "Eligible partner offers", "Track every step"],
         "vo": "Welcome back, Ramprakash! Your custom dashboard keeps every loan update right at your fingertips.",
         "vo_hi": "Welcome back, Ramprakash.\nYour loan dashboard.",
     },
     {
         "id": "approved", "screen": "12-approved.png", "step": "APPROVED",
-        "title": "Congratulations!\nLoan Approved 🎉",
-        "subtitle": "₹5,00,000 pre-approved",
-        "bullets": ["Select your loan amount", "Instant disbursal eligible", "Funds in minutes"],
-        "vo": "Congratulations! Your five lakh loan is approved. Select your loan amount and get disbursed within minutes on NeerCred.",
-        "vo_hi": "Congratulations!\nFive lakhs approved.\nDisbursed in minutes.",
+        "title": "You May\nQualify! 🎉",
+        "subtitle": "Up to ₹5,00,000 · indicative offer",
+        "bullets": ["Select your loan amount", "Disbursal via lender", "Funds to your bank"],
+        "vo": "Great news! You may qualify for up to five lakhs. Select your loan amount and move closer to disbursal on NeerCred.",
+        "vo_hi": "You may qualify!\nUp to five lakhs.\nSelect your amount.",
+    },
+    {
+        "id": "transfer", "layout": "celebration", "animation": "transfer", "step": "DISBURSE",
+        "title": "Funds to\nYour Bank",
+        "subtitle": "Real-time transfer in progress",
+        "bullets": ["Direct to your bank account", "Secure lender disbursal", "Track every step"],
+        "vo": "And just like that — funds are transferring straight to your bank account. Real-time, secure, and seamless.",
+        "vo_hi": "Transferring to your bank.\nReal-time.\nSecure disbursal.",
+    },
+    {
+        "id": "endcard", "layout": "endcard", "step": "NEERCRED",
+        "title": "Dream Big.\nBorrow Smart.",
+        "subtitle": "neercred.com",
+        "bullets": [],
+        "vo": "NeerCred — your digital lending aggregator. Dream big, borrow smart. Visit neercred.com to check your eligibility today.",
+        "vo_hi": "Dream Big · Borrow Smart.\nneercred.com",
     },
 ]
 
 C = {
-    "navy": "#070D18",
-    "navy2": "#0B1528",
-    "teal": "#0D9488",
-    "mint": "#2DD4BF",
-    "gold": "#C9A227",
+    "navy": "#0B1220",
+    "teal": "#0F766E",
+    "teal_deep": "#134E4A",
+    "cyan": "#0891B2",
+    "mint": "#5EEAD4",
+    "gold": "#D4A017",
+    "gold_light": "#FDE68A",
+    "bg_blue": "#E8F4FC",
     "white": "#F8FAFC",
     "muted": "#94A3B8",
-    "glass": (12, 20, 36, 210),
+    "glass": (11, 18, 32, 215),
 }
 
 
@@ -185,17 +205,17 @@ def load_logo() -> Image.Image:
     return padded
 
 
-def ensure_celebration_frames() -> list[Path]:
-    """Capture animated eKYC celebration from promo page (cached)."""
-    cache = ASSETS / "ekyc_celebration_frames"
+def ensure_animation_frames(cache_name: str, url: str, n: int = 54) -> list[Path]:
+    """Capture animated promo page frames (cached)."""
+    cache = ASSETS / f"{cache_name}_frames"
     cache.mkdir(parents=True, exist_ok=True)
     existing = sorted(cache.glob("frame_*.png"))
-    if len(existing) >= 48:
+    if len(existing) >= n:
         return existing
 
     from playwright.sync_api import sync_playwright
 
-    print("  Capturing eKYC celebration animation frames...")
+    print(f"  Capturing {cache_name} animation frames...")
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         ctx = browser.new_context(viewport={"width": 420, "height": 720}, device_scale_factor=2)
@@ -205,7 +225,7 @@ def ensure_celebration_frames() -> list[Path]:
             }));
         """)
         page = ctx.new_page()
-        page.goto("http://localhost:3000/promo-ekyc-approved", wait_until="domcontentloaded", timeout=30000)
+        page.goto(url, wait_until="domcontentloaded", timeout=30000)
         page.wait_for_function("document.fonts.ready", timeout=15000)
         page.evaluate("""() => {
           document.querySelectorAll('[class*="cookie"], [class*="Cookie"], [aria-label*="Cookie"]')
@@ -213,13 +233,21 @@ def ensure_celebration_frames() -> list[Path]:
         }""")
         page.wait_for_timeout(800)
         paths: list[Path] = []
-        for i in range(48):
+        for i in range(n):
             fp = cache / f"frame_{i:03d}.png"
             page.screenshot(path=str(fp), type="png", animations="allow")
-            page.wait_for_timeout(70)
+            page.wait_for_timeout(65 if cache_name == "transfer" else 70)
             paths.append(fp)
         browser.close()
     return paths
+
+
+def ensure_celebration_frames() -> list[Path]:
+    return ensure_animation_frames("ekyc", "http://localhost:3000/promo-ekyc-approved")
+
+
+def ensure_transfer_frames() -> list[Path]:
+    return ensure_animation_frames("transfer", "http://localhost:3000/promo-transfer", n=60)
 
 
 def celebration_panel_at(frame_paths: list[Path], t: float) -> Image.Image:
@@ -237,24 +265,34 @@ def phone_position(phone_w: int, phone_h: int) -> tuple[int, int]:
     return px, py
 
 
+_bg_cache: Image.Image | None = None
+
+
 def bg_canvas() -> Image.Image:
-    c = Image.new("RGB", (W, H), rgb(C["navy"]))
-    d = ImageDraw.Draw(c)
-    for y in range(H):
-        t = y / H
-        col = tuple(
-            int(rgb(C["navy"])[i] + (rgb(C["navy2"])[i] - rgb(C["navy"])[i]) * t)
-            for i in range(3)
-        )
-        d.line([(0, y), (W, y)], fill=col)
-    orbs = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    od = ImageDraw.Draw(orbs)
-    od.ellipse([W - 520, -120, W + 80, 480], fill=(13, 148, 136, 38))
-    od.ellipse([-180, H - 420, 380, H + 80], fill=(45, 212, 191, 22))
-    od.ellipse([W // 2 - 200, H // 2 - 100, W // 2 + 300, H // 2 + 200], fill=(201, 162, 39, 12))
-    orbs = orbs.filter(ImageFilter.GaussianBlur(60))
-    c.paste(orbs, (0, 0), orbs)
-    return c
+    """Brand hero gradient: Navy → Teal → Cyan — cached."""
+    global _bg_cache
+    if _bg_cache is None:
+        c = Image.new("RGB", (W, H), rgb(C["navy"]))
+        d = ImageDraw.Draw(c)
+        c0, c1, c2 = rgb(C["navy"]), rgb(C["teal"]), rgb(C["cyan"])
+        for y in range(H):
+            t = y / H
+            if t < 0.55:
+                u = t / 0.55
+                col = tuple(int(c0[i] + (c1[i] - c0[i]) * u) for i in range(3))
+            else:
+                u = (t - 0.55) / 0.45
+                col = tuple(int(c1[i] + (c2[i] - c1[i]) * u) for i in range(3))
+            d.line([(0, y), (W, y)], fill=col)
+        orbs = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        od = ImageDraw.Draw(orbs)
+        od.ellipse([W - 520, -120, W + 80, 480], fill=(15, 118, 110, 42))
+        od.ellipse([-180, H - 420, 380, H + 80], fill=(94, 234, 212, 18))
+        od.ellipse([W // 2 - 200, H // 2 - 100, W // 2 + 300, H // 2 + 200], fill=(212, 160, 23, 14))
+        orbs = orbs.filter(ImageFilter.GaussianBlur(60))
+        c.paste(orbs, (0, 0), orbs)
+        _bg_cache = c
+    return _bg_cache.copy()
 
 
 def fit_screen(path: Path) -> Image.Image:
@@ -308,7 +346,55 @@ def wrap_lines(text: str, fnt: ImageFont.FreeTypeFont, max_w: int) -> list[str]:
     return lines or [text]
 
 
-def render_frame(scene: dict, logo: Image.Image, frame_t: float = 0.0, celebration_frames: list[Path] | None = None) -> Image.Image:
+def render_endcard(scene: dict, logo: Image.Image) -> Image.Image:
+    """Full-frame brand end-card per style guide."""
+    c = bg_canvas()
+    rgba = c.convert("RGBA")
+    d = ImageDraw.Draw(rgba)
+
+    lg = logo.copy()
+    scale = 72 / lg.height
+    lg = lg.resize((int(lg.width * scale), 72), Image.Resampling.LANCZOS)
+    rgba.paste(lg, ((W - lg.width) // 2, H // 2 - 160), lg)
+
+    tag_f = font(18, bold=True)
+    tag = "DREAM BIG · BORROW SMART"
+    tw = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(tag, font=tag_f)
+    d.text(((W - tw) // 2, H // 2 - 68), tag, fill=rgb(C["gold_light"]), font=tag_f)
+
+    val_f = font(14)
+    val = "Purity & Trust"
+    vw = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(val, font=val_f)
+    d.text(((W - vw) // 2, H // 2 - 38), val, fill=rgb(C["mint"]), font=val_f)
+
+    site_f = font(42, bold=True)
+    site = "neercred.com"
+    sw = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(site, font=site_f)
+    d.text(((W - sw) // 2, H // 2 + 10), site, fill=rgb(C["white"]), font=site_f)
+
+    leg_f = font(13)
+    leg = "Nirav Enterprises, operating as NeerCred"
+    lw = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(leg, font=leg_f)
+    d.text(((W - lw) // 2, H - 100), leg, fill=rgb(C["muted"]), font=leg_f)
+
+    agg = "Digital Lending Aggregator · Financial Services Platform"
+    aw = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(agg, font=leg_f)
+    d.text(((W - aw) // 2, H - 72), agg, fill=rgb(C["muted"]), font=leg_f)
+
+    return rgba.convert("RGB")
+
+
+def render_frame(
+    scene: dict,
+    logo: Image.Image,
+    frame_t: float = 0.0,
+    anim_frames: dict[str, list[Path]] | None = None,
+    scene_idx: int = 0,
+) -> Image.Image:
+    if scene.get("layout") == "endcard":
+        return render_endcard(scene, logo)
+
+    anim_frames = anim_frames or {}
     c = bg_canvas()
     rgba = c.convert("RGBA")
 
@@ -343,17 +429,18 @@ def render_frame(scene: dict, logo: Image.Image, frame_t: float = 0.0, celebrati
         d.text((lx + 22, y), b, fill=rgb(C["white"]), font=bullet_f)
         y += 38
 
-    # Right panel — phone mockup OR celebration card (no phone for lender eKYC)
+    # Right panel — phone mockup OR celebration card
     if scene.get("layout") == "celebration":
-        panel = celebration_panel_at(celebration_frames or [], frame_t)
+        key = scene.get("animation", "ekyc")
+        frames = anim_frames.get(key, [])
+        panel = celebration_panel_at(frames, frame_t)
         pw, ph = panel.width, panel.height
         scale = min(440 / pw, 820 / ph)
         nw, nh = int(pw * scale), int(ph * scale)
         panel = panel.resize((nw, nh), Image.Resampling.LANCZOS)
         px, py = phone_position(nw, nh)
-        # glow behind celebration card
         sh = Image.new("RGBA", (nw + 80, nh + 80), (0, 0, 0, 0))
-        ImageDraw.Draw(sh).rounded_rectangle([30, 30, nw + 50, nh + 50], radius=40, fill=(13, 148, 136, 60))
+        ImageDraw.Draw(sh).rounded_rectangle([30, 30, nw + 50, nh + 50], radius=40, fill=(15, 118, 110, 60))
         sh = sh.filter(ImageFilter.GaussianBlur(32))
         rgba.paste(sh, (px - 28, py + 12), sh)
         rgba.paste(panel, (px, py), panel)
@@ -389,9 +476,8 @@ def render_frame(scene: dict, logo: Image.Image, frame_t: float = 0.0, celebrati
         cy += line_h
     rgba.paste(bar, (0, bar_y), bar)
 
-    # Progress accent — sits just above caption bar
-    idx = SCENES.index(scene) + 1
-    prog_w = int((W - 160) * idx / len(SCENES))
+    # Progress accent
+    prog_w = int((W - 160) * (scene_idx + 1) / len(SCENES))
     bd2 = ImageDraw.Draw(rgba)
     bd2.rounded_rectangle([80, bar_y - 14, 80 + prog_w, bar_y - 8], radius=3, fill=rgb(C["gold"]))
 
@@ -452,7 +538,10 @@ def make_bgm(dur: float, path: Path, drum_times: list[float] | None = None) -> N
     looped.unlink(missing_ok=True)
 
 
-def render_celebration_clip(scene: dict, logo: Image.Image, vo: Path, dur: float, idx: int, celebration_frames: list[Path]) -> Path:
+def render_celebration_clip(
+    scene: dict, logo: Image.Image, vo: Path, dur: float, idx: int,
+    anim_frames: dict[str, list[Path]],
+) -> Path:
     """Animated celebration scene — loops frames while VO plays."""
     CLIPS.mkdir(parents=True, exist_ok=True)
     out = CLIPS / f"scene_{idx:02d}.mp4"
@@ -462,7 +551,7 @@ def render_celebration_clip(scene: dict, logo: Image.Image, vo: Path, dur: float
     seq_dir.mkdir(parents=True, exist_ok=True)
     for f in range(n_frames):
         t = f / n_frames
-        img = render_frame(scene, logo, frame_t=t, celebration_frames=celebration_frames)
+        img = render_frame(scene, logo, frame_t=t, anim_frames=anim_frames, scene_idx=idx)
         img.save(seq_dir / f"frame_{f:04d}.png", quality=92)
     vf = f"fade=t=in:st=0:d=0.35,fade=t=out:st={total - 0.4:.3f}:d=0.4"
     run([
@@ -538,7 +627,7 @@ def concat_clips(clips: list[Path], out: Path) -> None:
     ])
 
 
-async def main(celebration_frames: list[Path]) -> None:
+async def main(anim_frames: dict[str, list[Path]]) -> None:
     for d in (ASSETS, AUDIO, FRAMES, CLIPS, SCREENS, DOWNLOAD):
         d.mkdir(parents=True, exist_ok=True)
 
@@ -556,9 +645,9 @@ async def main(celebration_frames: list[Path]) -> None:
         acc += dur + 0.55
         scene_ends.append(acc)
         fr = FRAMES / f"premium_{i:02d}.png"
-        render_frame(scene, logo, celebration_frames=celebration_frames).save(fr, quality=95)
+        render_frame(scene, logo, anim_frames=anim_frames, scene_idx=i).save(fr, quality=95)
         if scene.get("layout") == "celebration":
-            clips.append(render_celebration_clip(scene, logo, vo, dur, i, celebration_frames))
+            clips.append(render_celebration_clip(scene, logo, vo, dur, i, anim_frames))
         else:
             clips.append(render_clip(fr, vo, dur, i))
         print(f"  {scene['id']}: {dur:.1f}s")
@@ -594,7 +683,7 @@ async def main(celebration_frames: list[Path]) -> None:
     v_out = DOWNLOAD / "NeerCred-Promo-PREMIUM-9x16.mp4"
     run([
         "ffmpeg", "-y", "-i", str(h_out),
-        "-vf", "scale=1080:-2,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=0x070D18",
+        "-vf", "scale=1080:-2,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=0x0B1220",
         "-c:v", "libx264", "-crf", "14", "-pix_fmt", "yuv420p",
         "-c:a", "copy", "-movflags", "+faststart", str(v_out),
     ])
@@ -616,5 +705,7 @@ async def main(celebration_frames: list[Path]) -> None:
 
 
 if __name__ == "__main__":
-    celebration_frames = ensure_celebration_frames()
-    asyncio.run(main(celebration_frames))
+    ekyc_frames = ensure_celebration_frames()
+    transfer_frames = ensure_transfer_frames()
+    anim_frames = {"ekyc": ekyc_frames, "transfer": transfer_frames}
+    asyncio.run(main(anim_frames))
