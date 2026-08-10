@@ -199,6 +199,14 @@ def capture() -> None:
         except Exception as e:
             print(f"  ! api flow: {e}")
 
+        # Approved scene — always capture (no API dependency)
+        try:
+            page.goto(f"{BASE}/promo-approved", wait_until="domcontentloaded", timeout=20000)
+            ready(2000)
+            shot("12-approved")
+        except Exception as e:
+            print(f"  ! approved page: {e}")
+
         browser.close()
     print("Done")
 

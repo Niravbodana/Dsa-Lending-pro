@@ -22,23 +22,18 @@ function OneLineLockup({
   dark?: boolean;
   className?: string;
 }) {
-  const iconSize = Math.round(size * 0.82);
-  const fontSize = Math.round(size * 0.52);
+  const height = Math.round(size * 0.95);
+  const width = Math.round(size * 4.45);
+  const src = dark ? "/neercred-logo-lockup-dark.svg" : "/neercred-logo-lockup.svg";
 
   return (
-    <span className={`inline-flex items-center gap-2 whitespace-nowrap ${className}`}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={SOURCES.icon}
-        alt=""
-        className="shrink-0 rounded-[22%]"
-        style={{ width: iconSize, height: iconSize }}
-      />
-      <span className="font-bold leading-none tracking-tight" style={{ fontSize }}>
-        <span className={dark ? "text-white" : "text-neercred-navy"}>Neer</span>
-        <span className={dark ? "text-teal-300" : "text-neercred-teal"}>Cred</span>
-      </span>
-    </span>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      alt="NeerCred"
+      className={`shrink-0 object-contain object-left ${className}`}
+      style={{ height, width: "auto", maxWidth: width }}
+    />
   );
 }
 

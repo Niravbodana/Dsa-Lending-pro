@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""NeerCred Premium Promo v10 — email OTP, original logo bar, premium audio."""
+"""NeerCred Premium Promo v11 — original logo, approved scene, premium audio."""
 
 from __future__ import annotations
 
@@ -22,7 +22,6 @@ CLIPS = OUT / "clips"
 DOWNLOAD = Path("/opt/cursor/artifacts")
 
 BGM_SOURCE = ASSETS / "soft_morning_keys_piano.mp3"
-LOGO_BAR_H = 92
 
 W, H = 1920, 1080
 FPS = 30
@@ -86,12 +85,20 @@ SCENES = [
         "vo_hi": "Digital KYC.\nAadhaar, bank, eSign.\nAll from home.",
     },
     {
-        "id": "close", "screen": "11-dashboard.png", "step": "START NOW",
+        "id": "dashboard", "screen": "11-dashboard.png", "step": "DASHBOARD",
         "title": "Welcome Back,\nRamprakash",
         "subtitle": "Real-time loan dashboard",
-        "bullets": ["Live application status", "Pre-approved offers", "Apply in 5 minutes"],
-        "vo": "Welcome back, Ramprakash! Track your loan in real time on NeerCred. Dream big, borrow smart — your journey starts here.",
-        "vo_hi": "Welcome back, Ramprakash.\nDream Big. Borrow Smart.",
+        "bullets": ["Live application status", "Pre-approved offers", "Track every step"],
+        "vo": "Welcome back, Ramprakash! Your personalised dashboard keeps every application update right at your fingertips.",
+        "vo_hi": "Welcome back, Ramprakash.\nYour loan dashboard.",
+    },
+    {
+        "id": "approved", "screen": "12-approved.png", "step": "APPROVED",
+        "title": "Congratulations!\nLoan Approved",
+        "subtitle": "₹5,00,000 pre-approved",
+        "bullets": ["Select your loan amount", "Instant disbursal eligible", "Funds in minutes"],
+        "vo": "Congratulations! Your loan of five lakhs is approved. Select your loan amount and get disbursed within minutes on NeerCred.",
+        "vo_hi": "Loan approved — five lakhs.\nSelect amount.\nDisbursed in minutes.",
     },
 ]
 
@@ -139,21 +146,33 @@ def font(sz: int, bold: bool = False, hindi: bool = False) -> ImageFont.FreeType
 
 
 def load_logo() -> Image.Image:
-    p = ASSETS / "logo_header.png"
-    if not p.exists():
-        svg = ROOT / "frontend/public/neercred-logo-header.svg"
-        html = ASSETS / "logo_header_render.html"
+    p = ASSETS / "logo_lockup_dark.png"
+    svg = ROOT / "frontend/public/neercred-logo-lockup-dark.svg"
+    if not p.exists() or p.stat().st_mtime < svg.stat().st_mtime:
+        html = ASSETS / "logo_lockup_render.html"
         html.write_text(
-            f'<!DOCTYPE html><html><head><style>'
-            f'body{{margin:0;background:#070D18;width:420px;height:90px;display:flex;align-items:center;justify-content:center}}'
-            f'</style></head><body>{svg.read_text(encoding="utf-8", errors="replace")}</body></html>'
+            f'<!DOCTYPE html><html><head>'
+            f'<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">'
+            f'<style>body{{margin:0;padding:0;background:#070D18;width:220px;height:52px;'
+            f'display:flex;align-items:center;justify-content:flex-start}}</style>'
+            f'</head><body>{svg.read_text(encoding="utf-8", errors="replace")}</body></html>'
         )
         run(
             ["npx", "playwright", "screenshot", "--browser", "chromium",
-             f"file://{html.resolve()}", str(p), "--viewport-size=420,90"],
+             f"file://{html.resolve()}", str(p), "--viewport-size=220,52"],
             cwd=ROOT / "frontend",
         )
-    return Image.open(p).convert("RGBA")
+    img = Image.open(p).convert("RGBA")
+    px = img.load()
+    bg = rgb(C["navy"])
+    for y in range(img.height):
+        for x in range(img.width):
+            r, g, b, a = px[x, y]
+            if abs(r - bg[0]) < 8 and abs(g - bg[1]) < 8 and abs(b - bg[2]) < 8:
+                px[x, y] = (r, g, b, 0)
+    if img.getbbox():
+        img = img.crop(img.getbbox())
+    return img
 
 
 def bg_canvas() -> Image.Image:
@@ -231,17 +250,13 @@ def render_frame(scene: dict, logo: Image.Image) -> Image.Image:
     c = bg_canvas()
     rgba = c.convert("RGBA")
 
-    # Top brand strip — original logo, one line, centred
-    strip = Image.new("RGBA", (W, LOGO_BAR_H), (7, 13, 24, 245))
-    sd = ImageDraw.Draw(strip)
-    sd.line([(0, LOGO_BAR_H - 1), (W, LOGO_BAR_H - 1)], fill=rgb(C["teal"]) + (80,), width=1)
+    # Original logo — top-left corner, N icon + NeerCred on one line
     lg = logo.copy()
-    lg.thumbnail((360, 64), Image.Resampling.LANCZOS)
-    rgba.paste(strip, (0, 0), strip)
-    rgba.paste(lg, ((W - lg.width) // 2, (LOGO_BAR_H - lg.height) // 2), lg)
+    lg.thumbnail((280, 50), Image.Resampling.LANCZOS)
+    rgba.paste(lg, (48, 32), lg)
 
     # Left copy
-    lx, ly = 72, LOGO_BAR_H + 38
+    lx, ly = 72, 118
     d = ImageDraw.Draw(rgba)
     step_f = font(13, bold=True)
     d.text((lx, ly), scene["step"], fill=rgb(C["teal"]), font=step_f)
@@ -306,14 +321,15 @@ def render_frame(scene: dict, logo: Image.Image) -> Image.Image:
 
 
 async def make_vo(text: str, path: Path) -> float:
-    """Warm, conversational TTS — slower pace, subtle room warmth."""
-    await edge_tts.Communicate(text, VOICE, rate="-4%", pitch="-1Hz").save(str(path))
+    """Warm, conversational TTS — natural pace with subtle warmth."""
+    await edge_tts.Communicate(text, VOICE, rate="-5%", pitch="+0Hz").save(str(path))
     tmp = path.with_suffix(".boost.mp3")
     run([
         "ffmpeg", "-y", "-i", str(path),
         "-af",
-        "highpass=f=80,afftdn=nr=4:nf=-26,"
-        "compand=0.3|0.8:6:-70/-60|-18/-8|0/-4,volume=3.2,alimiter=limit=0.95",
+        "highpass=f=75,lowpass=f=14000,afftdn=nr=3:nf=-28,"
+        "compand=0.25|0.75:5:-70/-58|-20/-10|0/-3,volume=3.0,"
+        "aecho=0.8:0.88:12:0.12,alimiter=limit=0.94",
         "-ar", "44100", "-ac", "2", "-b:a", "192k", str(tmp),
     ])
     tmp.replace(path)
@@ -338,8 +354,8 @@ def make_bgm(dur: float, path: Path, drum_times: list[float] | None = None) -> N
     run([
         "ffmpeg", "-y", "-i", str(src),
         "-af",
-        "highpass=f=80,lowpass=f=7500,"
-        "volume=0.9",
+        "highpass=f=80,lowpass=f=8000,"
+        "volume=1.05",
         str(processed),
     ])
     looped = AUDIO / "bgm_looped.wav"
@@ -347,7 +363,7 @@ def make_bgm(dur: float, path: Path, drum_times: list[float] | None = None) -> N
         "ffmpeg", "-y", "-stream_loop", "-1", "-i", str(processed),
         "-t", f"{dur + 2:.2f}",
         "-af",
-        f"loudnorm=I=-22:TP=-1.5:LRA=10,afade=t=in:d=3,afade=t=out:st={max(0, dur - 3):.2f}:d=3",
+        f"loudnorm=I=-17:TP=-1.0:LRA=9,afade=t=in:d=3,afade=t=out:st={max(0, dur - 3):.2f}:d=3",
         str(looped),
     ])
     run([
@@ -457,12 +473,12 @@ async def main() -> None:
     run([
         "ffmpeg", "-y", "-i", str(merged), "-i", str(bgm),
         "-filter_complex",
-        "[0:a]highpass=f=120,lowpass=f=12000,volume=2.5[sp1];"
+        "[0:a]highpass=f=100,lowpass=f=13000,volume=2.5[sp1];"
         "[sp1]asplit=2[sc][mx];"
-        "[1:a]volume=0.42,aloop=loop=-1:size=2e+09[pi1];"
-        "[pi1][sc]sidechaincompress=threshold=0.02:ratio=8:attack=30:release=600:makeup=2[du1];"
-        "[mx][du1]amix=inputs=2:duration=first:weights=1 0.68:normalize=0,"
-        "loudnorm=I=-17:TP=-1.2:LRA=11,alimiter=limit=0.95[aout]",
+        "[1:a]volume=0.72,aloop=loop=-1:size=2e+09[pi1];"
+        "[pi1][sc]sidechaincompress=threshold=0.03:ratio=5:attack=40:release=450:makeup=2.5[du1];"
+        "[mx][du1]amix=inputs=2:duration=first:weights=1 0.9:normalize=0,"
+        "loudnorm=I=-16:TP=-1.0:LRA=11,alimiter=limit=0.96[aout]",
         "-map", "0:v:0", "-map", "[aout]",
         "-c:v", "copy", "-c:a", "aac", "-b:a", "320k", "-ar", "44100", "-ac", "2",
         "-movflags", "+faststart", str(h_out),
