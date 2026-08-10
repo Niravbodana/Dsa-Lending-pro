@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""NeerCred Premium Promo v4 — cinematic fintech style, motion, pro audio."""
+"""NeerCred Premium Promo v7 — cinematic layout, English VO, melancholic piano BGM."""
 
 from __future__ import annotations
 
@@ -20,6 +20,10 @@ AUDIO = OUT / "audio"
 FRAMES = OUT / "frames"
 CLIPS = OUT / "clips"
 DOWNLOAD = Path("/opt/cursor/artifacts")
+
+# Melancholic solo piano — Mixkit "Piano Reflections" (royalty-free, Caretaker-style vibe)
+BGM_URL = "https://assets.mixkit.co/music/22/22.mp3"
+BGM_SOURCE = ASSETS / "too_many_days_piano.mp3"
 
 W, H = 1920, 1080
 FPS = 30
@@ -321,109 +325,41 @@ async def make_vo(text: str, path: Path) -> float:
     return float(json.loads(r.stdout)["format"]["duration"])
 
 
-def _piano_note(freq: float, duration: float, out: Path) -> None:
-    d = duration
-    fade_out = max(0.05, d - 0.35)
-    run([
-        "ffmpeg", "-y",
-        "-f", "lavfi", "-i", f"sine=f={freq}:duration={d}",
-        "-f", "lavfi", "-i", f"sine=f={freq * 2}:duration={d}",
-        "-f", "lavfi", "-i", f"sine=f={freq * 3}:duration={d}",
-        "-filter_complex",
-        "[0]volume=1[a];[1]volume=0.4[b];[2]volume=0.2[c];"
-        "[a][b][c]amix=inputs=3:duration=first,"
-        f"lowpass=f=3200,afade=t=in:d=0.01,afade=t=out:st={fade_out:.3f}:d=0.35,"
-        "aecho=0.5:0.6:80:0.2,volume=0.55[out]",
-        "-map", "[out]", "-ar", "44100", "-ac", "2", str(out),
-    ])
-
-
-def _drum_hit(kind: str, out: Path) -> None:
-    if kind == "kick":
-        run([
-            "ffmpeg", "-y", "-f", "lavfi", "-i", "sine=f=55:duration=0.2",
-            "-af", "volume=0.9,lowpass=f=140,afade=t=out:st=0.05:d=0.15", "-ar", "44100", "-ac", "2", str(out),
-        ])
-    else:
-        run([
-            "ffmpeg", "-y", "-f", "lavfi", "-i", "anoisesrc=d=0.14:c=pink",
-            "-af", "highpass=f=700,lowpass=f=5000,volume=0.7,afade=t=out:st=0.03:d=0.11",
-            "-ar", "44100", "-ac", "2", str(out),
-        ])
+def ensure_bgm_source() -> Path:
+    ASSETS.mkdir(parents=True, exist_ok=True)
+    if not BGM_SOURCE.exists():
+        print("  Downloading melancholic piano BGM (Too Many Days style)...")
+        urllib.request.urlretrieve(BGM_URL, BGM_SOURCE)
+    return BGM_SOURCE
 
 
 def make_bgm(dur: float, path: Path, drum_times: list[float] | None = None) -> None:
-    """Soft piano arpeggio loop + dramatic drum hits at scene changes."""
-    melody = [
-        (261.63, 0.65), (329.63, 0.55), (392.00, 0.55), (523.25, 0.85),
-        (293.66, 0.65), (349.23, 0.55), (440.00, 0.55), (587.33, 0.85),
-        (349.23, 0.65), (440.00, 0.55), (523.25, 0.55), (698.46, 0.85),
-        (392.00, 0.65), (493.88, 0.55), (587.33, 0.55), (783.99, 0.90),
-    ]
-    piano_parts: list[Path] = []
-    for i, (freq, nd) in enumerate(melody):
-        p = AUDIO / f"pn_{i}.wav"
-        _piano_note(freq, nd, p)
-        piano_parts.append(p)
-
-    inp = []
-    for j, p in enumerate(piano_parts):
-        inp += ["-i", str(p)]
-    filt = "".join(f"[{j}:a]" for j in range(len(piano_parts))) + f"concat=n={len(piano_parts)}:v=0:a=1[piano]"
-    piano_loop = AUDIO / "piano_loop.wav"
-    run(["ffmpeg", "-y", *inp, "-filter_complex", filt, "-map", "[piano]", str(piano_loop)])
-    for p in piano_parts:
-        p.unlink(missing_ok=True)
-
-    piano_wav = AUDIO / "piano_full.wav"
+    """Slow melancholic solo piano — royalty-free, Caretaker / Too Many Days vibe."""
+    _ = drum_times  # piano-only BGM
+    src = ensure_bgm_source()
+    processed = AUDIO / "bgm_processed.wav"
     run([
-        "ffmpeg", "-y", "-stream_loop", "-1", "-i", str(piano_loop),
-        "-t", f"{dur + 2:.2f}", "-af", "volume=1.2", str(piano_wav),
+        "ffmpeg", "-y", "-i", str(src),
+        "-af",
+        "atempo=0.92,asetrate=42336,aresample=44100,"
+        "aecho=0.55:0.65:100:0.28,lowpass=f=4500,"
+        "volume=1.5",
+        str(processed),
     ])
-    piano_loop.unlink(missing_ok=True)
-
-    drum_times = drum_times or [12, 24, 36, 48, 60]
-    drum_wav = AUDIO / "drums_raw.wav"
+    looped = AUDIO / "bgm_looped.wav"
     run([
-        "ffmpeg", "-y", "-f", "lavfi", "-i", f"anullsrc=r=44100:cl=stereo:d={dur + 2:.2f}",
-        "-filter_complex", "anull[out]", "-map", "[out]", str(drum_wav),
-    ])
-    for di, dt in enumerate(drum_times):
-        if dt >= dur:
-            continue
-        kick = AUDIO / f"dk{di}.wav"
-        snare = AUDIO / f"ds{di}.wav"
-        _drum_hit("kick", kick)
-        _drum_hit("snare", snare)
-        merged_drums = AUDIO / f"dm{di}.wav"
-        run([
-            "ffmpeg", "-y", "-i", str(drum_wav), "-i", str(kick), "-i", str(snare),
-            "-filter_complex",
-            f"[1]adelay={int(dt * 1000)}|{int(dt * 1000)}[k];"
-            f"[2]adelay={int((dt + 0.22) * 1000)}|{int((dt + 0.22) * 1000)}[s];"
-            "[0][k][s]amix=inputs=3:duration=first:dropout_transition=0[out]",
-            "-map", "[out]", str(merged_drums),
-        ])
-        drum_wav.unlink(missing_ok=True)
-        drum_wav = merged_drums
-        kick.unlink(missing_ok=True)
-        snare.unlink(missing_ok=True)
-
-    mixed = AUDIO / "bgm_mix.wav"
-    run([
-        "ffmpeg", "-y", "-i", str(piano_wav), "-i", str(drum_wav),
-        "-filter_complex",
-        "[0]volume=1[p];[1]volume=0.85[d];[p][d]amix=inputs=2:duration=first:dropout_transition=0[out]",
-        "-map", "[out]", str(mixed),
+        "ffmpeg", "-y", "-stream_loop", "-1", "-i", str(processed),
+        "-t", f"{dur + 2:.2f}",
+        "-af",
+        f"loudnorm=I=-16:TP=-1.5:LRA=11,afade=t=in:d=2.5,afade=t=out:st={max(0, dur - 2.5):.2f}:d=2.5",
+        str(looped),
     ])
     run([
-        "ffmpeg", "-y", "-i", str(mixed), "-t", f"{dur + 1:.2f}",
-        "-af", f"loudnorm=I=-18:TP=-1.5:LRA=11,afade=t=in:d=2,afade=t=out:st={max(0, dur - 2):.2f}:d=2",
+        "ffmpeg", "-y", "-i", str(looped), "-t", f"{dur + 1:.2f}",
         "-ar", "44100", "-ac", "2", str(path),
     ])
-    piano_wav.unlink(missing_ok=True)
-    drum_wav.unlink(missing_ok=True)
-    mixed.unlink(missing_ok=True)
+    processed.unlink(missing_ok=True)
+    looped.unlink(missing_ok=True)
 
 
 def render_clip(frame: Path, vo: Path, dur: float, idx: int) -> Path:
@@ -519,15 +455,14 @@ async def main() -> None:
     bgm = AUDIO / "bgm_premium.mp3"
     r = run(["ffprobe", "-v", "quiet", "-print_format", "json", "-show_format", str(merged)], capture_output=True, text=True)
     vid_dur = float(json.loads(r.stdout)["format"]["duration"])
-    drum_times = [max(2.0, t - 0.3) for t in scene_ends[1:-1]]
-    make_bgm(vid_dur, bgm, drum_times=drum_times)
+    make_bgm(vid_dur, bgm)
 
     h_out = DOWNLOAD / "NeerCred-Promo-PREMIUM-16x9.mp4"
     run([
         "ffmpeg", "-y", "-i", str(merged), "-i", str(bgm),
         "-filter_complex",
         "[0:a]volume=1.5[va];[1:a]volume=1.0,aloop=loop=-1:size=2e+09[vb];"
-        "[va][vb]amix=inputs=2:duration=first:weights=1 0.45:normalize=0[aout]",
+        "[va][vb]amix=inputs=2:duration=first:weights=1 0.58:normalize=0[aout]",
         "-map", "0:v:0", "-map", "[aout]",
         "-c:v", "copy", "-c:a", "aac", "-b:a", "320k", "-ar", "44100", "-ac", "2",
         "-movflags", "+faststart", str(h_out),
