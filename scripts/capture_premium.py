@@ -13,6 +13,7 @@ import requests
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 from capture_email_js import EMAIL_APPLY_JS, EMAIL_OTP_JS  # noqa: E402
+from capture_profile_js import PROFILE_PROMO_JS  # noqa: E402
 
 OUT = Path("/opt/cursor/artifacts/neercred-promo-video/screenshots")
 BASE = "http://localhost:3000"
@@ -127,6 +128,9 @@ def capture() -> None:
             page.evaluate(f"localStorage.setItem('session_token', '{t}')")
             page.goto(f"{BASE}/apply", wait_until="domcontentloaded", timeout=30000)
             ready(2000)
+            page.evaluate(PROFILE_PROMO_JS)
+            page.wait_for_timeout(400)
+            clean()
             shot("04-profile")
 
             prof = {
@@ -184,13 +188,7 @@ def capture() -> None:
                 ).json()
                 aid = sel.get("application_id")
                 if aid:
-                    page.goto(
-                        f"{BASE}/application/{aid}/kyc",
-                        wait_until="domcontentloaded",
-                        timeout=30000,
-                    )
-                    ready()
-                    shot("10-kyc")
+                    pass  # KYC happens on lender platform — no mobile screenshot
 
             page.goto(f"{BASE}/dashboard?demo=1", wait_until="domcontentloaded", timeout=20000)
             ready()

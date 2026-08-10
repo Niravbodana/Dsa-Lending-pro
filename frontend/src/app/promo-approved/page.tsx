@@ -5,21 +5,33 @@ import Link from "next/link";
 
 export default function PromoApprovedPage() {
   return (
-    <div className="min-h-dvh bg-gradient-to-b from-[#ECFDF5] via-white to-[#F0FDFA]">
-      <div className="mx-auto flex min-h-dvh max-w-md flex-col px-5 pb-8 pt-5">
+    <div className="relative min-h-dvh bg-gradient-to-b from-[#ECFDF5] via-white to-[#F0FDFA]">
+      <div className="relative mx-auto flex min-h-dvh max-w-md flex-col px-5 pb-8 pt-5">
         <Link href="/" className="mb-6 inline-flex w-fit items-center">
           <Image src="/neercred-logo-lockup.svg" alt="NeerCred" width={168} height={56} priority className="h-12 w-auto" />
         </Link>
 
-        <div className="flex flex-1 flex-col items-center text-center">
+        <div className="relative flex flex-1 flex-col items-center text-center">
+          <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-center gap-4 text-2xl opacity-80">
+            {["🎉", "😊", "✨", "🎊"].map((e, i) => (
+              <span
+                key={e}
+                className="animate-bounce"
+                style={{ animationDelay: `${i * 0.2}s`, animationDuration: "1.4s" }}
+              >
+                {e}
+              </span>
+            ))}
+          </div>
+
           <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 shadow-lg shadow-emerald-500/30">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden>
               <path d="M5 13l4 4L19 7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
 
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-600">Congratulations!</p>
-          <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-[#0B1220]">Loan Approved</h1>
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-600">Congratulations! 🎉</p>
+          <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-[#0B1220]">Loan Approved 🎉</h1>
           <p className="mt-2 text-sm text-slate-500">Your application has been approved by our lending partner</p>
 
           <div className="mt-8 w-full rounded-3xl border border-emerald-200/80 bg-white p-6 shadow-[0_12px_40px_-16px_rgba(16,185,129,0.35)]">

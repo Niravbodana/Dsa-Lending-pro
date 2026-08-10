@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import math
 import subprocess
 import urllib.request
 from pathlib import Path
@@ -27,6 +28,7 @@ W, H = 1920, 1080
 FPS = 30
 VOICE = "en-IN-NeerjaNeural"
 PHONE_W, PHONE_H = 400, 866
+PHONE_X_RATIO = 0.645  # nudge mockup right for better fit
 
 SCENES = [
     {
@@ -62,11 +64,11 @@ SCENES = [
     },
     {
         "id": "profile", "screen": "04-profile.png", "step": "PROFILE",
-        "title": "Smart\nProfile",
-        "subtitle": "PAN auto-fill from records",
-        "bullets": ["One form, no repeat entry", "Minimal documentation", "Guided step by step"],
-        "vo": "Fill in your profile once. Your PAN details auto-fill, so you're not typing the same thing over and over.",
-        "vo_hi": "Complete your profile.\nPAN auto-fill.\nFill once only.",
+        "title": "PAN\nVerification",
+        "subtitle": "Enter PAN to verify identity",
+        "bullets": ["Secure identity check", "Minimal documentation", "Guided step by step"],
+        "vo": "Enter your PAN number and complete your profile — one simple form with guided steps.",
+        "vo_hi": "Enter PAN.\nComplete profile.\nOne simple form.",
     },
     {
         "id": "offers", "screen": "09-offers.png", "step": "COMPARE",
@@ -77,28 +79,28 @@ SCENES = [
         "vo_hi": "Compare lender offers.\nBest rates on one screen.\nSelect in one tap.",
     },
     {
-        "id": "kyc", "screen": "10-kyc.png", "step": "KYC",
-        "title": "Digital\nKYC",
-        "subtitle": "Aadhaar · Bank · eSign",
-        "bullets": ["Aadhaar OTP verification", "Bank account verify", "Digital eSign from home"],
-        "vo": "KYC is fully digital. Aadhaar OTP, bank verification, and eSign — all done from your couch.",
-        "vo_hi": "Digital KYC.\nAadhaar, bank, eSign.\nAll from home.",
+        "id": "kyc", "layout": "celebration", "step": "KYC",
+        "title": "Aadhaar\neKYC",
+        "subtitle": "Verified on lender platform",
+        "bullets": ["Lender-side secure verification", "Instant approval", "Not on NeerCred app"],
+        "vo": "Your Aadhaar eKYC is verified on your lender's secure platform. Approved in seconds!",
+        "vo_hi": "Aadhaar eKYC approved!\nLender platform.\nVerified in seconds.",
     },
     {
         "id": "dashboard", "screen": "11-dashboard.png", "step": "DASHBOARD",
         "title": "Welcome Back,\nRamprakash",
         "subtitle": "Real-time loan dashboard",
         "bullets": ["Live application status", "Pre-approved offers", "Track every step"],
-        "vo": "Welcome back, Ramprakash! Your personalised dashboard keeps every application update right at your fingertips.",
+        "vo": "Welcome back, Ramprakash! Your custom dashboard keeps every loan update right at your fingertips.",
         "vo_hi": "Welcome back, Ramprakash.\nYour loan dashboard.",
     },
     {
         "id": "approved", "screen": "12-approved.png", "step": "APPROVED",
-        "title": "Congratulations!\nLoan Approved",
+        "title": "Congratulations!\nLoan Approved 🎉",
         "subtitle": "₹5,00,000 pre-approved",
         "bullets": ["Select your loan amount", "Instant disbursal eligible", "Funds in minutes"],
-        "vo": "Congratulations! Your loan of five lakhs is approved. Select your loan amount and get disbursed within minutes on NeerCred.",
-        "vo_hi": "Loan approved — five lakhs.\nSelect amount.\nDisbursed in minutes.",
+        "vo": "Congratulations! Your five lakh loan is approved. Select your loan amount and get disbursed within minutes on NeerCred.",
+        "vo_hi": "Congratulations!\nFive lakhs approved.\nDisbursed in minutes.",
     },
 ]
 
@@ -183,6 +185,58 @@ def load_logo() -> Image.Image:
     return padded
 
 
+def ensure_celebration_frames() -> list[Path]:
+    """Capture animated eKYC celebration from promo page (cached)."""
+    cache = ASSETS / "ekyc_celebration_frames"
+    cache.mkdir(parents=True, exist_ok=True)
+    existing = sorted(cache.glob("frame_*.png"))
+    if len(existing) >= 48:
+        return existing
+
+    from playwright.sync_api import sync_playwright
+
+    print("  Capturing eKYC celebration animation frames...")
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        ctx = browser.new_context(viewport={"width": 420, "height": 720}, device_scale_factor=2)
+        ctx.add_init_script("""
+            localStorage.setItem('neer_cookie_consent_v1', JSON.stringify({
+              essential: true, analytics: false, savedAt: new Date().toISOString()
+            }));
+        """)
+        page = ctx.new_page()
+        page.goto("http://localhost:3000/promo-ekyc-approved", wait_until="domcontentloaded", timeout=30000)
+        page.wait_for_function("document.fonts.ready", timeout=15000)
+        page.evaluate("""() => {
+          document.querySelectorAll('[class*="cookie"], [class*="Cookie"], [aria-label*="Cookie"]')
+            .forEach(e => e.remove());
+        }""")
+        page.wait_for_timeout(800)
+        paths: list[Path] = []
+        for i in range(48):
+            fp = cache / f"frame_{i:03d}.png"
+            page.screenshot(path=str(fp), type="png", animations="allow")
+            page.wait_for_timeout(70)
+            paths.append(fp)
+        browser.close()
+    return paths
+
+
+def celebration_panel_at(frame_paths: list[Path], t: float) -> Image.Image:
+    """Pick celebration frame by animation time (loops every ~3.4s)."""
+    if not frame_paths:
+        return Image.new("RGBA", (420, 720), rgb(C["navy"]) + (255,))
+    cycle = len(frame_paths)
+    idx = int(t * cycle * 0.85) % cycle
+    return Image.open(frame_paths[idx]).convert("RGBA")
+
+
+def phone_position(phone_w: int, phone_h: int) -> tuple[int, int]:
+    px = int(W * PHONE_X_RATIO) - phone_w // 2 + 18
+    py = (H - phone_h) // 2 + 4
+    return px, py
+
+
 def bg_canvas() -> Image.Image:
     c = Image.new("RGB", (W, H), rgb(C["navy"]))
     d = ImageDraw.Draw(c)
@@ -254,7 +308,7 @@ def wrap_lines(text: str, fnt: ImageFont.FreeTypeFont, max_w: int) -> list[str]:
     return lines or [text]
 
 
-def render_frame(scene: dict, logo: Image.Image) -> Image.Image:
+def render_frame(scene: dict, logo: Image.Image, frame_t: float = 0.0, celebration_frames: list[Path] | None = None) -> Image.Image:
     c = bg_canvas()
     rgba = c.convert("RGBA")
 
@@ -289,18 +343,31 @@ def render_frame(scene: dict, logo: Image.Image) -> Image.Image:
         d.text((lx + 22, y), b, fill=rgb(C["white"]), font=bullet_f)
         y += 38
 
-    # Phone right
-    sf = SCREENS / scene["screen"]
-    if not sf.exists():
-        sf = SCREENS / "01-homepage.png"
-    phone = draw_phone(fit_screen(sf))
-    px = int(W * 0.58) - phone.width // 2
-    py = (H - phone.height) // 2 + 8
-    sh = Image.new("RGBA", (phone.width + 80, phone.height + 80), (0, 0, 0, 0))
-    ImageDraw.Draw(sh).rounded_rectangle([30, 30, phone.width + 50, phone.height + 50], radius=60, fill=(0, 0, 0, 90))
-    sh = sh.filter(ImageFilter.GaussianBlur(28))
-    rgba.paste(sh, (px - 24, py + 16), sh)
-    rgba.paste(phone, (px, py), phone)
+    # Right panel — phone mockup OR celebration card (no phone for lender eKYC)
+    if scene.get("layout") == "celebration":
+        panel = celebration_panel_at(celebration_frames or [], frame_t)
+        pw, ph = panel.width, panel.height
+        scale = min(440 / pw, 820 / ph)
+        nw, nh = int(pw * scale), int(ph * scale)
+        panel = panel.resize((nw, nh), Image.Resampling.LANCZOS)
+        px, py = phone_position(nw, nh)
+        # glow behind celebration card
+        sh = Image.new("RGBA", (nw + 80, nh + 80), (0, 0, 0, 0))
+        ImageDraw.Draw(sh).rounded_rectangle([30, 30, nw + 50, nh + 50], radius=40, fill=(13, 148, 136, 60))
+        sh = sh.filter(ImageFilter.GaussianBlur(32))
+        rgba.paste(sh, (px - 28, py + 12), sh)
+        rgba.paste(panel, (px, py), panel)
+    else:
+        sf = SCREENS / scene["screen"]
+        if not sf.exists():
+            sf = SCREENS / "01-homepage.png"
+        phone = draw_phone(fit_screen(sf))
+        px, py = phone_position(phone.width, phone.height)
+        sh = Image.new("RGBA", (phone.width + 80, phone.height + 80), (0, 0, 0, 0))
+        ImageDraw.Draw(sh).rounded_rectangle([30, 30, phone.width + 50, phone.height + 50], radius=60, fill=(0, 0, 0, 90))
+        sh = sh.filter(ImageFilter.GaussianBlur(28))
+        rgba.paste(sh, (px - 24, py + 16), sh)
+        rgba.paste(phone, (px, py), phone)
 
     # Caption bar — dynamic height, lifted from bottom so text never clips
     cap_f = font(24, bold=True)
@@ -385,6 +452,32 @@ def make_bgm(dur: float, path: Path, drum_times: list[float] | None = None) -> N
     looped.unlink(missing_ok=True)
 
 
+def render_celebration_clip(scene: dict, logo: Image.Image, vo: Path, dur: float, idx: int, celebration_frames: list[Path]) -> Path:
+    """Animated celebration scene — loops frames while VO plays."""
+    CLIPS.mkdir(parents=True, exist_ok=True)
+    out = CLIPS / f"scene_{idx:02d}.mp4"
+    total = dur + 0.55
+    n_frames = max(int(total * FPS), 30)
+    seq_dir = CLIPS / f"celebration_seq_{idx}"
+    seq_dir.mkdir(parents=True, exist_ok=True)
+    for f in range(n_frames):
+        t = f / n_frames
+        img = render_frame(scene, logo, frame_t=t, celebration_frames=celebration_frames)
+        img.save(seq_dir / f"frame_{f:04d}.png", quality=92)
+    vf = f"fade=t=in:st=0:d=0.35,fade=t=out:st={total - 0.4:.3f}:d=0.4"
+    run([
+        "ffmpeg", "-y", "-framerate", str(FPS), "-i", str(seq_dir / "frame_%04d.png"),
+        "-i", str(vo),
+        "-vf", vf, "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "14", "-preset", "medium",
+        "-c:a", "aac", "-b:a", "256k", "-ar", "44100", "-ac", "2",
+        "-shortest", "-t", f"{total:.3f}", str(out),
+    ])
+    for fp in seq_dir.glob("*.png"):
+        fp.unlink(missing_ok=True)
+    seq_dir.rmdir()
+    return out
+
+
 def render_clip(frame: Path, vo: Path, dur: float, idx: int) -> Path:
     """Stable static frame — no zoompan (prevents screen shake/vibration)."""
     CLIPS.mkdir(parents=True, exist_ok=True)
@@ -445,7 +538,7 @@ def concat_clips(clips: list[Path], out: Path) -> None:
     ])
 
 
-async def main() -> None:
+async def main(celebration_frames: list[Path]) -> None:
     for d in (ASSETS, AUDIO, FRAMES, CLIPS, SCREENS, DOWNLOAD):
         d.mkdir(parents=True, exist_ok=True)
 
@@ -463,8 +556,11 @@ async def main() -> None:
         acc += dur + 0.55
         scene_ends.append(acc)
         fr = FRAMES / f"premium_{i:02d}.png"
-        render_frame(scene, logo).save(fr, quality=95)
-        clips.append(render_clip(fr, vo, dur, i))
+        render_frame(scene, logo, celebration_frames=celebration_frames).save(fr, quality=95)
+        if scene.get("layout") == "celebration":
+            clips.append(render_celebration_clip(scene, logo, vo, dur, i, celebration_frames))
+        else:
+            clips.append(render_clip(fr, vo, dur, i))
         print(f"  {scene['id']}: {dur:.1f}s")
 
     vo_list = AUDIO / "vo_all.txt"
@@ -520,4 +616,5 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    celebration_frames = ensure_celebration_frames()
+    asyncio.run(main(celebration_frames))
