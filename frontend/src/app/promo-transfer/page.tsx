@@ -19,7 +19,7 @@ export default function PromoTransferPage() {
   const done = progress >= 99;
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-gradient-to-br from-[#0B1220] via-[#0F766E] to-[#0891B2] px-6">
+    <div className="promo-no-chrome flex min-h-dvh items-center justify-center bg-gradient-to-br from-[#0B1220] via-[#0F766E] to-[#0891B2] px-6">
       <div className="transfer-card w-full max-w-sm rounded-3xl border border-white/10 bg-white/5 p-8 text-center shadow-[0_0_80px_-20px_rgba(94,234,212,0.5)] backdrop-blur-xl">
         <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0F766E] to-[#0891B2] shadow-lg">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -67,6 +67,18 @@ export default function PromoTransferPage() {
         )}
       </div>
 
+      <style jsx global>{`
+        .promo-no-chrome ~ [role="dialog"],
+        nextjs-portal,
+        [data-nextjs-toast],
+        [data-next-mark],
+        #__nextjs-dev-tools-menu,
+        #__nextjs-build-indicator,
+        button.fixed.bottom-6.left-6 {
+          display: none !important;
+          visibility: hidden !important;
+        }
+      `}</style>
       <style jsx>{`
         .transfer-card { animation: cardIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
         @keyframes cardIn {

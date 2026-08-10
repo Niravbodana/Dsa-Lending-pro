@@ -52,29 +52,27 @@ function EndcardLogo() {
           fill="url(#ec-gold)"
         />
       </g>
-      <text
-        x="78"
-        y="48"
-        fontFamily="Poppins, system-ui, sans-serif"
-        fontSize="34"
-        fontWeight="800"
-        letterSpacing="-0.5"
-        dominantBaseline="middle"
-      >
+      <text x="78" y="48" fontFamily="Poppins, system-ui, sans-serif" fontSize="34" fontWeight="800" letterSpacing="-0.5" dominantBaseline="middle">
         <tspan fill="#F8FAFC">Neer</tspan>
         <tspan fill="url(#ec-cred)">Cred</tspan>
       </text>
-      <text
-        x="78"
-        y="78"
-        fontFamily="Poppins, system-ui, sans-serif"
-        fontSize="11"
-        fontWeight="600"
-        fill="url(#ec-gold-text)"
-        letterSpacing="3.2"
-      >
+      <text x="78" y="78" fontFamily="Poppins, system-ui, sans-serif" fontSize="11" fontWeight="600" fill="url(#ec-gold-text)" letterSpacing="3.2">
         DREAM BIG · BORROW SMART
       </text>
+    </svg>
+  );
+}
+
+function PointerCursor() {
+  return (
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden className="drop-shadow-lg">
+      <path
+        d="M5.5 3.5L18.5 11.2C19.3 11.7 19.1 13 18.1 13.2L13.8 14.1L12.2 18.8C11.9 19.7 10.7 19.8 10.2 19L5.5 3.5Z"
+        fill="white"
+        stroke="#0B1220"
+        strokeWidth="1.2"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
@@ -84,7 +82,7 @@ export default function PromoEndcardPage() {
     <>
       <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
       <div
-        className="promo-endcard-root relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-8"
+        className="promo-no-chrome promo-endcard-root relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-8"
         style={{
           background: "linear-gradient(135deg, #0B1220 0%, #0F766E 48%, #0891B2 100%)",
           fontFamily: "Poppins, system-ui, sans-serif",
@@ -106,29 +104,53 @@ export default function PromoEndcardPage() {
         </div>
 
         <p
-          className="endcard-tag relative z-10 mt-6 text-center text-base font-semibold uppercase tracking-[0.35em] text-[#FDE68A]"
+          className="endcard-tag relative z-10 mt-5 text-center text-base font-semibold uppercase tracking-[0.35em] text-[#FDE68A]"
           style={{ textShadow: "0 2px 24px rgba(212,160,23,0.35)" }}
         >
           Purity &amp; Trust
         </p>
 
-        <p className="endcard-site relative z-10 mt-8 text-6xl font-extrabold tracking-tight text-white">
-          neercred.com
-        </p>
+        <div className="endcard-link-wrap relative z-10 mt-8">
+          <a
+            href="https://www.neercred.com"
+            className="endcard-link group relative inline-block text-5xl font-extrabold tracking-tight text-white no-underline sm:text-[3.25rem]"
+          >
+            <span className="relative z-10">www.neercred.com</span>
+            <span className="endcard-link-underline absolute -bottom-1 left-0 h-1 w-full rounded-full bg-gradient-to-r from-[#5EEAD4] to-[#FDE68A]" />
+            <span className="endcard-click-ripple pointer-events-none absolute left-1/2 top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/40" />
+          </a>
+          <div className="endcard-cursor pointer-events-none absolute left-full top-1/2 z-20 -translate-y-1/2">
+            <PointerCursor />
+          </div>
+        </div>
 
-        <p className="endcard-legal relative z-10 mt-14 max-w-xl text-center text-sm leading-relaxed text-slate-300">
+        <button
+          type="button"
+          className="endcard-cta relative z-10 mt-8 rounded-2xl px-12 py-4 text-lg font-bold text-white shadow-2xl"
+          style={{
+            background: "linear-gradient(135deg, #0B1220 0%, #134E4A 50%, #0F766E 100%)",
+            boxShadow: "0 12px 40px -8px rgba(15,118,110,0.65), 0 0 0 1px rgba(94,234,212,0.25)",
+          }}
+        >
+          Apply Now →
+        </button>
+
+        <p className="endcard-legal relative z-10 mt-12 max-w-xl text-center text-sm leading-relaxed text-slate-300">
           Nirav Enterprises, operating as NeerCred
           <br />
           Digital Lending Aggregator · Financial Services Platform
         </p>
 
         <style jsx global>{`
+          .promo-no-chrome ~ [role="dialog"],
           nextjs-portal,
           [data-nextjs-toast],
           [data-next-mark],
           #__nextjs-dev-tools-menu,
-          #__nextjs-build-indicator {
+          #__nextjs-build-indicator,
+          button.fixed.bottom-6.left-6 {
             display: none !important;
+            visibility: hidden !important;
           }
           @keyframes endcardLogoIn {
             0% {
@@ -159,6 +181,78 @@ export default function PromoEndcardPage() {
               filter: blur(0);
             }
           }
+          @keyframes endcardCursorMove {
+            0%,
+            18% {
+              opacity: 0;
+              transform: translate(120px, 80px) scale(1);
+            }
+            28% {
+              opacity: 1;
+              transform: translate(120px, 80px) scale(1);
+            }
+            52% {
+              opacity: 1;
+              transform: translate(-28px, 8px) scale(1);
+            }
+            58% {
+              opacity: 1;
+              transform: translate(-28px, 8px) scale(0.82);
+            }
+            62% {
+              opacity: 1;
+              transform: translate(-28px, 8px) scale(1);
+            }
+            100% {
+              opacity: 1;
+              transform: translate(-28px, 8px) scale(1);
+            }
+          }
+          @keyframes endcardLinkPulse {
+            0%,
+            55% {
+              text-shadow: none;
+              filter: brightness(1);
+            }
+            62% {
+              text-shadow: 0 0 28px rgba(94, 234, 212, 0.85);
+              filter: brightness(1.15);
+            }
+            75%,
+            100% {
+              text-shadow: 0 0 16px rgba(94, 234, 212, 0.45);
+              filter: brightness(1.05);
+            }
+          }
+          @keyframes endcardRipple {
+            0%,
+            58% {
+              opacity: 0;
+              transform: translate(-50%, -50%) scale(0.2);
+            }
+            62% {
+              opacity: 0.7;
+              transform: translate(-50%, -50%) scale(2.5);
+            }
+            75% {
+              opacity: 0;
+              transform: translate(-50%, -50%) scale(4);
+            }
+            100% {
+              opacity: 0;
+            }
+          }
+          @keyframes endcardCtaIn {
+            0%,
+            60% {
+              opacity: 0;
+              transform: translateY(24px) scale(0.94);
+            }
+            100% {
+              opacity: 1;
+              transform: translateY(0) scale(1);
+            }
+          }
           .endcard-logo {
             animation: endcardLogoIn 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
           }
@@ -166,13 +260,26 @@ export default function PromoEndcardPage() {
             opacity: 0;
             animation: endcardFadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.45s forwards;
           }
-          .endcard-site {
+          .endcard-link-wrap {
             opacity: 0;
-            animation: endcardFadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.7s forwards;
+            animation: endcardFadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.65s forwards;
+          }
+          .endcard-link {
+            animation: endcardLinkPulse 3.5s ease-in-out 0.65s infinite;
+          }
+          .endcard-cursor {
+            animation: endcardCursorMove 3.5s cubic-bezier(0.22, 1, 0.36, 1) 0.8s infinite;
+          }
+          .endcard-click-ripple {
+            animation: endcardRipple 3.5s ease-out 0.8s infinite;
+          }
+          .endcard-cta {
+            opacity: 0;
+            animation: endcardCtaIn 0.85s cubic-bezier(0.16, 1, 0.3, 1) 1.1s forwards;
           }
           .endcard-legal {
             opacity: 0;
-            animation: endcardFadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 1s forwards;
+            animation: endcardFadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 1.25s forwards;
           }
         `}</style>
       </div>

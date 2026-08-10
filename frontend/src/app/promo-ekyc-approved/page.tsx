@@ -2,7 +2,7 @@
 
 export default function PromoEkycApprovedPage() {
   return (
-    <div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-gradient-to-br from-[#070D18] via-[#0B1528] to-[#0F172A] px-6">
+    <div className="promo-no-chrome relative flex min-h-dvh items-center justify-center overflow-hidden bg-gradient-to-br from-[#070D18] via-[#0B1528] to-[#0F172A] px-6">
       <div className="pointer-events-none absolute inset-0">
         {["🎉", "😊", "✨", "🎊", "⭐", "😄"].map((e, i) => (
           <span

@@ -68,7 +68,7 @@ export default function PromoGreetingPage() {
     <>
       <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
       <div
-        className="promo-greeting-root relative flex min-h-dvh flex-col items-center justify-center overflow-hidden"
+        className="promo-no-chrome promo-greeting-root relative flex min-h-dvh flex-col items-center justify-center overflow-hidden"
         style={{
           background: "linear-gradient(135deg, #0B1220 0%, #0F766E 50%, #0891B2 100%)",
           fontFamily: "Poppins, system-ui, sans-serif",
@@ -98,8 +98,10 @@ export default function PromoGreetingPage() {
           [data-nextjs-toast],
           [data-next-mark],
           #__nextjs-dev-tools-menu,
-          #__nextjs-build-indicator {
+          #__nextjs-build-indicator,
+          button.fixed.bottom-6.left-6 {
             display: none !important;
+            visibility: hidden !important;
           }
           @keyframes greetingWelcomeIn {
             0% {

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""NeerCred Premium Promo v18 — HD greeting + clean phone screen."""
+"""NeerCred Premium Promo v19 — brand voice + premium endcard CTA."""
 
 from __future__ import annotations
 
@@ -113,10 +113,10 @@ SCENES = [
     {
         "id": "endcard", "layout": "endcard_full", "animation": "endcard", "step": "NEERCRED",
         "title": "Dream Big.\nBorrow Smart.",
-        "subtitle": "neercred.com",
+        "subtitle": "www.neercred.com",
         "bullets": [],
-        "vo": "NeerCred — your digital lending aggregator. Dream big, borrow smart. Visit neercred.com to check your eligibility today.",
-        "vo_hi": "Dream Big · Borrow Smart.\nneercred.com",
+        "vo": "NeerCred — your digital lending aggregator. Dream big, borrow smart. Visit www dot neercred dot com and apply now.",
+        "vo_hi": "Dream Big · Borrow Smart.\nwww.neercred.com",
     },
 ]
 
@@ -306,7 +306,7 @@ def ensure_endcard_frames() -> list[Path]:
     return ensure_animation_frames(
         "endcard",
         "http://localhost:3000/promo-endcard",
-        n=72,
+        n=96,
         viewport_w=960,
         viewport_h=540,
         device_scale=2,
@@ -567,9 +567,18 @@ def render_frame(
     return rgba.convert("RGB")
 
 
+def brand_voice_text(text: str) -> str:
+    """TTS-friendly brand pronunciation — Neer Cred (not Near Cred)."""
+    text = text.replace("NeerCred", "Neer Cred")
+    text = text.replace("www.neercred.com", "www dot neercred dot com")
+    text = text.replace("neercred.com", "neercred dot com")
+    return text
+
+
 async def make_vo(text: str, path: Path) -> float:
-    """Warm, conversational TTS — natural pace with subtle warmth."""
-    await edge_tts.Communicate(text, VOICE, rate="-5%", pitch="+0Hz").save(str(path))
+    """Warm TTS with correct NeerCred brand pronunciation."""
+    spoken = brand_voice_text(text)
+    await edge_tts.Communicate(spoken, VOICE, rate="-5%", pitch="+0Hz").save(str(path))
     tmp = path.with_suffix(".boost.mp3")
     run([
         "ffmpeg", "-y", "-i", str(path),
