@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""NeerCred Premium Promo v8 — humanized English VO, soft morning piano BGM."""
+"""NeerCred Premium Promo v9 — clear VO mix, fixed caption bar."""
 
 from __future__ import annotations
 
@@ -282,23 +282,31 @@ def render_frame(scene: dict, logo: Image.Image) -> Image.Image:
     rgba.paste(sh, (px - 24, py + 16), sh)
     rgba.paste(phone, (px, py), phone)
 
-    # Hindi VO caption bar
-    bar_h = 118
+    # Caption bar — dynamic height, lifted from bottom so text never clips
+    cap_f = font(24, bold=True)
+    cap_lines: list[str] = []
+    for block in scene["vo_hi"].split("\n"):
+        cap_lines.extend(wrap_lines(block, cap_f, W - 160))
+    line_h = 36
+    pad_top, pad_bottom = 22, 24
+    bar_h = pad_top + len(cap_lines) * line_h + pad_bottom
+    margin_bottom = 72
+    bar_y = H - bar_h - margin_bottom
+
     bar = Image.new("RGBA", (W, bar_h), C["glass"])
     bd = ImageDraw.Draw(bar)
     bd.line([(0, 0), (W, 0)], fill=rgb(C["teal"]) + (120,), width=2)
-    cap_f = font(26, bold=True)
-    cy = 24
-    for line in wrap_lines(scene["vo_hi"], cap_f, W - 160):
+    cy = pad_top
+    for line in cap_lines:
         bd.text((80, cy), line, fill=rgb(C["white"]), font=cap_f)
-        cy += 40
-    rgba.paste(bar, (0, H - bar_h), bar)
+        cy += line_h
+    rgba.paste(bar, (0, bar_y), bar)
 
-    # Progress accent
+    # Progress accent — sits just above caption bar
     idx = SCENES.index(scene) + 1
     prog_w = int((W - 160) * idx / len(SCENES))
     bd2 = ImageDraw.Draw(rgba)
-    bd2.rounded_rectangle([80, H - bar_h - 18, 80 + prog_w, H - bar_h - 12], radius=3, fill=rgb(C["gold"]))
+    bd2.rounded_rectangle([80, bar_y - 14, 80 + prog_w, bar_y - 8], radius=3, fill=rgb(C["gold"]))
 
     return rgba.convert("RGB")
 
@@ -312,7 +320,7 @@ async def make_vo(text: str, path: Path) -> float:
         "-af",
         "highpass=f=80,afftdn=nr=5:nf=-24,"
         "aecho=0.3:0.4:30:0.1,"
-        "compand=0.3|0.8:6:-70/-60|-20/-10|0/-6,volume=2.9,alimiter=limit=0.95",
+        "compand=0.3|0.8:6:-70/-60|-20/-8|0/-4,volume=3.1,alimiter=limit=0.95",
         "-ar", "44100", "-ac", "2", "-b:a", "192k", str(tmp),
     ])
     tmp.replace(path)
@@ -337,9 +345,8 @@ def make_bgm(dur: float, path: Path, drum_times: list[float] | None = None) -> N
     run([
         "ffmpeg", "-y", "-i", str(src),
         "-af",
-        "highpass=f=60,lowpass=f=8000,"
-        "aecho=0.4:0.5:80:0.18,"
-        "volume=1.3",
+        "highpass=f=80,lowpass=f=7000,"
+        "volume=0.75",
         str(processed),
     ])
     looped = AUDIO / "bgm_looped.wav"
@@ -347,7 +354,7 @@ def make_bgm(dur: float, path: Path, drum_times: list[float] | None = None) -> N
         "ffmpeg", "-y", "-stream_loop", "-1", "-i", str(processed),
         "-t", f"{dur + 2:.2f}",
         "-af",
-        f"loudnorm=I=-18:TP=-1.5:LRA=11,afade=t=in:d=3,afade=t=out:st={max(0, dur - 3):.2f}:d=3",
+        f"loudnorm=I=-26:TP=-2:LRA=9,afade=t=in:d=3,afade=t=out:st={max(0, dur - 3):.2f}:d=3",
         str(looped),
     ])
     run([
@@ -457,8 +464,10 @@ async def main() -> None:
     run([
         "ffmpeg", "-y", "-i", str(merged), "-i", str(bgm),
         "-filter_complex",
-        "[0:a]volume=1.8[va];[1:a]volume=1.1,aloop=loop=-1:size=2e+09[vb];"
-        "[va][vb]amix=inputs=2:duration=first:weights=1 0.55:normalize=0,alimiter=limit=0.98[aout]",
+        "[0:a]highpass=f=120,lowpass=f=12000,volume=2.5[vo];"
+        "[1:a]volume=0.28,aloop=loop=-1:size=2e+09[bgm];"
+        "[bgm][vo]sidechaincompress=threshold=0.018:ratio=10:attack=25:release=700:makeup=1[ducked];"
+        "[vo][ducked]amix=inputs=2:duration=first:weights=1 0.65:normalize=0,alimiter=limit=0.95[aout]",
         "-map", "0:v:0", "-map", "[aout]",
         "-c:v", "copy", "-c:a", "aac", "-b:a", "320k", "-ar", "44100", "-ac", "2",
         "-movflags", "+faststart", str(h_out),
