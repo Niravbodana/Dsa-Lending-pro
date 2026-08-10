@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""NeerCred Premium Promo v20 — silent end card (BGM only)."""
+"""NeerCred Premium Promo v21 — mobile-compatible MP4 playback."""
 
 from __future__ import annotations
 
@@ -577,6 +577,26 @@ def brand_voice_text(text: str) -> str:
     return text
 
 
+def mobile_encode_args() -> list[str]:
+    """H.264 Main + AAC-LC — plays on iPhone & Android gallery/WhatsApp."""
+    return [
+        "-c:v", "libx264", "-profile:v", "main", "-level", "4.0",
+        "-pix_fmt", "yuv420p", "-crf", "20", "-preset", "medium",
+        "-movflags", "+faststart", "-tag:v", "avc1",
+        "-c:a", "aac", "-b:a", "128k", "-ar", "44100", "-ac", "2",
+        "-brand", "mp42", "-map_metadata", "-1",
+    ]
+
+
+def finalize_mobile_mp4(src: Path, dst: Path, vf: str | None = None) -> None:
+    cmd = ["ffmpeg", "-y", "-i", str(src)]
+    if vf:
+        cmd += ["-vf", vf]
+    cmd += mobile_encode_args()
+    cmd.append(str(dst))
+    run(cmd)
+
+
 def make_silent_audio(dur: float, path: Path) -> float:
     """Silent track — scene plays with BGM only."""
     run([
@@ -778,7 +798,7 @@ async def main(anim_frames: dict[str, list[Path]]) -> None:
     vid_dur = float(json.loads(r.stdout)["format"]["duration"])
     make_bgm(vid_dur, bgm)
 
-    h_out = DOWNLOAD / "NeerCred-Promo-PREMIUM-16x9.mp4"
+    h_raw = DOWNLOAD / "NeerCred-Promo-RAW-16x9.mp4"
     run([
         "ffmpeg", "-y", "-i", str(merged), "-i", str(bgm),
         "-filter_complex",
@@ -790,16 +810,20 @@ async def main(anim_frames: dict[str, list[Path]]) -> None:
         "loudnorm=I=-16:TP=-1.0:LRA=11,alimiter=limit=0.96[aout]",
         "-map", "0:v:0", "-map", "[aout]",
         "-c:v", "copy", "-c:a", "aac", "-b:a", "320k", "-ar", "44100", "-ac", "2",
-        "-movflags", "+faststart", str(h_out),
+        str(h_raw),
     ])
 
+    h_out = DOWNLOAD / "NeerCred-Promo-PREMIUM-16x9.mp4"
+    print("  Finalizing 16:9 for mobile playback...")
+    finalize_mobile_mp4(h_raw, h_out)
+    h_raw.unlink(missing_ok=True)
+
     v_out = DOWNLOAD / "NeerCred-Promo-PREMIUM-9x16.mp4"
-    run([
-        "ffmpeg", "-y", "-i", str(h_out),
-        "-vf", "scale=1080:-2,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=0x0B1220",
-        "-c:v", "libx264", "-crf", "12", "-pix_fmt", "yuv420p",
-        "-c:a", "copy", "-movflags", "+faststart", str(v_out),
-    ])
+    print("  Finalizing 9:16 for mobile playback...")
+    finalize_mobile_mp4(
+        h_out, v_out,
+        vf="scale=1080:-2:flags=lanczos,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=0x0B1220",
+    )
 
     ws = Path("/workspace/artifacts")
     ws.mkdir(parents=True, exist_ok=True)
