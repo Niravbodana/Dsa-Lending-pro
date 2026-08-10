@@ -153,13 +153,13 @@ def load_logo() -> Image.Image:
         html.write_text(
             f'<!DOCTYPE html><html><head>'
             f'<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">'
-            f'<style>body{{margin:0;padding:0;background:#070D18;width:220px;height:52px;'
-            f'display:flex;align-items:center;justify-content:flex-start}}</style>'
+            f'<style>body{{margin:0;padding:8px 6px;background:#070D18;width:240px;height:72px;'
+            f'display:flex;align-items:center;justify-content:flex-start;box-sizing:border-box}}</style>'
             f'</head><body>{svg.read_text(encoding="utf-8", errors="replace")}</body></html>'
         )
         run(
             ["npx", "playwright", "screenshot", "--browser", "chromium",
-             f"file://{html.resolve()}", str(p), "--viewport-size=220,52"],
+             f"file://{html.resolve()}", str(p), "--viewport-size=240,72"],
             cwd=ROOT / "frontend",
         )
     img = Image.open(p).convert("RGBA")
@@ -172,7 +172,11 @@ def load_logo() -> Image.Image:
                 px[x, y] = (r, g, b, 0)
     if img.getbbox():
         img = img.crop(img.getbbox())
-    return img
+    # Add breathing room so star/icon never clips in video overlay
+    pad = 6
+    padded = Image.new("RGBA", (img.width + pad * 2, img.height + pad * 2), (0, 0, 0, 0))
+    padded.paste(img, (pad, pad), img)
+    return padded
 
 
 def bg_canvas() -> Image.Image:
@@ -250,13 +254,15 @@ def render_frame(scene: dict, logo: Image.Image) -> Image.Image:
     c = bg_canvas()
     rgba = c.convert("RGBA")
 
-    # Original logo — top-left corner, N icon + NeerCred on one line
+    # Original logo — top-left corner with safe padding (no clipping)
     lg = logo.copy()
-    lg.thumbnail((280, 50), Image.Resampling.LANCZOS)
-    rgba.paste(lg, (48, 32), lg)
+    target_h = 54
+    scale = target_h / lg.height
+    lg = lg.resize((int(lg.width * scale), target_h), Image.Resampling.LANCZOS)
+    rgba.paste(lg, (56, 52), lg)
 
-    # Left copy
-    lx, ly = 72, 118
+    # Left copy — below logo
+    lx, ly = 72, 132
     d = ImageDraw.Draw(rgba)
     step_f = font(13, bold=True)
     d.text((lx, ly), scene["step"], fill=rgb(C["teal"]), font=step_f)
