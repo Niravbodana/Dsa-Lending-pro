@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""NeerCred Premium Promo v19 — brand voice + premium endcard CTA."""
+"""NeerCred Premium Promo v20 — silent end card (BGM only)."""
 
 from __future__ import annotations
 
@@ -115,7 +115,9 @@ SCENES = [
         "title": "Dream Big.\nBorrow Smart.",
         "subtitle": "www.neercred.com",
         "bullets": [],
-        "vo": "NeerCred — your digital lending aggregator. Dream big, borrow smart. Visit www dot neercred dot com and apply now.",
+        "vo": "",
+        "vo_silent": True,
+        "duration": 9.0,
         "vo_hi": "Dream Big · Borrow Smart.\nwww.neercred.com",
     },
 ]
@@ -575,6 +577,16 @@ def brand_voice_text(text: str) -> str:
     return text
 
 
+def make_silent_audio(dur: float, path: Path) -> float:
+    """Silent track — scene plays with BGM only."""
+    run([
+        "ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
+        "-t", f"{dur:.3f}", "-c:a", "libmp3lame", "-b:a", "192k", "-ar", "44100", "-ac", "2",
+        str(path),
+    ])
+    return dur
+
+
 async def make_vo(text: str, path: Path) -> float:
     """Warm TTS with correct NeerCred brand pronunciation."""
     spoken = brand_voice_text(text)
@@ -728,13 +740,21 @@ async def main(anim_frames: dict[str, list[Path]]) -> None:
     logo_hires = load_logo_hires()
     clips: list[Path] = []
     vo_files: list[Path] = []
+    voiced_files: list[Path] = []
     scene_ends: list[float] = []
     acc = 0.0
 
     print("=== Premium VO + Frames (stable video) ===")
     for i, scene in enumerate(SCENES):
         vo = AUDIO / f"vo_{scene['id']}.mp3"
-        dur = await make_vo(scene["vo"], vo)
+        if scene.get("vo_silent") or not scene.get("vo", "").strip():
+            dur = float(scene.get("duration", 9.0))
+            make_silent_audio(dur, vo)
+            print(f"  {scene['id']}: {dur:.1f}s (silent — BGM only)")
+        else:
+            dur = await make_vo(scene["vo"], vo)
+            voiced_files.append(vo)
+            print(f"  {scene['id']}: {dur:.1f}s")
         vo_files.append(vo)
         acc += dur + 0.55
         scene_ends.append(acc)
@@ -744,10 +764,9 @@ async def main(anim_frames: dict[str, list[Path]]) -> None:
             clips.append(render_celebration_clip(scene, logo, vo, dur, i, anim_frames, logo_hires))
         else:
             clips.append(render_clip(fr, vo, dur, i))
-        print(f"  {scene['id']}: {dur:.1f}s")
 
     vo_list = AUDIO / "vo_all.txt"
-    vo_list.write_text("\n".join(f"file '{v}'" for v in vo_files))
+    vo_list.write_text("\n".join(f"file '{v}'" for v in voiced_files))
     vo_full = DOWNLOAD / "NeerCred-Voice-Only.mp3"
     run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(vo_list), "-c", "copy", str(vo_full)])
 
