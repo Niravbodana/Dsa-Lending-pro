@@ -78,7 +78,7 @@ def main() -> int:
     if all_issues:
         print(f"FAILED — {len(all_issues)} issue(s) found")
         return 1
-    print("PASSED — all 9 scenes have intact logos")
+    print("PASSED — all scenes have intact logos")
     return 0
 
 

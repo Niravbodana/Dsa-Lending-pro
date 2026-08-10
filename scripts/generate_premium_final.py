@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""NeerCred Premium Promo v14 — brand style guide compliant."""
+"""NeerCred Premium Promo v15 — brand style guide compliant."""
 
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ BGM_SOURCE = ASSETS / "soft_morning_keys_piano.mp3"
 W, H = 1920, 1080
 FPS = 30
 VOICE = "en-IN-NeerjaNeural"
-PHONE_W, PHONE_H = 400, 866
+PHONE_W, PHONE_H = 448, 970
 PHONE_X_RATIO = 0.655
 
 # NeerCred Brand & Video Style Guide (dev.neercred.com)
@@ -80,28 +80,20 @@ SCENES = [
         "vo_hi": "Compare eligible offers.\nBest rates on one screen.",
     },
     {
-        "id": "kyc", "layout": "celebration", "animation": "ekyc", "step": "KYC",
-        "title": "Aadhaar\neKYC",
-        "subtitle": "Verified on lender platform",
-        "bullets": ["Lender-side secure verification", "Fast digital process", "Not on NeerCred app"],
-        "vo": "Your Aadhaar eKYC is completed on your lender's secure platform. Verified and ready to go!",
-        "vo_hi": "Aadhaar eKYC verified!\nLender platform.\nDone in seconds.",
-    },
-    {
-        "id": "dashboard", "screen": "11-dashboard.png", "step": "DASHBOARD",
-        "title": "Welcome Back,\nRamprakash",
-        "subtitle": "Track your loan journey",
-        "bullets": ["Live application status", "Eligible partner offers", "Track every step"],
-        "vo": "Welcome back, Ramprakash! Your custom dashboard keeps every loan update right at your fingertips.",
-        "vo_hi": "Welcome back, Ramprakash.\nYour loan dashboard.",
-    },
-    {
         "id": "approved", "screen": "12-approved.png", "step": "APPROVED",
         "title": "You May\nQualify! 🎉",
         "subtitle": "Up to ₹5,00,000 · indicative offer",
         "bullets": ["Select your loan amount", "Disbursal via lender", "Funds to your bank"],
         "vo": "Great news! You may qualify for up to five lakhs. Select your loan amount and move closer to disbursal on NeerCred.",
         "vo_hi": "You may qualify!\nUp to five lakhs.\nSelect your amount.",
+    },
+    {
+        "id": "kyc", "layout": "celebration", "animation": "ekyc", "step": "KYC",
+        "title": "Aadhaar\neKYC",
+        "subtitle": "Verified on lender platform",
+        "bullets": ["Lender-side secure verification", "Fast digital process", "Not on NeerCred app"],
+        "vo": "Your Aadhaar eKYC is completed on your lender's secure platform. Verified and ready to go!",
+        "vo_hi": "Aadhaar eKYC verified!\nLender platform.\nDone in seconds.",
     },
     {
         "id": "transfer", "layout": "celebration", "animation": "transfer", "step": "DISBURSE",
@@ -168,41 +160,35 @@ def font(sz: int, bold: bool = False, hindi: bool = False) -> ImageFont.FreeType
 
 
 def load_logo() -> Image.Image:
+    """Transparent lockup — same render path as v11 (no dark box artifact)."""
     p = ASSETS / "logo_lockup_dark.png"
     svg = ROOT / "frontend/public/neercred-logo-lockup-dark.svg"
+    bg_hex = C["navy"]
     if not p.exists() or p.stat().st_mtime < svg.stat().st_mtime:
         html = ASSETS / "logo_lockup_render.html"
         html.write_text(
             f'<!DOCTYPE html><html><head>'
             f'<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">'
-            f'<style>body{{margin:0;padding:16px 12px;background:#070D18;width:280px;height:104px;'
-            f'display:flex;align-items:center;justify-content:flex-start;box-sizing:border-box;overflow:visible}}</style>'
+            f'<style>body{{margin:0;padding:0;background:{bg_hex};width:220px;height:52px;'
+            f'display:flex;align-items:center;justify-content:flex-start}}</style>'
             f'</head><body>{svg.read_text(encoding="utf-8", errors="replace")}</body></html>'
         )
         run(
             ["npx", "playwright", "screenshot", "--browser", "chromium",
-             f"file://{html.resolve()}", str(p), "--viewport-size=280,104"],
+             f"file://{html.resolve()}", str(p), "--viewport-size=220,52"],
             cwd=ROOT / "frontend",
         )
     img = Image.open(p).convert("RGBA")
     px = img.load()
-    bg = rgb(C["navy"])
+    bg = rgb(bg_hex)
     for y in range(img.height):
         for x in range(img.width):
             r, g, b, a = px[x, y]
-            if abs(r - bg[0]) < 8 and abs(g - bg[1]) < 8 and abs(b - bg[2]) < 8:
+            if abs(r - bg[0]) < 10 and abs(g - bg[1]) < 10 and abs(b - bg[2]) < 10:
                 px[x, y] = (r, g, b, 0)
     if img.getbbox():
         img = img.crop(img.getbbox())
-    # Generous transparent padding on all sides
-    pad_x, pad_top, pad_bottom = 12, 16, 16
-    padded = Image.new(
-        "RGBA",
-        (img.width + pad_x * 2, img.height + pad_top + pad_bottom),
-        (0, 0, 0, 0),
-    )
-    padded.paste(img, (pad_x, pad_top), img)
-    return padded
+    return img
 
 
 def ensure_animation_frames(cache_name: str, url: str, n: int = 54) -> list[Path]:
@@ -398,23 +384,20 @@ def render_frame(
     c = bg_canvas()
     rgba = c.convert("RGBA")
 
-    # Original logo — top-left with generous safe margin (never clip at frame edge)
+    # Original logo — top-left, N icon + NeerCred on one line (v11 placement)
     lg = logo.copy()
-    target_h = 48
-    scale = target_h / lg.height
-    lg = lg.resize((int(lg.width * scale), target_h), Image.Resampling.LANCZOS)
-    logo_x, logo_y = 64, 88
-    rgba.paste(lg, (logo_x, logo_y), lg)
+    lg.thumbnail((280, 50), Image.Resampling.LANCZOS)
+    rgba.paste(lg, (48, 32), lg)
 
-    # Left copy — starts below logo block
-    lx, ly = 72, logo_y + target_h + 28
+    # Left copy
+    lx, ly = 72, 118
     d = ImageDraw.Draw(rgba)
-    step_f = font(13, bold=True)
+    step_f = font(20, bold=True)
     d.text((lx, ly), scene["step"], fill=rgb(C["teal"]), font=step_f)
-    d.line([(lx, ly + 28), (lx + 56, ly + 28)], fill=rgb(C["mint"]), width=2)
+    d.line([(lx, ly + 36), (lx + 96, ly + 36)], fill=rgb(C["mint"]), width=3)
 
     title_f = font(58, bold=True)
-    y = ly + 52
+    y = ly + 58
     for line in scene["title"].split("\n"):
         d.text((lx, y), line, fill=rgb(C["white"]), font=title_f)
         y += 68
@@ -435,7 +418,7 @@ def render_frame(
         frames = anim_frames.get(key, [])
         panel = celebration_panel_at(frames, frame_t)
         pw, ph = panel.width, panel.height
-        scale = min(440 / pw, 820 / ph)
+        scale = min(480 / pw, 880 / ph)
         nw, nh = int(pw * scale), int(ph * scale)
         panel = panel.resize((nw, nh), Image.Resampling.LANCZOS)
         px, py = phone_position(nw, nh)
