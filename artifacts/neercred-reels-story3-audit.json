@@ -1,0 +1,81 @@
+{
+  "file": "/opt/cursor/artifacts/NeerCred-Reels-Story3-Medical.mp4",
+  "duration_sec": 71.2,
+  "size_mb": 14.3,
+  "video": {
+    "codec": "h264",
+    "profile": "Main",
+    "resolution": "1080x1920",
+    "pix_fmt": "yuv420p"
+  },
+  "audio": {
+    "[Parsed_volumedetect_0 @ 0x55dcba83b2c0] mean_volume": "-19.3 dB",
+    "[Parsed_volumedetect_0 @ 0x55dcba83b2c0] max_volume": "-0.8 dB"
+  },
+  "voice": {
+    "engine": "en-IN-NeerjaNeural",
+    "rate": "-14%",
+    "pitch": "-4Hz",
+    "phrase_gap_sec": 0.42,
+    "chain": "EQ + light denoise + soft compressor + subtle echo + loudnorm -18 LUFS"
+  },
+  "bgm": {
+    "tension": "silent-descent.mp3",
+    "hope": "too_many_days_piano.mp3",
+    "uplift": "soft_morning_keys_piano.mp3",
+    "staging": "per-scene mood with 1.2s crossfades"
+  },
+  "scenes": [
+    {
+      "id": "hook",
+      "vo_sec": 9.33
+    },
+    {
+      "id": "counter",
+      "vo_sec": 10.76
+    },
+    {
+      "id": "worry",
+      "vo_sec": 8.36
+    },
+    {
+      "id": "help",
+      "vo_sec": 15.07
+    },
+    {
+      "id": "app",
+      "vo_sec": 13.04
+    },
+    {
+      "id": "relief",
+      "vo_sec": 6.06
+    },
+    {
+      "id": "endcard",
+      "vo_sec": 11.52
+    }
+  ],
+  "checks": [
+    {
+      "item": "duration_30_90s",
+      "pass": true,
+      "value": 71.2
+    },
+    {
+      "item": "h264_main_mobile",
+      "pass": true,
+      "value": "Main"
+    },
+    {
+      "item": "vertical_9x16",
+      "pass": true,
+      "value": "1080x1920"
+    },
+    {
+      "item": "endcard_scene_present",
+      "pass": true,
+      "value": true
+    }
+  ],
+  "all_pass": true
+}
