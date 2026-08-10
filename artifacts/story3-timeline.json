@@ -1,0 +1,178 @@
+{
+  "totalDuration": 82.45,
+  "scenes": [
+    {
+      "id": "corridor",
+      "bg": "story3-01-hospital-corridor.png",
+      "duration": 15.66,
+      "mood": "tension",
+      "ken": "in",
+      "lines": [
+        {
+          "speaker": "narrator",
+          "name": "Meera",
+          "text": "Raat ke do baje... hospital ki corridor sunsaan thi.",
+          "at": 0.8,
+          "duration": 5.49
+        },
+        {
+          "speaker": "narrator",
+          "name": "Meera",
+          "text": "Papa admit hue. Counter ne bola \u2014 ek lakh assi hazaar advance.",
+          "at": 6.84,
+          "duration": 7.63
+        }
+      ]
+    },
+    {
+      "id": "counter",
+      "bg": "story3-02-hospital-counter.png",
+      "duration": 17.76,
+      "mood": "tension",
+      "ken": "right",
+      "lines": [
+        {
+          "speaker": "receptionist",
+          "name": "Receptionist",
+          "text": "Kitna amount pending hai abhi?",
+          "at": 0.8,
+          "duration": 2.14
+        },
+        {
+          "speaker": "meera",
+          "name": "Meera",
+          "text": "Ek lakh assi hazaar... insurance ne sirf partial cover kiya.",
+          "at": 3.49,
+          "duration": 5.69
+        },
+        {
+          "speaker": "receptionist",
+          "name": "Receptionist",
+          "text": "Baaki ka arrangement ho gaya?",
+          "at": 9.74,
+          "duration": 2.06
+        },
+        {
+          "speaker": "meera",
+          "name": "Meera",
+          "text": "Nahi... abhi tak koi solution nahi mila.",
+          "at": 12.35,
+          "duration": 4.21
+        }
+      ]
+    },
+    {
+      "id": "panic",
+      "bg": "story3-03-worried-phone.png",
+      "duration": 11.07,
+      "mood": "tension",
+      "ken": "in",
+      "lines": [
+        {
+          "speaker": "meera",
+          "name": "Meera",
+          "text": "ATM limit khatam ho chuki thi.",
+          "at": 0.8,
+          "duration": 3.53
+        },
+        {
+          "speaker": "meera",
+          "name": "Meera",
+          "text": "Is waqt kise phone karun? Sab so rahe the.",
+          "at": 4.88,
+          "duration": 4.99
+        }
+      ]
+    },
+    {
+      "id": "suggestion",
+      "bg": "story3-04-receptionist-help.png",
+      "duration": 18.54,
+      "mood": "transition",
+      "ken": "left",
+      "lines": [
+        {
+          "speaker": "receptionist",
+          "name": "Receptionist",
+          "text": "Ek minute... aap NeerCred try kijiye.",
+          "at": 0.8,
+          "duration": 2.85
+        },
+        {
+          "speaker": "receptionist",
+          "name": "Receptionist",
+          "text": "Phone se eligible offers mil jaate hain. Branch jaane ki zaroorat nahi.",
+          "at": 4.2,
+          "duration": 4.68
+        },
+        {
+          "speaker": "meera",
+          "name": "Meera",
+          "text": "Sach mein? Itni raat ko bhi?",
+          "at": 9.42,
+          "duration": 4.15
+        },
+        {
+          "speaker": "receptionist",
+          "name": "Receptionist",
+          "text": "Haan. Compare karke apply kar sakte hain.",
+          "at": 14.13,
+          "duration": 3.21
+        }
+      ]
+    },
+    {
+      "id": "app",
+      "bg": "story3-04-receptionist-help.png",
+      "duration": 13.94,
+      "mood": "hope",
+      "ken": "in",
+      "lines": [
+        {
+          "speaker": "meera",
+          "name": "Meera",
+          "text": "Maine NeerCred khola... partner lenders ke offers ek screen pe.",
+          "at": 0.8,
+          "duration": 5.88
+        },
+        {
+          "speaker": "meera",
+          "name": "Meera",
+          "text": "Compare karke best option choose kiya. Fully digital.",
+          "at": 7.23,
+          "duration": 5.51
+        }
+      ],
+      "type": "phone",
+      "screens": [
+        "01-homepage.png",
+        "09-offers.png",
+        "12-approved.png"
+      ]
+    },
+    {
+      "id": "relief",
+      "bg": "story3-05-relief.png",
+      "duration": 12.48,
+      "mood": "hope",
+      "ken": "out",
+      "lines": [
+        {
+          "speaker": "meera",
+          "name": "Meera",
+          "text": "Jab clarity mili... ek pal ke liye saans aayi.",
+          "at": 0.8,
+          "duration": 4.83
+        },
+        {
+          "speaker": "narrator",
+          "name": "Meera",
+          "text": "Tension kam hui. Ab decision clear tha.",
+          "at": 6.18,
+          "duration": 5.09
+        }
+      ]
+    }
+  ],
+  "endcardDuration": 9.0
+}
