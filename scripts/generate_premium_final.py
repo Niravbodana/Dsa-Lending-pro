@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""NeerCred Premium Promo v17 — greeting intro + no dev thunder icon."""
+"""NeerCred Premium Promo v18 — HD greeting + clean phone screen."""
 
 from __future__ import annotations
 
@@ -34,7 +34,7 @@ CAPTION_RESERVE = 200
 # NeerCred Brand & Video Style Guide (dev.neercred.com)
 SCENES = [
     {
-        "id": "greeting", "layout": "greeting", "step": "",
+        "id": "greeting", "layout": "greeting_full", "animation": "greeting", "step": "",
         "title": "", "subtitle": "", "bullets": [],
         "vo": "Welcome to NeerCred.",
         "vo_hi": "",
@@ -313,6 +313,18 @@ def ensure_endcard_frames() -> list[Path]:
     )
 
 
+def ensure_greeting_frames() -> list[Path]:
+    """Full HD greeting — vector-sharp logo at 1920×1080."""
+    return ensure_animation_frames(
+        "greeting",
+        "http://localhost:3000/promo-greeting",
+        n=54,
+        viewport_w=960,
+        viewport_h=540,
+        device_scale=2,
+    )
+
+
 def celebration_panel_at(frame_paths: list[Path], t: float) -> Image.Image:
     """Pick celebration frame by animation time (loops every ~3.4s)."""
     if not frame_paths:
@@ -369,11 +381,17 @@ def bg_canvas() -> Image.Image:
 
 
 def fit_screen(path: Path) -> Image.Image:
-    """Fit mobile screenshot — 1:1 viewport, no letterboxing."""
+    """Fit mobile screenshot — crisp 1:1 viewport match."""
     src = Image.open(path).convert("RGB")
-    scale = min(PHONE_W / src.width, PHONE_H / src.height)
-    nw, nh = int(src.width * scale), int(src.height * scale)
-    r = src.resize((nw, nh), Image.Resampling.LANCZOS)
+    # Screenshots are 390×844 @3x — scale to phone canvas with minimal resample
+    if src.width > PHONE_W * 2:
+        # Downscale in steps for sharper result
+        scale = PHONE_W / src.width
+        nw, nh = int(src.width * scale), int(src.height * scale)
+        r = src.resize((nw, nh), Image.Resampling.LANCZOS)
+    else:
+        r = src
+        nw, nh = r.width, r.height
     canvas = Image.new("RGB", (PHONE_W, PHONE_H), "#F8FAFC")
     ox, oy = (PHONE_W - nw) // 2, (PHONE_H - nh) // 2
     canvas.paste(r, (ox, oy))
@@ -395,11 +413,6 @@ def draw_phone(screen: Image.Image) -> Image.Image:
     scr = screen.convert("RGBA")
     scr.putalpha(mask)
     frame.paste(scr, (bezel, bezel + 18), scr)
-    # subtle screen glare
-    glare = Image.new("RGBA", (PHONE_W, PHONE_H), (0, 0, 0, 0))
-    gd = ImageDraw.Draw(glare)
-    gd.polygon([(0, 0), (PHONE_W // 2, 0), (0, PHONE_H // 2)], fill=(255, 255, 255, 18))
-    frame.paste(glare, (bezel, bezel + 18), glare)
     return frame
 
 
@@ -421,48 +434,17 @@ def wrap_lines(text: str, fnt: ImageFont.FreeTypeFont, max_w: int) -> list[str]:
     return lines or [text]
 
 
-def render_greeting_frame(logo_hires: Image.Image, frame_t: float) -> Image.Image:
-    """Centered welcome splash — logo emerges from background."""
-    rgba = bg_canvas().convert("RGBA")
-    glow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    gd = ImageDraw.Draw(glow)
-    gd.ellipse([W // 2 - 320, H // 2 - 260, W // 2 + 320, H // 2 + 200], fill=(15, 118, 110, 42))
-    glow = glow.filter(ImageFilter.GaussianBlur(90))
-    rgba = Image.alpha_composite(rgba, glow)
-    d = ImageDraw.Draw(rgba)
-
-    cy = H // 2 - 20
-    wt = ease_out_cubic(min(1.0, frame_t / 0.38))
-    wf = font(44, bold=True)
-    welcome = "Welcome to"
-    wl = d.textlength(welcome, font=wf)
-    wy = cy - 118 + int(36 * (1 - wt))
-    d.text(((W - wl) // 2, wy), welcome, fill=rgb(C["mint"]), font=wf)
-
-    lt = ease_out_cubic(min(1.0, max(0.0, (frame_t - 0.1) / 0.42)))
-    lg = logo_hires.copy()
-    target_w = 460
-    scale = (target_w / lg.width) * (0.78 + 0.22 * lt)
-    nw, nh = int(lg.width * scale), int(lg.height * scale)
-    lg = lg.resize((nw, nh), Image.Resampling.LANCZOS)
-    lx, ly = (W - nw) // 2, cy - nh // 2 + int(28 * (1 - lt))
-    rgba.paste(lg, (lx, ly), lg)
-
-    tt = ease_out_cubic(min(1.0, max(0.0, (frame_t - 0.32) / 0.38)))
-    tf = font(22, bold=True)
-    tag = "DREAM BIG · BORROW SMART"
-    tl = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(tag, font=tf)
-    ty = cy + nh // 2 + 36 + int(24 * (1 - tt))
-    d.text(((W - tl) // 2, ty), tag, fill=rgb(C["gold_light"]), font=tf)
-
-    vt = ease_out_cubic(min(1.0, max(0.0, (frame_t - 0.48) / 0.35)))
-    vf = font(18)
-    val = "Purity & Trust"
-    vl = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(val, font=vf)
-    vy = ty + 44 + int(16 * (1 - vt))
-    d.text(((W - vl) // 2, vy), val, fill=rgb(C["muted"]), font=vf)
-
-    return rgba.convert("RGB")
+def render_greeting_frame(anim_frames: dict[str, list[Path]], frame_t: float) -> Image.Image:
+    """Full-frame HD greeting from browser-captured animation."""
+    frames = anim_frames.get("greeting", [])
+    if not frames:
+        return bg_canvas()
+    cycle = len(frames)
+    idx = min(int(frame_t * cycle * 0.92), cycle - 1)
+    img = Image.open(frames[idx]).convert("RGB")
+    if img.size != (W, H):
+        img = img.resize((W, H), Image.Resampling.LANCZOS)
+    return img
 
 
 def render_endcard_frame(anim_frames: dict[str, list[Path]], frame_t: float) -> Image.Image:
@@ -486,8 +468,8 @@ def render_frame(
     scene_idx: int = 0,
     logo_hires: Image.Image | None = None,
 ) -> Image.Image:
-    if scene.get("layout") == "greeting":
-        return render_greeting_frame(logo_hires or logo, frame_t)
+    if scene.get("layout") == "greeting_full":
+        return render_greeting_frame(anim_frames or {}, frame_t)
     if scene.get("layout") == "endcard_full":
         return render_endcard_frame(anim_frames or {}, frame_t)
 
@@ -555,7 +537,7 @@ def render_frame(
         rgba.paste(phone, (px, py), phone)
 
     # Caption bar — skip on full-frame greeting
-    if scene.get("layout") == "greeting":
+    if scene.get("layout") in ("greeting_full", "greeting"):
         return rgba.convert("RGB")
 
     cap_f = font(24, bold=True)
@@ -749,7 +731,7 @@ async def main(anim_frames: dict[str, list[Path]]) -> None:
         scene_ends.append(acc)
         fr = FRAMES / f"premium_{i:02d}.png"
         render_frame(scene, logo, anim_frames=anim_frames, scene_idx=i, logo_hires=logo_hires).save(fr, quality=95)
-        if scene.get("layout") in ("celebration", "endcard_full", "greeting"):
+        if scene.get("layout") in ("celebration", "endcard_full", "greeting_full"):
             clips.append(render_celebration_clip(scene, logo, vo, dur, i, anim_frames, logo_hires))
         else:
             clips.append(render_clip(fr, vo, dur, i))
@@ -811,5 +793,11 @@ if __name__ == "__main__":
     ekyc_frames = ensure_celebration_frames()
     transfer_frames = ensure_transfer_frames()
     endcard_frames = ensure_endcard_frames()
-    anim_frames = {"ekyc": ekyc_frames, "transfer": transfer_frames, "endcard": endcard_frames}
+    greeting_frames = ensure_greeting_frames()
+    anim_frames = {
+        "ekyc": ekyc_frames,
+        "transfer": transfer_frames,
+        "endcard": endcard_frames,
+        "greeting": greeting_frames,
+    }
     asyncio.run(main(anim_frames))
