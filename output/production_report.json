@@ -1,0 +1,347 @@
+{
+  "project_id": "you-always-say-that",
+  "title": "YOU ALWAYS SAY THAT",
+  "generated_at": "2026-08-10T20:21:04.474840+00:00",
+  "status": "blocked",
+  "providers": {
+    "video": {
+      "name": "unavailable",
+      "configured": false
+    },
+    "voice": {
+      "name": "edge_performance",
+      "configured": true,
+      "production_quality": false
+    },
+    "image": {
+      "name": "unavailable",
+      "configured": false
+    },
+    "lipsync": {
+      "name": "unavailable",
+      "configured": false
+    },
+    "music": {
+      "name": "local",
+      "configured": true
+    }
+  },
+  "missing_for_photoreal": [
+    "VIDEO_PROVIDER + API credentials (replicate/runway/fal). Ken Burns slideshow is NOT an acceptable fallback.",
+    "IMAGE_PROVIDER for character reference sheets (replicate/fal recommended)."
+  ],
+  "artifacts": {
+    "storyboard": "/workspace/output/storyboard.json",
+    "scenes": "/workspace/output/scenes.json",
+    "voice_script": "/workspace/output/voice_script.json",
+    "master_audio": "/workspace/output/master_audio.wav",
+    "subtitles": "/workspace/output/subtitles.srt"
+  },
+  "scene_results": [
+    {
+      "scene": "phone-call",
+      "success": false,
+      "message": "Video provider not configured \u2014 shot prompt preserved in storyboard.json"
+    },
+    {
+      "scene": "son-notices",
+      "success": false,
+      "message": "Video provider not configured \u2014 shot prompt preserved in storyboard.json"
+    },
+    {
+      "scene": "night-table",
+      "success": false,
+      "message": "Video provider not configured \u2014 shot prompt preserved in storyboard.json"
+    },
+    {
+      "scene": "discovery",
+      "success": false,
+      "message": "Video provider not configured \u2014 shot prompt preserved in storyboard.json"
+    },
+    {
+      "scene": "solution",
+      "success": false,
+      "message": "Video provider not configured \u2014 shot prompt preserved in storyboard.json"
+    },
+    {
+      "scene": "payoff",
+      "success": false,
+      "message": "Video provider not configured \u2014 shot prompt preserved in storyboard.json"
+    },
+    {
+      "scene": "brand",
+      "success": true,
+      "provider": "ffmpeg_endcard"
+    }
+  ],
+  "qc": {
+    "passed": false,
+    "checks": [
+      {
+        "check": "video_provider_configured",
+        "passed": false,
+        "detail": "Photorealistic VIDEO_PROVIDER required. Ken Burns slideshow is disabled.",
+        "severity": "error"
+      },
+      {
+        "check": "voice_production_quality",
+        "passed": false,
+        "detail": "VOICE_PROVIDER=elevenlabs required for production. Edge TTS is preview-only.",
+        "severity": "error"
+      },
+      {
+        "check": "scene_video_phone-call",
+        "passed": false,
+        "detail": "Missing video for scene phone-call",
+        "severity": "error"
+      },
+      {
+        "check": "scene_video_son-notices",
+        "passed": false,
+        "detail": "Missing video for scene son-notices",
+        "severity": "error"
+      },
+      {
+        "check": "scene_video_night-table",
+        "passed": false,
+        "detail": "Missing video for scene night-table",
+        "severity": "error"
+      },
+      {
+        "check": "scene_video_discovery",
+        "passed": false,
+        "detail": "Missing video for scene discovery",
+        "severity": "error"
+      },
+      {
+        "check": "scene_video_solution",
+        "passed": false,
+        "detail": "Missing video for scene solution",
+        "severity": "error"
+      },
+      {
+        "check": "scene_video_payoff",
+        "passed": false,
+        "detail": "Missing video for scene payoff",
+        "severity": "error"
+      },
+      {
+        "check": "duration_range",
+        "passed": true,
+        "detail": "Total duration 45.0s (target 40-45s)",
+        "severity": "error"
+      },
+      {
+        "check": "audio_present",
+        "passed": true,
+        "detail": "/workspace/scripts/reel_engine/.work/you-always-say-that/audio/master.wav",
+        "severity": "error"
+      },
+      {
+        "check": "story_opening_hook",
+        "passed": true,
+        "detail": "Scene 1 is phone call with natural dialogue \u2014 curiosity hook",
+        "severity": "info"
+      },
+      {
+        "check": "brand_cta",
+        "passed": true,
+        "detail": "CTA: Explore your loan options.",
+        "severity": "info"
+      },
+      {
+        "check": "no_false_claims",
+        "passed": true,
+        "detail": "No guaranteed approval or fake rates in script",
+        "severity": "info"
+      }
+    ],
+    "failed_scenes": [
+      "phone-call",
+      "son-notices",
+      "night-table",
+      "discovery",
+      "solution",
+      "payoff"
+    ]
+  },
+  "final_output": null,
+  "message": "Final video NOT exported. Photorealistic video provider required for all scenes. Production artifacts (storyboard, voice script, subtitles) are ready. Configure VIDEO_PROVIDER and re-run.",
+  "character_refs": {
+    "characters": [
+      {
+        "id": "mother",
+        "name": "Mother",
+        "success": false,
+        "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/characters/mother_ref.prompt.txt",
+        "message": "IMAGE_PROVIDER not configured. Prompt saved to /workspace/scripts/reel_engine/.work/you-always-say-that/characters/mother_ref.prompt.txt"
+      },
+      {
+        "id": "son",
+        "name": "Son",
+        "success": false,
+        "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/characters/son_ref.prompt.txt",
+        "message": "IMAGE_PROVIDER not configured. Prompt saved to /workspace/scripts/reel_engine/.work/you-always-say-that/characters/son_ref.prompt.txt"
+      }
+    ]
+  },
+  "voice_synthesis": {
+    "provider": "edge_performance",
+    "production_quality": false,
+    "lines": [
+      {
+        "scene": "phone-call",
+        "speaker": "mother",
+        "text": "Hello... yes... how much?",
+        "success": true,
+        "message": "",
+        "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/audio/line_000_phone-call.mp3"
+      },
+      {
+        "scene": "phone-call",
+        "speaker": "mother",
+        "text": "Okay... I'll arrange it.",
+        "success": true,
+        "message": "",
+        "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/audio/line_001_phone-call.mp3"
+      },
+      {
+        "scene": "son-notices",
+        "speaker": "son",
+        "text": "Mom... what happened?",
+        "success": true,
+        "message": "",
+        "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/audio/line_002_son-notices.mp3"
+      },
+      {
+        "scene": "son-notices",
+        "speaker": "mother",
+        "text": "Nothing.",
+        "success": true,
+        "message": "",
+        "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/audio/line_003_son-notices.mp3"
+      },
+      {
+        "scene": "son-notices",
+        "speaker": "mother",
+        "text": "You'll be late.",
+        "success": true,
+        "message": "",
+        "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/audio/line_004_son-notices.mp3"
+      },
+      {
+        "scene": "discovery",
+        "speaker": "son",
+        "text": "How much do you need?",
+        "success": true,
+        "message": "",
+        "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/audio/line_005_discovery.mp3"
+      },
+      {
+        "scene": "discovery",
+        "speaker": "mother",
+        "text": "It's okay.",
+        "success": true,
+        "message": "",
+        "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/audio/line_006_discovery.mp3"
+      },
+      {
+        "scene": "discovery",
+        "speaker": "mother",
+        "text": "I'll manage.",
+        "success": true,
+        "message": "",
+        "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/audio/line_007_discovery.mp3"
+      },
+      {
+        "scene": "discovery",
+        "speaker": "son",
+        "text": "You always say that.",
+        "success": true,
+        "message": "",
+        "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/audio/line_008_discovery.mp3"
+      },
+      {
+        "scene": "solution",
+        "speaker": "narrator",
+        "text": "Sometimes, the first step is simply understanding your options.",
+        "success": true,
+        "message": "",
+        "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/audio/line_009_solution.mp3"
+      },
+      {
+        "scene": "payoff",
+        "speaker": "mother",
+        "text": "Everything okay?",
+        "success": true,
+        "message": "",
+        "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/audio/line_010_payoff.mp3"
+      },
+      {
+        "scene": "payoff",
+        "speaker": "son",
+        "text": "Yeah. We'll figure it out.",
+        "success": true,
+        "message": "",
+        "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/audio/line_011_payoff.mp3"
+      },
+      {
+        "scene": "payoff",
+        "speaker": "mother",
+        "text": "Together?",
+        "success": true,
+        "message": "",
+        "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/audio/line_012_payoff.mp3"
+      },
+      {
+        "scene": "payoff",
+        "speaker": "son",
+        "text": "Together.",
+        "success": true,
+        "message": "",
+        "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/audio/line_013_payoff.mp3"
+      }
+    ],
+    "success_count": 14,
+    "fail_count": 0
+  },
+  "bgm": {
+    "segments": [
+      {
+        "scene": "phone-call",
+        "success": true,
+        "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/audio/bgm_phone-call.wav"
+      },
+      {
+        "scene": "son-notices",
+        "success": true,
+        "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/audio/bgm_son-notices.wav"
+      },
+      {
+        "scene": "night-table",
+        "success": true,
+        "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/audio/bgm_night-table.wav"
+      },
+      {
+        "scene": "discovery",
+        "success": true,
+        "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/audio/bgm_discovery.wav"
+      },
+      {
+        "scene": "solution",
+        "success": true,
+        "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/audio/bgm_solution.wav"
+      },
+      {
+        "scene": "payoff",
+        "success": true,
+        "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/audio/bgm_payoff.wav"
+      },
+      {
+        "scene": "brand",
+        "success": true,
+        "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/audio/bgm_brand.wav"
+      }
+    ]
+  }
+}

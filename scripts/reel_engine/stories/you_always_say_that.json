@@ -1,0 +1,385 @@
+{
+  "id": "you-always-say-that",
+  "title": "YOU ALWAYS SAY THAT",
+  "target_duration": 43,
+  "characters": {
+    "mother": {
+      "name": "Mother",
+      "age_range": "48-55",
+      "description": "Indian woman, middle-class, warm but tired expression, slight signs of age, natural skin texture, minimal jewelry, no heavy makeup, natural hair",
+      "wardrobe": "Simple cotton saree or salwar kameez in muted earth tones, minimal gold earrings",
+      "reference_prompt": "Photorealistic Indian mother age 50, middle-class Mumbai apartment dweller, natural skin with fine lines, warm brown eyes, salt-and-pepper hair in loose bun, kind tired face, documentary portrait photography"
+    },
+    "son": {
+      "name": "Son",
+      "age_range": "24-29",
+      "description": "Indian young man, normal middle-class appearance, natural Indian features, realistic skin, natural hairstyle, not model-like",
+      "wardrobe": "Simple office shirt and trousers, no tie, everyday watch",
+      "reference_prompt": "Photorealistic Indian young man age 26, middle-class professional, natural skin, short black hair, clean-shaven, earnest expression, documentary portrait photography"
+    }
+  },
+  "locations": {
+    "apartment_kitchen": {
+      "name": "Apartment Kitchen",
+      "description": "Modest Indian middle-class apartment kitchen, early morning light through window, steel utensils, gas stove, worn but clean surfaces",
+      "ambient": "kitchen"
+    },
+    "apartment_living": {
+      "name": "Living Area",
+      "description": "Small Indian apartment living/bedroom area, morning preparation space",
+      "ambient": "home"
+    },
+    "dining_night": {
+      "name": "Dining Table Night",
+      "description": "Dim dining area, single warm lamp, bills and notebook on wooden table",
+      "ambient": "night"
+    },
+    "morning_living": {
+      "name": "Morning Living",
+      "description": "Same apartment, soft morning light, calm atmosphere",
+      "ambient": "morning"
+    }
+  },
+  "branding": {
+    "title": "NEERCRED",
+    "tagline": "Dream Big. Borrow Smart.",
+    "cta": "Explore your loan options.",
+    "disclaimer": "Eligible offers from partner lenders. Approval subject to lender terms.",
+    "logo_path": "frontend/public/neercred-logo-lockup-dark.svg",
+    "logo_lockup_path": "frontend/public/brand/neercred-full.svg"
+  },
+  "voices": {
+    "mother": {
+      "engine": "en-IN-NeerjaNeural",
+      "rate": "-6%",
+      "pitch": "-5Hz",
+      "mature": true,
+      "elevenlabs_voice_id": ""
+    },
+    "son": {
+      "engine": "en-IN-PrabhatNeural",
+      "rate": "-4%",
+      "pitch": "+0Hz",
+      "elevenlabs_voice_id": ""
+    },
+    "narrator": {
+      "engine": "en-IN-NeerjaNeural",
+      "rate": "-14%",
+      "pitch": "-5Hz",
+      "elevenlabs_voice_id": ""
+    }
+  },
+  "speakers": {
+    "mother": { "name": "Mother", "color": "#FDE68A", "align": "left" },
+    "son": { "name": "Son", "color": "#5EEAD4", "align": "right" },
+    "narrator": { "name": "", "color": "#F8FAFC", "align": "center" }
+  },
+  "bgm": {
+    "silent": { "file": "silent-descent.mp3", "volume": 0.08 },
+    "quiet": { "file": "silent-descent.mp3", "volume": 0.12 },
+    "warm": { "file": "too_many_days_piano.mp3", "volume": 0.22 },
+    "hope": { "file": "soft_morning_keys_piano.mp3", "volume": 0.32 }
+  },
+  "scenes": [
+    {
+      "id": "phone-call",
+      "title": "The Phone Call",
+      "time_range": "0-5",
+      "duration_target": 5.0,
+      "location_id": "apartment_kitchen",
+      "mood": "quiet",
+      "ambient": "kitchen",
+      "type": "live_action",
+      "requires_lipsync": true,
+      "characters": ["mother"],
+      "cinematography": {
+        "lens": "35mm",
+        "shot_type": "medium shot",
+        "camera_movement": "slow handheld observation",
+        "framing": "mother at stove, phone to ear, kitchen depth behind",
+        "depth_of_field": "moderate",
+        "lighting": "soft early morning window light, practical kitchen lamp"
+      },
+      "visual_prompt": "Early morning Indian apartment kitchen. Middle-aged Indian mother in simple saree preparing tea at gas stove. Phone rings, she answers with slight concern. Natural documentary cinematography, photorealistic, vertical 9:16.",
+      "negative_prompt": "cartoon, illustration, 3d, anime, plastic skin, avatar, stock photo watermark",
+      "sound_design": ["tea pouring", "cup placement", "kitchen ambience", "phone vibration", "ceiling fan", "distant traffic"],
+      "music_note": "Almost silent — room tone only",
+      "dialogue": [
+        {
+          "speaker": "mother",
+          "text": "Hello... yes... how much?",
+          "emotional_state": "calm shifting to concern",
+          "speed": "natural",
+          "intensity": "quiet",
+          "pause_before_sec": 0.3,
+          "pauses_in_text": [{"after": "Hello", "sec": 0.4}],
+          "direction": "Natural conversational English, Indian accent, listening between lines"
+        },
+        {
+          "speaker": "mother",
+          "text": "Okay... I'll arrange it.",
+          "emotional_state": "contained worry",
+          "speed": "slow",
+          "intensity": "quiet",
+          "pause_before_sec": 0.8,
+          "pauses_in_text": [{"after": "Okay", "sec": 0.5}],
+          "direction": "Small exhale before speaking, forced calm"
+        }
+      ]
+    },
+    {
+      "id": "son-notices",
+      "title": "Son Notices",
+      "time_range": "5-10",
+      "duration_target": 5.0,
+      "location_id": "apartment_living",
+      "mood": "quiet",
+      "ambient": "home",
+      "type": "live_action",
+      "requires_lipsync": true,
+      "characters": ["mother", "son"],
+      "cinematography": {
+        "lens": "50mm",
+        "shot_type": "over-the-shoulder",
+        "camera_movement": "static with subtle breathing",
+        "framing": "son foreground, mother background hiding concern",
+        "depth_of_field": "shallow",
+        "lighting": "morning practical light"
+      },
+      "visual_prompt": "Indian young man getting ready for work, adjusting shirt, glances toward mother. Mother turns away masking worry. Natural silence between them. Photorealistic Indian apartment, vertical 9:16.",
+      "sound_design": ["room ambience", "fabric movement", "distant traffic"],
+      "music_note": "Room tone continues",
+      "dialogue": [
+        {
+          "speaker": "son",
+          "text": "Mom... what happened?",
+          "emotional_state": "concerned, gentle",
+          "speed": "natural",
+          "intensity": "quiet",
+          "pause_before_sec": 0.4,
+          "direction": "Soft, not accusatory"
+        },
+        {
+          "speaker": "mother",
+          "text": "Nothing.",
+          "emotional_state": "deflecting",
+          "speed": "natural",
+          "intensity": "quiet",
+          "pause_before_sec": 0.5
+        },
+        {
+          "speaker": "mother",
+          "text": "You'll be late.",
+          "emotional_state": "deflecting with care",
+          "speed": "natural",
+          "intensity": "normal",
+          "pause_before_sec": 0.6,
+          "direction": "Small forced smile, changing subject"
+        }
+      ]
+    },
+    {
+      "id": "night-table",
+      "title": "Night",
+      "time_range": "10-18",
+      "duration_target": 8.0,
+      "location_id": "dining_night",
+      "mood": "warm",
+      "ambient": "night",
+      "type": "silent",
+      "requires_lipsync": false,
+      "characters": ["mother"],
+      "cinematography": {
+        "lens": "85mm",
+        "shot_type": "close-up insert sequence",
+        "camera_movement": "slow push-in",
+        "framing": "notebook, calculator, bills, then mother's tired face",
+        "depth_of_field": "shallow",
+        "lighting": "single warm table lamp, deep shadows"
+      },
+      "visual_prompt": "Night. Indian mother alone at dining table with notebook, calculator, utility bills. She calculates expenses, pauses, tired breath. Slow cinematic push-in on her face. No crying, quiet emotion. Photorealistic, vertical 9:16.",
+      "sound_design": ["quiet room", "ceiling fan", "distant city", "paper movement", "calculator clicks", "chair creak"],
+      "music_note": "Introduce subtle piano around 12s, very low",
+      "dialogue": []
+    },
+    {
+      "id": "discovery",
+      "title": "Discovery",
+      "time_range": "18-25",
+      "duration_target": 7.0,
+      "location_id": "dining_night",
+      "mood": "warm",
+      "ambient": "night",
+      "type": "live_action",
+      "requires_lipsync": true,
+      "characters": ["mother", "son"],
+      "cinematography": {
+        "lens": "50mm",
+        "shot_type": "two-shot becoming close-up",
+        "camera_movement": "slow push-in on emotional peak",
+        "framing": "son sits beside mother, notebook between them",
+        "depth_of_field": "shallow",
+        "lighting": "warm lamp, faces softly lit"
+      },
+      "visual_prompt": "Son enters dim dining room, notices notebook, sits beside mother. Intimate two-shot, emotional but restrained. Photorealistic Indian family, vertical 9:16.",
+      "sound_design": ["footsteps", "chair movement", "room tone drops quieter"],
+      "music_note": "Piano slightly more present",
+      "dialogue": [
+        {
+          "speaker": "son",
+          "text": "How much do you need?",
+          "emotional_state": "quiet directness",
+          "speed": "slow",
+          "intensity": "quiet",
+          "pause_before_sec": 0.5
+        },
+        {
+          "speaker": "mother",
+          "text": "It's okay.",
+          "emotional_state": "hiding concern",
+          "speed": "natural",
+          "intensity": "whisper",
+          "pause_before_sec": 0.4
+        },
+        {
+          "speaker": "mother",
+          "text": "I'll manage.",
+          "emotional_state": "forced reassurance",
+          "speed": "slow",
+          "intensity": "quiet",
+          "pause_before_sec": 0.7,
+          "pauses_in_text": [{"after": "It's okay", "sec": 0.5}],
+          "emphasis_words": ["manage"],
+          "direction": "Quiet voice, small pause before I'll manage, slightly forced smile"
+        },
+        {
+          "speaker": "son",
+          "text": "You always say that.",
+          "emotional_state": "loving frustration",
+          "speed": "slow",
+          "intensity": "quiet",
+          "pause_before_sec": 1.0,
+          "emphasis_words": ["always"],
+          "direction": "Very natural delivery, not dramatic. Emotional peak."
+        }
+      ]
+    },
+    {
+      "id": "solution",
+      "title": "The Solution",
+      "time_range": "25-34",
+      "duration_target": 9.0,
+      "location_id": "morning_living",
+      "mood": "hope",
+      "ambient": "morning",
+      "type": "phone",
+      "requires_lipsync": false,
+      "characters": ["son"],
+      "phone_screens": ["01-homepage.png", "09-offers.png"],
+      "cinematography": {
+        "lens": "85mm",
+        "shot_type": "cinematic product insert",
+        "camera_movement": "shallow focus pull phone to face",
+        "framing": "phone foreground, son soft background",
+        "depth_of_field": "very shallow",
+        "lighting": "soft morning window light"
+      },
+      "visual_prompt": "Next morning. Young Indian man's hands holding smartphone showing loan marketplace app. Shallow depth of field, son's face soft in background. Natural hand movement scrolling. Cinematic product shot, photorealistic, vertical 9:16.",
+      "sound_design": ["subtle touch sounds", "morning ambience"],
+      "music_note": "Hopeful piano, still under dialogue",
+      "dialogue": [
+        {
+          "speaker": "narrator",
+          "text": "Sometimes, the first step is simply understanding your options.",
+          "emotional_state": "warm, understated",
+          "speed": "slow",
+          "intensity": "quiet",
+          "pause_before_sec": 0.5,
+          "on_camera": false,
+          "direction": "Optional VO — soft, not salesy"
+        }
+      ]
+    },
+    {
+      "id": "payoff",
+      "title": "Payoff",
+      "time_range": "34-41",
+      "duration_target": 7.0,
+      "location_id": "morning_living",
+      "mood": "hope",
+      "ambient": "morning",
+      "type": "live_action",
+      "requires_lipsync": true,
+      "characters": ["mother", "son"],
+      "cinematography": {
+        "lens": "50mm",
+        "shot_type": "medium two-shot",
+        "camera_movement": "gentle static",
+        "framing": "mother brings tea, warm domestic moment",
+        "depth_of_field": "moderate",
+        "lighting": "soft morning golden light"
+      },
+      "visual_prompt": "Mother brings tea cup to son. Genuine small smiles, no hug, quiet family warmth. Photorealistic Indian apartment morning, vertical 9:16.",
+      "sound_design": ["tea cup placement", "morning birds distant", "soft room tone"],
+      "music_note": "Hopeful piano continues",
+      "dialogue": [
+        {
+          "speaker": "mother",
+          "text": "Everything okay?",
+          "emotional_state": "hopeful, cautious",
+          "speed": "natural",
+          "intensity": "quiet",
+          "pause_before_sec": 0.3
+        },
+        {
+          "speaker": "son",
+          "text": "Yeah. We'll figure it out.",
+          "emotional_state": "reassuring",
+          "speed": "natural",
+          "intensity": "normal",
+          "pause_before_sec": 0.5
+        },
+        {
+          "speaker": "mother",
+          "text": "Together?",
+          "emotional_state": "tentative hope",
+          "speed": "slow",
+          "intensity": "quiet",
+          "pause_before_sec": 0.6
+        },
+        {
+          "speaker": "son",
+          "text": "Together.",
+          "emotional_state": "warm certainty",
+          "speed": "slow",
+          "intensity": "quiet",
+          "pause_before_sec": 0.4,
+          "emphasis_words": ["Together"]
+        }
+      ]
+    },
+    {
+      "id": "brand",
+      "title": "Brand",
+      "time_range": "41-45",
+      "duration_target": 4.0,
+      "location_id": "morning_living",
+      "mood": "uplift",
+      "ambient": "morning",
+      "type": "endcard",
+      "requires_lipsync": false,
+      "characters": [],
+      "cinematography": {
+        "lens": "50mm",
+        "shot_type": "brand card",
+        "camera_movement": "subtle fade in",
+        "framing": "centered logo and tagline",
+        "depth_of_field": "n/a",
+        "lighting": "clean dark cinematic background"
+      },
+      "visual_prompt": "Clean cinematic brand end card, dark navy background, NeerCred logo, tagline Dream Big Borrow Smart, CTA Explore your loan options",
+      "music_note": "Music resolves gently",
+      "dialogue": []
+    }
+  ]
+}

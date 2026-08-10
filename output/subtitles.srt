@@ -1,0 +1,55 @@
+1
+00:00:00,700 --> 00:00:02,450
+Mother: Hello... yes... how much?
+
+2
+00:00:03,250 --> 00:00:04,929
+Mother: Okay... I'll arrange it.
+
+3
+00:00:05,800 --> 00:00:07,300
+Son: Mom... what happened?
+
+4
+00:00:07,799 --> 00:00:09,300
+Mother: Nothing.
+
+5
+00:00:09,900 --> 00:00:11,400
+Mother: You'll be late.
+
+6
+00:00:18,899 --> 00:00:20,399
+Son: How much do you need?
+
+7
+00:00:20,799 --> 00:00:22,299
+Mother: It's okay.
+
+8
+00:00:23,000 --> 00:00:24,500
+Mother: I'll manage.
+
+9
+00:00:25,500 --> 00:00:27,000
+Son: You always say that.
+
+10
+00:00:25,899 --> 00:00:30,309
+Sometimes, the first step is simply understanding your options.
+
+11
+00:00:34,699 --> 00:00:36,199
+Mother: Everything okay?
+
+12
+00:00:36,700 --> 00:00:38,520
+Son: Yeah. We'll figure it out.
+
+13
+00:00:39,120 --> 00:00:40,620
+Mother: Together?
+
+14
+00:00:41,020 --> 00:00:42,520
+Son: Together.

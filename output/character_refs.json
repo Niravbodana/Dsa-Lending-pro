@@ -1,0 +1,18 @@
+{
+  "characters": [
+    {
+      "id": "mother",
+      "name": "Mother",
+      "success": false,
+      "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/characters/mother_ref.prompt.txt",
+      "message": "IMAGE_PROVIDER not configured. Prompt saved to /workspace/scripts/reel_engine/.work/you-always-say-that/characters/mother_ref.prompt.txt"
+    },
+    {
+      "id": "son",
+      "name": "Son",
+      "success": false,
+      "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/characters/son_ref.prompt.txt",
+      "message": "IMAGE_PROVIDER not configured. Prompt saved to /workspace/scripts/reel_engine/.work/you-always-say-that/characters/son_ref.prompt.txt"
+    }
+  ]
+}

@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Modular NeerCred cinematic reel generator — story JSON → film."""
+"""DEPRECATED — v1 Ken Burns slideshow reel generator.
+
+Use scripts/generate_reel_v2.py (cinematic reel engine v2) instead.
+This script produces illustrated slideshow + edge TTS output that fails
+the photorealistic quality gate. Kept for reference only.
+"""
 
 from __future__ import annotations
 

@@ -1,0 +1,251 @@
+{
+  "project_id": "you-always-say-that",
+  "title": "YOU ALWAYS SAY THAT",
+  "target_duration": 43,
+  "total_duration": 45.0,
+  "aspect_ratio": "9:16",
+  "resolution": "1080x1920",
+  "shot_count": 7,
+  "shots": [
+    {
+      "id": "phone-call",
+      "title": "The Phone Call",
+      "start_sec": 0.0,
+      "duration_sec": 5.0,
+      "end_sec": 5.0,
+      "time_range": "0-5",
+      "type": "live_action",
+      "mood": "quiet",
+      "characters": [
+        "mother"
+      ],
+      "location": "Apartment Kitchen",
+      "cinematography": {
+        "lens": "35mm",
+        "shot_type": "medium shot",
+        "camera_movement": "slow handheld observation",
+        "framing": "mother at stove, phone to ear, kitchen depth behind",
+        "depth_of_field": "moderate",
+        "lighting": "soft early morning window light, practical kitchen lamp"
+      },
+      "visual_prompt": "Early morning Indian apartment kitchen. Middle-aged Indian mother in simple saree preparing tea at gas stove. Phone rings, she answers with slight concern. Natural documentary cinematography, photorealistic, vertical 9:16.",
+      "negative_prompt": "cartoon, illustration, 3d, anime, plastic skin, avatar, stock photo watermark",
+      "requires_lipsync": true,
+      "sound_design": [
+        "tea pouring",
+        "cup placement",
+        "kitchen ambience",
+        "phone vibration",
+        "ceiling fan",
+        "distant traffic"
+      ],
+      "music_note": "Almost silent \u2014 room tone only"
+    },
+    {
+      "id": "son-notices",
+      "title": "Son Notices",
+      "start_sec": 5.0,
+      "duration_sec": 5.0,
+      "end_sec": 10.0,
+      "time_range": "5-10",
+      "type": "live_action",
+      "mood": "quiet",
+      "characters": [
+        "mother",
+        "son"
+      ],
+      "location": "Living Area",
+      "cinematography": {
+        "lens": "50mm",
+        "shot_type": "over-the-shoulder",
+        "camera_movement": "static with subtle breathing",
+        "framing": "son foreground, mother background hiding concern",
+        "depth_of_field": "shallow",
+        "lighting": "morning practical light"
+      },
+      "visual_prompt": "Indian young man getting ready for work, adjusting shirt, glances toward mother. Mother turns away masking worry. Natural silence between them. Photorealistic Indian apartment, vertical 9:16.",
+      "negative_prompt": "",
+      "requires_lipsync": true,
+      "sound_design": [
+        "room ambience",
+        "fabric movement",
+        "distant traffic"
+      ],
+      "music_note": "Room tone continues"
+    },
+    {
+      "id": "night-table",
+      "title": "Night",
+      "start_sec": 10.0,
+      "duration_sec": 8.0,
+      "end_sec": 18.0,
+      "time_range": "10-18",
+      "type": "silent",
+      "mood": "warm",
+      "characters": [
+        "mother"
+      ],
+      "location": "Dining Table Night",
+      "cinematography": {
+        "lens": "85mm",
+        "shot_type": "close-up insert sequence",
+        "camera_movement": "slow push-in",
+        "framing": "notebook, calculator, bills, then mother's tired face",
+        "depth_of_field": "shallow",
+        "lighting": "single warm table lamp, deep shadows"
+      },
+      "visual_prompt": "Night. Indian mother alone at dining table with notebook, calculator, utility bills. She calculates expenses, pauses, tired breath. Slow cinematic push-in on her face. No crying, quiet emotion. Photorealistic, vertical 9:16.",
+      "negative_prompt": "",
+      "requires_lipsync": false,
+      "sound_design": [
+        "quiet room",
+        "ceiling fan",
+        "distant city",
+        "paper movement",
+        "calculator clicks",
+        "chair creak"
+      ],
+      "music_note": "Introduce subtle piano around 12s, very low"
+    },
+    {
+      "id": "discovery",
+      "title": "Discovery",
+      "start_sec": 18.0,
+      "duration_sec": 7.0,
+      "end_sec": 25.0,
+      "time_range": "18-25",
+      "type": "live_action",
+      "mood": "warm",
+      "characters": [
+        "mother",
+        "son"
+      ],
+      "location": "Dining Table Night",
+      "cinematography": {
+        "lens": "50mm",
+        "shot_type": "two-shot becoming close-up",
+        "camera_movement": "slow push-in on emotional peak",
+        "framing": "son sits beside mother, notebook between them",
+        "depth_of_field": "shallow",
+        "lighting": "warm lamp, faces softly lit"
+      },
+      "visual_prompt": "Son enters dim dining room, notices notebook, sits beside mother. Intimate two-shot, emotional but restrained. Photorealistic Indian family, vertical 9:16.",
+      "negative_prompt": "",
+      "requires_lipsync": true,
+      "sound_design": [
+        "footsteps",
+        "chair movement",
+        "room tone drops quieter"
+      ],
+      "music_note": "Piano slightly more present"
+    },
+    {
+      "id": "solution",
+      "title": "The Solution",
+      "start_sec": 25.0,
+      "duration_sec": 9.0,
+      "end_sec": 34.0,
+      "time_range": "25-34",
+      "type": "phone",
+      "mood": "hope",
+      "characters": [
+        "son"
+      ],
+      "location": "Morning Living",
+      "cinematography": {
+        "lens": "85mm",
+        "shot_type": "cinematic product insert",
+        "camera_movement": "shallow focus pull phone to face",
+        "framing": "phone foreground, son soft background",
+        "depth_of_field": "very shallow",
+        "lighting": "soft morning window light"
+      },
+      "visual_prompt": "Next morning. Young Indian man's hands holding smartphone showing loan marketplace app. Shallow depth of field, son's face soft in background. Natural hand movement scrolling. Cinematic product shot, photorealistic, vertical 9:16.",
+      "negative_prompt": "",
+      "requires_lipsync": false,
+      "sound_design": [
+        "subtle touch sounds",
+        "morning ambience"
+      ],
+      "music_note": "Hopeful piano, still under dialogue"
+    },
+    {
+      "id": "payoff",
+      "title": "Payoff",
+      "start_sec": 34.0,
+      "duration_sec": 7.0,
+      "end_sec": 41.0,
+      "time_range": "34-41",
+      "type": "live_action",
+      "mood": "hope",
+      "characters": [
+        "mother",
+        "son"
+      ],
+      "location": "Morning Living",
+      "cinematography": {
+        "lens": "50mm",
+        "shot_type": "medium two-shot",
+        "camera_movement": "gentle static",
+        "framing": "mother brings tea, warm domestic moment",
+        "depth_of_field": "moderate",
+        "lighting": "soft morning golden light"
+      },
+      "visual_prompt": "Mother brings tea cup to son. Genuine small smiles, no hug, quiet family warmth. Photorealistic Indian apartment morning, vertical 9:16.",
+      "negative_prompt": "",
+      "requires_lipsync": true,
+      "sound_design": [
+        "tea cup placement",
+        "morning birds distant",
+        "soft room tone"
+      ],
+      "music_note": "Hopeful piano continues"
+    },
+    {
+      "id": "brand",
+      "title": "Brand",
+      "start_sec": 41.0,
+      "duration_sec": 4.0,
+      "end_sec": 45.0,
+      "time_range": "41-45",
+      "type": "endcard",
+      "mood": "uplift",
+      "characters": [],
+      "location": "Morning Living",
+      "cinematography": {
+        "lens": "50mm",
+        "shot_type": "brand card",
+        "camera_movement": "subtle fade in",
+        "framing": "centered logo and tagline",
+        "depth_of_field": "n/a",
+        "lighting": "clean dark cinematic background"
+      },
+      "visual_prompt": "Clean cinematic brand end card, dark navy background, NeerCred logo, tagline Dream Big Borrow Smart, CTA Explore your loan options",
+      "negative_prompt": "",
+      "requires_lipsync": false,
+      "sound_design": [],
+      "music_note": "Music resolves gently"
+    }
+  ],
+  "characters": {
+    "mother": {
+      "name": "Mother",
+      "age_range": "48-55",
+      "description": "Indian woman, middle-class, warm but tired expression, slight signs of age, natural skin texture, minimal jewelry, no heavy makeup, natural hair",
+      "wardrobe": "Simple cotton saree or salwar kameez in muted earth tones, minimal gold earrings",
+      "reference_prompt": "Photorealistic Indian mother age 50, middle-class Mumbai apartment dweller, natural skin with fine lines, warm brown eyes, salt-and-pepper hair in loose bun, kind tired face, documentary portrait photography"
+    },
+    "son": {
+      "name": "Son",
+      "age_range": "24-29",
+      "description": "Indian young man, normal middle-class appearance, natural Indian features, realistic skin, natural hairstyle, not model-like",
+      "wardrobe": "Simple office shirt and trousers, no tie, everyday watch",
+      "reference_prompt": "Photorealistic Indian young man age 26, middle-class professional, natural skin, short black hair, clean-shaven, earnest expression, documentary portrait photography"
+    }
+  },
+  "pipeline_notes": [
+    "Generate character reference portraits BEFORE scene video generation.",
+    "Each shot is 3-9 seconds of photorealistic video, not Ken Burns on stills.",
+    "Compose every shot natively for vertical 9:16 \u2014 no letterboxing."
+  ]
+}
