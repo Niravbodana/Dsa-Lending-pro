@@ -22,7 +22,9 @@ VW, VH = 390, 844
 
 CLEAN_JS = """() => {
   document.querySelectorAll(
-    '.loan-guide-root, [class*="cookie"], [class*="Cookie"], [aria-label*="Cookie"]'
+    '.loan-guide-root, [class*="cookie"], [class*="Cookie"], [aria-label*="Cookie"], ' +
+    'nextjs-portal, [data-nextjs-toast], [data-next-mark], [data-nextjs-dev-tools-button], ' +
+    '#__nextjs-dev-tools-menu, #__nextjs-build-indicator, button.fixed.bottom-6.left-6'
   ).forEach(e => e.remove());
   document.querySelectorAll('p, span, div').forEach(el => {
     const t = (el.textContent || '').trim();

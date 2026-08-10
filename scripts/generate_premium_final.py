@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""NeerCred Premium Promo v16 — premium endcard + full mobile screen."""
+"""NeerCred Premium Promo v17 — greeting intro + no dev thunder icon."""
 
 from __future__ import annotations
 
@@ -34,11 +34,17 @@ CAPTION_RESERVE = 200
 # NeerCred Brand & Video Style Guide (dev.neercred.com)
 SCENES = [
     {
+        "id": "greeting", "layout": "greeting", "step": "",
+        "title": "", "subtitle": "", "bullets": [],
+        "vo": "Welcome to NeerCred.",
+        "vo_hi": "",
+    },
+    {
         "id": "intro", "screen": "01-homepage.png", "step": "WELCOME",
         "title": "NeerCred", "subtitle": "Dream Big · Borrow Smart",
         "bullets": ["Digital Lending Aggregator", "Purity & Trust", "100% digital journey"],
-        "vo": "Welcome to NeerCred — your digital lending aggregator. Dream big, borrow smart, and discover eligible loan offers from trusted partners.",
-        "vo_hi": "Welcome to NeerCred.\nDream Big · Borrow Smart.",
+        "vo": "Your digital lending aggregator. Dream big, borrow smart, and discover eligible loan offers from trusted partners.",
+        "vo_hi": "Dream Big · Borrow Smart.\nEligible offers from partners.",
     },
     {
         "id": "home", "screen": "01-homepage.png", "step": "EXPLORE",
@@ -192,6 +198,43 @@ def load_logo() -> Image.Image:
     return img
 
 
+def load_logo_hires() -> Image.Image:
+    """HD header lockup for greeting / end-card overlays."""
+    p = ASSETS / "logo_header_dark_hires.png"
+    svg = ROOT / "frontend/public/neercred-logo-header-dark.svg"
+    bg_hex = C["navy"]
+    if not p.exists() or p.stat().st_mtime < svg.stat().st_mtime:
+        html = ASSETS / "logo_header_hires_render.html"
+        html.write_text(
+            f'<!DOCTYPE html><html><head>'
+            f'<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">'
+            f'<style>body{{margin:0;padding:0;background:{bg_hex};width:480px;height:162px;'
+            f'display:flex;align-items:center;justify-content:center}}</style>'
+            f'</head><body>{svg.read_text(encoding="utf-8", errors="replace")}</body></html>'
+        )
+        run(
+            ["npx", "playwright", "screenshot", "--browser", "chromium",
+             f"file://{html.resolve()}", str(p), "--viewport-size=480,162"],
+            cwd=ROOT / "frontend",
+        )
+    img = Image.open(p).convert("RGBA")
+    px = img.load()
+    bg = rgb(bg_hex)
+    for y in range(img.height):
+        for x in range(img.width):
+            r, g, b, a = px[x, y]
+            if abs(r - bg[0]) < 10 and abs(g - bg[1]) < 10 and abs(b - bg[2]) < 10:
+                px[x, y] = (r, g, b, 0)
+    if img.getbbox():
+        img = img.crop(img.getbbox())
+    return img
+
+
+def ease_out_cubic(t: float) -> float:
+    t = max(0.0, min(1.0, t))
+    return 1 - (1 - t) ** 3
+
+
 def ensure_animation_frames(
     cache_name: str,
     url: str,
@@ -234,8 +277,9 @@ def ensure_animation_frames(
         page.wait_for_function("document.fonts.ready", timeout=15000)
         page.evaluate("""() => {
           document.querySelectorAll(
-            '[class*="cookie"], [class*="Cookie"], [aria-label*="Cookie"], ' +
-            '.loan-guide-root, nextjs-portal, [data-nextjs-toast], [data-next-mark]'
+            '.loan-guide-root, [class*="cookie"], [class*="Cookie"], [aria-label*="Cookie"], ' +
+            'nextjs-portal, [data-nextjs-toast], [data-next-mark], [data-nextjs-dev-tools-button], ' +
+            '#__nextjs-dev-tools-menu, #__nextjs-build-indicator, button.fixed.bottom-6.left-6'
           ).forEach(e => e.remove());
         }""")
         page.wait_for_timeout(800)
@@ -377,6 +421,50 @@ def wrap_lines(text: str, fnt: ImageFont.FreeTypeFont, max_w: int) -> list[str]:
     return lines or [text]
 
 
+def render_greeting_frame(logo_hires: Image.Image, frame_t: float) -> Image.Image:
+    """Centered welcome splash — logo emerges from background."""
+    rgba = bg_canvas().convert("RGBA")
+    glow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    gd = ImageDraw.Draw(glow)
+    gd.ellipse([W // 2 - 320, H // 2 - 260, W // 2 + 320, H // 2 + 200], fill=(15, 118, 110, 42))
+    glow = glow.filter(ImageFilter.GaussianBlur(90))
+    rgba = Image.alpha_composite(rgba, glow)
+    d = ImageDraw.Draw(rgba)
+
+    cy = H // 2 - 20
+    wt = ease_out_cubic(min(1.0, frame_t / 0.38))
+    wf = font(44, bold=True)
+    welcome = "Welcome to"
+    wl = d.textlength(welcome, font=wf)
+    wy = cy - 118 + int(36 * (1 - wt))
+    d.text(((W - wl) // 2, wy), welcome, fill=rgb(C["mint"]), font=wf)
+
+    lt = ease_out_cubic(min(1.0, max(0.0, (frame_t - 0.1) / 0.42)))
+    lg = logo_hires.copy()
+    target_w = 460
+    scale = (target_w / lg.width) * (0.78 + 0.22 * lt)
+    nw, nh = int(lg.width * scale), int(lg.height * scale)
+    lg = lg.resize((nw, nh), Image.Resampling.LANCZOS)
+    lx, ly = (W - nw) // 2, cy - nh // 2 + int(28 * (1 - lt))
+    rgba.paste(lg, (lx, ly), lg)
+
+    tt = ease_out_cubic(min(1.0, max(0.0, (frame_t - 0.32) / 0.38)))
+    tf = font(22, bold=True)
+    tag = "DREAM BIG · BORROW SMART"
+    tl = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(tag, font=tf)
+    ty = cy + nh // 2 + 36 + int(24 * (1 - tt))
+    d.text(((W - tl) // 2, ty), tag, fill=rgb(C["gold_light"]), font=tf)
+
+    vt = ease_out_cubic(min(1.0, max(0.0, (frame_t - 0.48) / 0.35)))
+    vf = font(18)
+    val = "Purity & Trust"
+    vl = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(val, font=vf)
+    vy = ty + 44 + int(16 * (1 - vt))
+    d.text(((W - vl) // 2, vy), val, fill=rgb(C["muted"]), font=vf)
+
+    return rgba.convert("RGB")
+
+
 def render_endcard_frame(anim_frames: dict[str, list[Path]], frame_t: float) -> Image.Image:
     """Full-frame HD end card from browser-captured animation."""
     frames = anim_frames.get("endcard", [])
@@ -396,7 +484,10 @@ def render_frame(
     frame_t: float = 0.0,
     anim_frames: dict[str, list[Path]] | None = None,
     scene_idx: int = 0,
+    logo_hires: Image.Image | None = None,
 ) -> Image.Image:
+    if scene.get("layout") == "greeting":
+        return render_greeting_frame(logo_hires or logo, frame_t)
     if scene.get("layout") == "endcard_full":
         return render_endcard_frame(anim_frames or {}, frame_t)
 
@@ -463,7 +554,10 @@ def render_frame(
         rgba.paste(sh, (px - 24, py + 16), sh)
         rgba.paste(phone, (px, py), phone)
 
-    # Caption bar — dynamic height, lifted from bottom so text never clips
+    # Caption bar — skip on full-frame greeting
+    if scene.get("layout") == "greeting":
+        return rgba.convert("RGB")
+
     cap_f = font(24, bold=True)
     cap_lines: list[str] = []
     for block in scene["vo_hi"].split("\n"):
@@ -548,6 +642,7 @@ def make_bgm(dur: float, path: Path, drum_times: list[float] | None = None) -> N
 def render_celebration_clip(
     scene: dict, logo: Image.Image, vo: Path, dur: float, idx: int,
     anim_frames: dict[str, list[Path]],
+    logo_hires: Image.Image | None = None,
 ) -> Path:
     """Animated celebration scene — loops frames while VO plays."""
     CLIPS.mkdir(parents=True, exist_ok=True)
@@ -558,7 +653,7 @@ def render_celebration_clip(
     seq_dir.mkdir(parents=True, exist_ok=True)
     for f in range(n_frames):
         t = f / n_frames
-        img = render_frame(scene, logo, frame_t=t, anim_frames=anim_frames, scene_idx=idx)
+        img = render_frame(scene, logo, frame_t=t, anim_frames=anim_frames, scene_idx=idx, logo_hires=logo_hires)
         img.save(seq_dir / f"frame_{f:04d}.png", quality=92)
     vf = f"fade=t=in:st=0:d=0.35,fade=t=out:st={total - 0.4:.3f}:d=0.4"
     run([
@@ -639,6 +734,7 @@ async def main(anim_frames: dict[str, list[Path]]) -> None:
         d.mkdir(parents=True, exist_ok=True)
 
     logo = load_logo()
+    logo_hires = load_logo_hires()
     clips: list[Path] = []
     vo_files: list[Path] = []
     scene_ends: list[float] = []
@@ -652,9 +748,9 @@ async def main(anim_frames: dict[str, list[Path]]) -> None:
         acc += dur + 0.55
         scene_ends.append(acc)
         fr = FRAMES / f"premium_{i:02d}.png"
-        render_frame(scene, logo, anim_frames=anim_frames, scene_idx=i).save(fr, quality=95)
-        if scene.get("layout") in ("celebration", "endcard_full"):
-            clips.append(render_celebration_clip(scene, logo, vo, dur, i, anim_frames))
+        render_frame(scene, logo, anim_frames=anim_frames, scene_idx=i, logo_hires=logo_hires).save(fr, quality=95)
+        if scene.get("layout") in ("celebration", "endcard_full", "greeting"):
+            clips.append(render_celebration_clip(scene, logo, vo, dur, i, anim_frames, logo_hires))
         else:
             clips.append(render_clip(fr, vo, dur, i))
         print(f"  {scene['id']}: {dur:.1f}s")
