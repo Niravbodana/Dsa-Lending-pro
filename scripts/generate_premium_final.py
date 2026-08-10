@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""NeerCred Premium Promo v7 — cinematic layout, English VO, melancholic piano BGM."""
+"""NeerCred Premium Promo v8 — humanized English VO, soft morning piano BGM."""
 
 from __future__ import annotations
 
@@ -21,9 +21,8 @@ FRAMES = OUT / "frames"
 CLIPS = OUT / "clips"
 DOWNLOAD = Path("/opt/cursor/artifacts")
 
-# Melancholic solo piano — Mixkit "Piano Reflections" (royalty-free, Caretaker-style vibe)
-BGM_URL = "https://assets.mixkit.co/music/22/22.mp3"
-BGM_SOURCE = ASSETS / "too_many_days_piano.mp3"
+# Pixabay — "Piano Soft Gentle Morning Keys" by alex-morgan (royalty-free)
+BGM_SOURCE = ASSETS / "soft_morning_keys_piano.mp3"
 
 W, H = 1920, 1080
 FPS = 30
@@ -34,40 +33,40 @@ SCENES = [
     {
         "id": "intro", "screen": "01-homepage.png", "step": "WELCOME",
         "title": "NeerCred", "subtitle": "Dream Big. Borrow Smart.",
-        "bullets": ["RBI LSP Registered Platform", "15+ Regulated Lenders", "Bank-grade Security"],
-        "vo": "Welcome to NeerCred. India's premium personal loan marketplace.",
-        "vo_hi": "Welcome to NeerCred.\nPremium loan marketplace.",
+        "bullets": ["15+ trusted lender partners", "Compare rates in minutes", "100% digital journey"],
+        "vo": "Hey there! Welcome to NeerCred. India's friendliest place to find the right personal loan for you.",
+        "vo_hi": "Welcome to NeerCred.\nYour personal loan marketplace.",
     },
     {
         "id": "home", "screen": "01-homepage.png", "step": "EXPLORE",
         "title": "One Platform.\nEvery Goal.",
         "subtitle": "Personal loans up to ₹20 Lakhs",
-        "bullets": ["Compare HDFC, ICICI, Bajaj & more", "100% digital journey", "Rates from 10.99%"],
-        "vo": "One platform for every financial goal. Personal loans up to twenty lakhs, fully digital.",
-        "vo_hi": "One platform, every goal.\nUp to ₹20 lakhs — fully digital.",
+        "bullets": ["Compare HDFC, ICICI, Bajaj and more", "Fully online — no branch visits", "Rates from 10.99%"],
+        "vo": "Whether it's a wedding, a home upgrade, or that trip you've been planning... one platform brings every option to you.",
+        "vo_hi": "One platform, every goal.\nUp to twenty lakhs — fully digital.",
     },
     {
         "id": "apply", "screen": "02-apply.png", "step": "APPLY",
         "title": "Mobile\nVerification",
         "subtitle": "Secure OTP in 30 seconds",
-        "bullets": ["DPDP Act compliant", "Encrypted session", "No spam ever"],
-        "vo": "Go to Apply and enter your mobile number. Allow SMS consent and continue. Completely secure.",
-        "vo_hi": "Enter mobile number.\nAllow SMS consent.\nCompletely secure.",
+        "bullets": ["Quick mobile verification", "Encrypted and private", "No spam, ever"],
+        "vo": "Just tap Apply, enter your mobile number, and allow SMS consent. That's it — quick and completely secure.",
+        "vo_hi": "Enter your mobile.\nAllow SMS consent.\nQuick and secure.",
     },
     {
         "id": "otp", "screen": "03-otp.png", "step": "VERIFY",
         "title": "OTP\nConfirmed",
         "subtitle": "Instant identity verification",
         "bullets": ["6-digit secure OTP", "Session protected", "Continue in one tap"],
-        "vo": "Enter your OTP and verify. Safe and fast — move ahead in one minute.",
-        "vo_hi": "Enter OTP, verify.\nSafe and fast.",
+        "vo": "Pop in your OTP, hit verify, and you're in. Takes less than a minute — we promise.",
+        "vo_hi": "Enter OTP and verify.\nLess than a minute.",
     },
     {
         "id": "profile", "screen": "04-profile.png", "step": "PROFILE",
         "title": "Smart\nProfile",
         "subtitle": "PAN auto-fill from records",
         "bullets": ["One form, no repeat entry", "Minimal documentation", "Guided step by step"],
-        "vo": "Complete your profile. Details auto-fill from PAN. Fill once, not again and again.",
+        "vo": "Fill in your profile once. Your PAN details auto-fill, so you're not typing the same thing over and over.",
         "vo_hi": "Complete your profile.\nPAN auto-fill.\nFill once only.",
     },
     {
@@ -75,32 +74,24 @@ SCENES = [
         "title": "Best Offers.\nOne Screen.",
         "subtitle": "Lowest rate · Lowest EMI",
         "bullets": ["50+ partner offers", "Transparent fees", "Select in one tap"],
-        "vo": "Multiple lender offers on one screen. Compare the best rate and EMI, then select.",
-        "vo_hi": "Multiple lender offers.\nCompare best rates.\nSelect in one tap.",
+        "vo": "Now the fun part — compare offers from multiple lenders side by side. Pick the best rate and EMI that works for you.",
+        "vo_hi": "Compare lender offers.\nBest rates on one screen.\nSelect in one tap.",
     },
     {
         "id": "kyc", "screen": "10-kyc.png", "step": "KYC",
         "title": "Digital\nKYC",
         "subtitle": "Aadhaar · Bank · eSign",
-        "bullets": ["UIDAI Aadhaar OTP", "Penny drop verify", "RBI compliant eSign"],
-        "vo": "KYC is fully digital. Aadhaar OTP, bank verification, and eSign — all from home.",
-        "vo_hi": "KYC 100% digital.\nAadhaar, bank, eSign.\nComplete from home.",
-    },
-    {
-        "id": "trust", "screen": "06-compliance.png", "step": "TRUST",
-        "title": "Built on\nTrust",
-        "subtitle": "RBI LSP · DPDP · Transparent",
-        "bullets": ["RBI LSP registered", "DPDP Act 2023", "Dedicated grievance redressal"],
-        "vo": "RBI LSP registered, DPDP compliant, two fifty six bit encryption. Your data is fully safe.",
-        "vo_hi": "RBI LSP registered.\nDPDP compliant.\nYour data is safe.",
+        "bullets": ["Aadhaar OTP verification", "Bank account verify", "Digital eSign from home"],
+        "vo": "KYC is fully digital. Aadhaar OTP, bank verification, and eSign — all done from your couch.",
+        "vo_hi": "Digital KYC.\nAadhaar, bank, eSign.\nAll from home.",
     },
     {
         "id": "close", "screen": "11-dashboard.png", "step": "START NOW",
         "title": "Track &\nDisburse",
         "subtitle": "Real-time loan dashboard",
         "bullets": ["Live application status", "Pre-approved offers", "Apply in 5 minutes"],
-        "vo": "Apply now on NeerCred. Dream Big, Borrow Smart. Your loan, in your hands.",
-        "vo_hi": "Apply now on NeerCred.\nDream Big. Borrow Smart.",
+        "vo": "Ready to get started? Visit NeerCred today. Dream big, borrow smart — your loan journey begins right here.",
+        "vo_hi": "Start on NeerCred today.\nDream Big. Borrow Smart.",
     },
 ]
 
@@ -313,11 +304,19 @@ def render_frame(scene: dict, logo: Image.Image) -> Image.Image:
 
 
 async def make_vo(text: str, path: Path) -> float:
-    await edge_tts.Communicate(text, VOICE, rate="+8%", pitch="+0Hz").save(str(path))
+    """Warm, conversational TTS with natural pacing."""
+    ssml = (
+        f'<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-IN">'
+        f'<prosody rate="-6%" pitch="-2%">{text}</prosody></speak>'
+    )
+    await edge_tts.Communicate(ssml, VOICE).save(str(path))
     tmp = path.with_suffix(".boost.mp3")
     run([
         "ffmpeg", "-y", "-i", str(path),
-        "-af", "highpass=f=90,compand=0.3|0.8:6:-70/-60|-20/-12|0/-8,volume=3.2,alimiter=limit=0.97",
+        "-af",
+        "highpass=f=80,afftdn=nr=6:nf=-22,"
+        "aecho=0.35:0.45:35:0.12,"
+        "compand=0.3|0.8:6:-70/-60|-20/-10|0/-6,volume=2.8,alimiter=limit=0.95",
         "-ar", "44100", "-ac", "2", "-b:a", "192k", str(tmp),
     ])
     tmp.replace(path)
@@ -327,23 +326,24 @@ async def make_vo(text: str, path: Path) -> float:
 
 def ensure_bgm_source() -> Path:
     ASSETS.mkdir(parents=True, exist_ok=True)
-    if not BGM_SOURCE.exists():
-        print("  Downloading melancholic piano BGM (Too Many Days style)...")
-        urllib.request.urlretrieve(BGM_URL, BGM_SOURCE)
+    if not BGM_SOURCE.exists() or BGM_SOURCE.stat().st_size < 50000:
+        print("  Downloading Pixabay soft morning keys piano...")
+        import subprocess
+        subprocess.run(["python", str(ROOT / "scripts" / "download_pixabay_bgm.py")], check=True)
     return BGM_SOURCE
 
 
 def make_bgm(dur: float, path: Path, drum_times: list[float] | None = None) -> None:
-    """Slow melancholic solo piano — royalty-free, Caretaker / Too Many Days vibe."""
-    _ = drum_times  # piano-only BGM
+    """Soft morning keys piano — gentle, warm, human feel."""
+    _ = drum_times
     src = ensure_bgm_source()
     processed = AUDIO / "bgm_processed.wav"
     run([
         "ffmpeg", "-y", "-i", str(src),
         "-af",
-        "atempo=0.92,asetrate=42336,aresample=44100,"
-        "aecho=0.55:0.65:100:0.28,lowpass=f=4500,"
-        "volume=1.5",
+        "highpass=f=60,lowpass=f=8000,"
+        "aecho=0.4:0.5:80:0.18,"
+        "volume=1.3",
         str(processed),
     ])
     looped = AUDIO / "bgm_looped.wav"
@@ -351,7 +351,7 @@ def make_bgm(dur: float, path: Path, drum_times: list[float] | None = None) -> N
         "ffmpeg", "-y", "-stream_loop", "-1", "-i", str(processed),
         "-t", f"{dur + 2:.2f}",
         "-af",
-        f"loudnorm=I=-16:TP=-1.5:LRA=11,afade=t=in:d=2.5,afade=t=out:st={max(0, dur - 2.5):.2f}:d=2.5",
+        f"loudnorm=I=-18:TP=-1.5:LRA=11,afade=t=in:d=3,afade=t=out:st={max(0, dur - 3):.2f}:d=3",
         str(looped),
     ])
     run([
@@ -461,8 +461,8 @@ async def main() -> None:
     run([
         "ffmpeg", "-y", "-i", str(merged), "-i", str(bgm),
         "-filter_complex",
-        "[0:a]volume=1.5[va];[1:a]volume=1.0,aloop=loop=-1:size=2e+09[vb];"
-        "[va][vb]amix=inputs=2:duration=first:weights=1 0.58:normalize=0[aout]",
+        "[0:a]volume=1.4[va];[1:a]volume=1.0,aloop=loop=-1:size=2e+09[vb];"
+        "[va][vb]amix=inputs=2:duration=first:weights=1 0.5:normalize=0[aout]",
         "-map", "0:v:0", "-map", "[aout]",
         "-c:v", "copy", "-c:a", "aac", "-b:a", "320k", "-ar", "44100", "-ac", "2",
         "-movflags", "+faststart", str(h_out),
