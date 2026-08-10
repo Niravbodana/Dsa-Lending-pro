@@ -40,10 +40,10 @@ export default function PromoHomepage() {
             <Image
               src="/neercred-logo-header.svg"
               alt="NeerCred"
-              width={156}
-              height={46}
+              width={168}
+              height={56}
               priority
-              className="h-11 w-auto"
+              className="h-14 w-auto"
             />
           </Link>
           <Link

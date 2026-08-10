@@ -22,8 +22,8 @@ function OneLineLockup({
   dark?: boolean;
   className?: string;
 }) {
-  const height = Math.round(size * 0.95);
-  const width = Math.round(size * 4.45);
+  const height = size;
+  const width = Math.round(size * 4.2);
   const src = dark ? "/neercred-logo-lockup-dark.svg" : "/neercred-logo-lockup.svg";
 
   return (
@@ -31,8 +31,8 @@ function OneLineLockup({
     <img
       src={src}
       alt="NeerCred"
-      className={`shrink-0 object-contain object-left ${className}`}
-      style={{ height, width: "auto", maxWidth: width }}
+      className={`shrink-0 overflow-visible object-contain object-left ${className}`}
+      style={{ height, width: "auto", maxWidth: width, minHeight: height }}
     />
   );
 }

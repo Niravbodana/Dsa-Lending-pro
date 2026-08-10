@@ -153,13 +153,13 @@ def load_logo() -> Image.Image:
         html.write_text(
             f'<!DOCTYPE html><html><head>'
             f'<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">'
-            f'<style>body{{margin:0;padding:18px 10px 12px;background:#070D18;width:260px;height:96px;'
-            f'display:flex;align-items:center;justify-content:flex-start;box-sizing:border-box}}</style>'
+            f'<style>body{{margin:0;padding:16px 12px;background:#070D18;width:280px;height:104px;'
+            f'display:flex;align-items:center;justify-content:flex-start;box-sizing:border-box;overflow:visible}}</style>'
             f'</head><body>{svg.read_text(encoding="utf-8", errors="replace")}</body></html>'
         )
         run(
             ["npx", "playwright", "screenshot", "--browser", "chromium",
-             f"file://{html.resolve()}", str(p), "--viewport-size=260,96"],
+             f"file://{html.resolve()}", str(p), "--viewport-size=280,104"],
             cwd=ROOT / "frontend",
         )
     img = Image.open(p).convert("RGBA")
@@ -172,8 +172,8 @@ def load_logo() -> Image.Image:
                 px[x, y] = (r, g, b, 0)
     if img.getbbox():
         img = img.crop(img.getbbox())
-    # Generous transparent padding — star/icon must never clip at video edge
-    pad_x, pad_top, pad_bottom = 10, 22, 12
+    # Generous transparent padding on all sides
+    pad_x, pad_top, pad_bottom = 12, 16, 16
     padded = Image.new(
         "RGBA",
         (img.width + pad_x * 2, img.height + pad_top + pad_bottom),

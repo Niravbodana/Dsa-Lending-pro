@@ -8,7 +8,7 @@ export default function PromoApprovedPage() {
     <div className="min-h-dvh bg-gradient-to-b from-[#ECFDF5] via-white to-[#F0FDFA]">
       <div className="mx-auto flex min-h-dvh max-w-md flex-col px-5 pb-8 pt-5">
         <Link href="/" className="mb-6 inline-flex w-fit items-center">
-          <Image src="/neercred-logo-lockup.svg" alt="NeerCred" width={168} height={40} priority />
+          <Image src="/neercred-logo-lockup.svg" alt="NeerCred" width={168} height={56} priority className="h-12 w-auto" />
         </Link>
 
         <div className="flex flex-1 flex-col items-center text-center">
