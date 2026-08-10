@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""NeerCred Premium Promo v21 — mobile-compatible MP4 playback."""
+"""NeerCred Premium Promo v22 — end-card voice + mobile-compatible MP4."""
 
 from __future__ import annotations
 
@@ -115,10 +115,9 @@ SCENES = [
         "title": "Dream Big.\nBorrow Smart.",
         "subtitle": "www.neercred.com",
         "bullets": [],
-        "vo": "",
-        "vo_silent": True,
+        "vo": "Apply now on neercred.com.",
         "duration": 9.0,
-        "vo_hi": "Dream Big · Borrow Smart.\nwww.neercred.com",
+        "vo_hi": "Apply now on NeerCred.\nwww.neercred.com",
     },
 ]
 
@@ -572,8 +571,8 @@ def render_frame(
 def brand_voice_text(text: str) -> str:
     """TTS-friendly brand pronunciation — Neer Cred (not Near Cred)."""
     text = text.replace("NeerCred", "Neer Cred")
-    text = text.replace("www.neercred.com", "www dot neercred dot com")
-    text = text.replace("neercred.com", "neercred dot com")
+    text = text.replace("www.neercred.com", "www dot Neer Cred dot com")
+    text = text.replace("neercred.com", "Neer Cred dot com")
     return text
 
 
@@ -773,6 +772,18 @@ async def main(anim_frames: dict[str, list[Path]]) -> None:
             print(f"  {scene['id']}: {dur:.1f}s (silent — BGM only)")
         else:
             dur = await make_vo(scene["vo"], vo)
+            min_dur = scene.get("duration")
+            if min_dur and dur < float(min_dur):
+                pad = float(min_dur) - dur
+                padded = vo.with_suffix(".pad.mp3")
+                run([
+                    "ffmpeg", "-y", "-i", str(vo),
+                    "-af", f"apad=pad_dur={pad:.3f}",
+                    "-t", f"{float(min_dur):.3f}",
+                    str(padded),
+                ])
+                padded.replace(vo)
+                dur = float(min_dur)
             voiced_files.append(vo)
             print(f"  {scene['id']}: {dur:.1f}s")
         vo_files.append(vo)
