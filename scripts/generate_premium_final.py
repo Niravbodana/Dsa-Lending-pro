@@ -464,10 +464,11 @@ async def main() -> None:
     run([
         "ffmpeg", "-y", "-i", str(merged), "-i", str(bgm),
         "-filter_complex",
-        "[0:a]highpass=f=120,lowpass=f=12000,volume=2.5[vo];"
-        "[1:a]volume=0.28,aloop=loop=-1:size=2e+09[bgm];"
-        "[bgm][vo]sidechaincompress=threshold=0.018:ratio=10:attack=25:release=700:makeup=1[ducked];"
-        "[vo][ducked]amix=inputs=2:duration=first:weights=1 0.65:normalize=0,alimiter=limit=0.95[aout]",
+        "[0:a]highpass=f=120,lowpass=f=12000,volume=2.6[sp1];"
+        "[sp1]asplit=2[sc][mx];"
+        "[1:a]volume=0.32,aloop=loop=-1:size=2e+09[pi1];"
+        "[pi1][sc]sidechaincompress=threshold=0.018:ratio=12:attack=20:release=800:makeup=1[du1];"
+        "[mx][du1]amix=inputs=2:duration=first:weights=1 0.55:normalize=0,alimiter=limit=0.95[aout]",
         "-map", "0:v:0", "-map", "[aout]",
         "-c:v", "copy", "-c:a", "aac", "-b:a", "320k", "-ar", "44100", "-ac", "2",
         "-movflags", "+faststart", str(h_out),
