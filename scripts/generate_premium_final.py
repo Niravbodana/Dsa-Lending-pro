@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import asyncio
 import json
-import math
 import subprocess
 import urllib.request
 from pathlib import Path
@@ -27,6 +26,81 @@ FPS = 30
 VOICE = "hi-IN-SwaraNeural"
 PHONE_W, PHONE_H = 400, 866
 
+# Devanagari VO — SwaraNeural pronounces Hindi correctly (no broken roman words)
+SCENES = [
+    {
+        "id": "intro", "screen": "01-homepage.png", "step": "WELCOME",
+        "title": "NeerCred", "subtitle": "Dream Big. Borrow Smart.",
+        "bullets": ["RBI LSP Registered Platform", "15+ Regulated Lenders", "Bank-grade Security"],
+        "vo": "नीर क्रेड पर आपका स्वागत है। भारत का प्रीमियम पर्सनल लोन मार्केटप्लेस।",
+        "vo_hi": "नीर क्रेड पर आपका स्वागत है।\nप्रीमियम लोन मार्केटप्लेस।",
+    },
+    {
+        "id": "home", "screen": "01-homepage.png", "step": "EXPLORE",
+        "title": "One Platform.\nEvery Goal.",
+        "subtitle": "Personal loans up to ₹20 Lakhs",
+        "bullets": ["Compare HDFC, ICICI, Bajaj & more", "100% digital journey", "Rates from 10.99%"],
+        "vo": "एक प्लेटफॉर्म, हर वित्तीय लक्ष्य के लिए। बीस लाख रुपये तक पर्सनल लोन, पूरी तरह डिजिटल।",
+        "vo_hi": "एक प्लेटफॉर्म, हर लक्ष्य के लिए।\n₹20 लाख तक — पूरी तरह डिजिटल।",
+    },
+    {
+        "id": "apply", "screen": "02-apply.png", "step": "APPLY",
+        "title": "Mobile\nVerification",
+        "subtitle": "Secure OTP in 30 seconds",
+        "bullets": ["DPDP Act compliant", "Encrypted session", "No spam ever"],
+        "vo": "अप्लाई पर जाइए और मोबाइल नंबर डालिए। एसएमएस की अनुमति देकर कंटिन्यू कीजिए। बिल्कुल सुरक्षित।",
+        "vo_hi": "मोबाइल नंबर डालिए।\nएसएमएस अनुमति दें।\nबिल्कुल सुरक्षित।",
+    },
+    {
+        "id": "otp", "screen": "03-otp.png", "step": "VERIFY",
+        "title": "OTP\nConfirmed",
+        "subtitle": "Instant identity verification",
+        "bullets": ["6-digit secure OTP", "Session protected", "Continue in one tap"],
+        "vo": "ओटीपी डालकर वेरिफाई कीजिए। सुरक्षित और तेज़ — एक मिनट में आगे बढ़िए।",
+        "vo_hi": "ओटीपी डालें, वेरिफाई करें।\nसुरक्षित और तेज़।",
+    },
+    {
+        "id": "profile", "screen": "04-profile.png", "step": "PROFILE",
+        "title": "Smart\nProfile",
+        "subtitle": "PAN auto-fill from records",
+        "bullets": ["One form, no repeat entry", "Minimal documentation", "Guided step by step"],
+        "vo": "प्रोफाइल पूरी कीजिए। पैन से डिटेल्स ऑटो फिल होती हैं। एक बार भरिए, बार बार नहीं।",
+        "vo_hi": "प्रोफाइल पूरी करें।\nपैन से ऑटो फिल।\nएक बार भरिए।",
+    },
+    {
+        "id": "offers", "screen": "09-offers.png", "step": "COMPARE",
+        "title": "Best Offers.\nOne Screen.",
+        "subtitle": "Lowest rate · Lowest EMI",
+        "bullets": ["50+ partner offers", "Transparent fees", "Select in one tap"],
+        "vo": "कई लेंडर्स के ऑफर्स एक स्क्रीन पर। सबसे अच्छी दर और ईएमआई तुलना करके चुनिए।",
+        "vo_hi": "कई लेंडर्स के ऑफर्स।\nसबसे अच्छी दर चुनिए।\nएक टैप में सेलेक्ट।",
+    },
+    {
+        "id": "kyc", "screen": "10-kyc.png", "step": "KYC",
+        "title": "Digital\nKYC",
+        "subtitle": "Aadhaar · Bank · eSign",
+        "bullets": ["UIDAI Aadhaar OTP", "Penny drop verify", "RBI compliant eSign"],
+        "vo": "केवाईसी पूरी तरह डिजिटल। आधार ओटीपी, बैंक वेरिफाई, और ई साइन — घर बैठे।",
+        "vo_hi": "केवाईसी 100% डिजिटल।\nआधार, बैंक, ई साइन।\nघर बैठे पूरा करें।",
+    },
+    {
+        "id": "trust", "screen": "06-compliance.png", "step": "TRUST",
+        "title": "Built on\nTrust",
+        "subtitle": "RBI LSP · DPDP · Transparent",
+        "bullets": ["RBI LSP registered", "DPDP Act 2023", "Dedicated grievance redressal"],
+        "vo": "आरबीआई एलएसपी रजिस्टर्ड, डीपीडीपी कंप्लायंट, दो सौ छप्पन बिट एन्क्रिप्शन। आपका डेटा पूरी तरह सुरक्षित।",
+        "vo_hi": "आरबीआई एलएसपी रजिस्टर्ड।\nडीपीडीपी कंप्लायंट।\nडेटा पूरी तरह सुरक्षित।",
+    },
+    {
+        "id": "close", "screen": "11-dashboard.png", "step": "START NOW",
+        "title": "Track &\nDisburse",
+        "subtitle": "Real-time loan dashboard",
+        "bullets": ["Live application status", "Pre-approved offers", "Apply in 5 minutes"],
+        "vo": "अभी नीर क्रेड पर अप्लाई करें। ड्रीम बिग, बॉरो स्मार्ट। आपका लोन, आपके हाथ में।",
+        "vo_hi": "अभी नीर क्रेड पर अप्लाई करें।\nड्रीम बिग, बॉरो स्मार्ट।",
+    },
+]
+
 C = {
     "navy": "#070D18",
     "navy2": "#0B1528",
@@ -38,80 +112,6 @@ C = {
     "glass": (12, 20, 36, 210),
 }
 
-SCENES = [
-    {
-        "id": "intro", "screen": "01-homepage.png", "step": "WELCOME",
-        "title": "NeerCred", "subtitle": "Dream Big. Borrow Smart.",
-        "bullets": ["RBI LSP Registered Platform", "15+ Regulated Lenders", "Bank-grade Security"],
-        "vo": "NeerCred par aapka swagat hai. India's premium personal loan marketplace.",
-        "vo_hi": "NeerCred par aapka swagat hai.\nPremium personal loan marketplace.",
-    },
-    {
-        "id": "home", "screen": "01-homepage.png", "step": "EXPLORE",
-        "title": "One Platform.\nEvery Goal.",
-        "subtitle": "Personal loans up to ₹20 Lakhs",
-        "bullets": ["Compare HDFC, ICICI, Bajaj & more", "100% digital journey", "Rates from 10.99%"],
-        "vo": "Ek platform, har financial goal. Personal loan bees lakh tak, fully digital.",
-        "vo_hi": "Ek platform, har financial goal.\n₹20 lakh tak — fully digital.",
-    },
-    {
-        "id": "apply", "screen": "02-apply.png", "step": "APPLY",
-        "title": "Mobile\nVerification",
-        "subtitle": "Secure OTP in 30 seconds",
-        "bullets": ["DPDP Act compliant", "Encrypted session", "No spam ever"],
-        "vo": "Apply par mobile number daaliye. SMS consent dekar continue kijiye — bilkul safe.",
-        "vo_hi": "Mobile number daaliye.\nSMS consent dekar continue.\nBilkul safe.",
-    },
-    {
-        "id": "otp", "screen": "03-otp.png", "step": "VERIFY",
-        "title": "OTP\nConfirmed",
-        "subtitle": "Instant identity verification",
-        "bullets": ["6-digit secure OTP", "Session protected", "Continue in one tap"],
-        "vo": "OTP enter karke verify kijiye. Secure aur fast — ek minute mein aage badhiye.",
-        "vo_hi": "OTP enter karein, verify karein.\nSecure aur fast.",
-    },
-    {
-        "id": "profile", "screen": "04-profile.png", "step": "PROFILE",
-        "title": "Smart\nProfile",
-        "subtitle": "PAN auto-fill from records",
-        "bullets": ["One form, no repeat entry", "Minimal documentation", "Guided step by step"],
-        "vo": "Profile complete kijiye. PAN se details auto fill — ek baar bhariye, baar baar nahi.",
-        "vo_hi": "Profile complete karein.\nPAN se auto-fill.\nEk baar bhariye.",
-    },
-    {
-        "id": "offers", "screen": "09-offers.png", "step": "COMPARE",
-        "title": "Best Offers.\nOne Screen.",
-        "subtitle": "Lowest rate · Lowest EMI",
-        "bullets": ["50+ partner offers", "Transparent fees", "Select in one tap"],
-        "vo": "Multiple lenders ke offers ek screen par. Best rate aur EMI compare karke select karein.",
-        "vo_hi": "Multiple lenders ke offers.\nBest rate compare karein.\nEk tap mein select.",
-    },
-    {
-        "id": "kyc", "screen": "10-kyc.png", "step": "KYC",
-        "title": "Digital\nKYC",
-        "subtitle": "Aadhaar · Bank · eSign",
-        "bullets": ["UIDAI Aadhaar OTP", "Penny drop verify", "RBI compliant eSign"],
-        "vo": "KYC poori tarah digital. Aadhaar OTP, bank verify, aur eSign ghar baithe.",
-        "vo_hi": "KYC 100% digital.\nAadhaar, bank, eSign.\nGhar baithe complete.",
-    },
-    {
-        "id": "trust", "screen": "06-compliance.png", "step": "TRUST",
-        "title": "Built on\nTrust",
-        "subtitle": "RBI LSP · DPDP · Transparent",
-        "bullets": ["RBI LSP registered", "DPDP Act 2023", "Dedicated grievance redressal"],
-        "vo": "RBI LSP registered, DPDP compliant, 256 bit encryption. Aapka data poori tarah safe.",
-        "vo_hi": "RBI LSP registered.\nDPDP compliant.\nData poori tarah safe.",
-    },
-    {
-        "id": "close", "screen": "11-dashboard.png", "step": "START NOW",
-        "title": "Track &\nDisburse",
-        "subtitle": "Real-time loan dashboard",
-        "bullets": ["Live application status", "Pre-approved offers", "Apply in 5 minutes"],
-        "vo": "Abhi apply karein NeerCred par. Dream Big, Borrow Smart. Aapka loan aapke haath mein.",
-        "vo_hi": "Abhi apply karein NeerCred par.\nDream Big. Borrow Smart.",
-    },
-]
-
 
 def run(cmd: list, **kw) -> subprocess.CompletedProcess:
     return subprocess.run(cmd, check=True, **kw)
@@ -122,22 +122,24 @@ def rgb(h: str) -> tuple[int, int, int]:
     return tuple(int(h[i : i + 2], 16) for i in (0, 2, 4))
 
 
-def ensure_fonts() -> tuple[Path, Path]:
+def ensure_fonts() -> tuple[Path, Path, Path]:
     ASSETS.mkdir(parents=True, exist_ok=True)
     urls = {
         "Poppins-Bold.ttf": "https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Bold.ttf",
         "Poppins-Regular.ttf": "https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Regular.ttf",
-        "Poppins-SemiBold.ttf": "https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-SemiBold.ttf",
+        "NotoSansDevanagari-Bold.ttf": "https://github.com/google/fonts/raw/main/ofl/notosansdevanagari/NotoSansDevanagari%5Bwdth%2Cwght%5D.ttf",
     }
     for name, url in urls.items():
         p = ASSETS / name
         if not p.exists() or p.stat().st_size < 1000:
             urllib.request.urlretrieve(url, p)
-    return ASSETS / "Poppins-Bold.ttf", ASSETS / "Poppins-Regular.ttf"
+    return ASSETS / "Poppins-Bold.ttf", ASSETS / "Poppins-Regular.ttf", ASSETS / "NotoSansDevanagari-Bold.ttf"
 
 
-def font(sz: int, bold: bool = False) -> ImageFont.FreeTypeFont:
-    bold_p, reg_p = ensure_fonts()
+def font(sz: int, bold: bool = False, hindi: bool = False) -> ImageFont.FreeTypeFont:
+    bold_p, reg_p, hi_p = ensure_fonts()
+    if hindi and hi_p.exists():
+        return ImageFont.truetype(str(hi_p), sz)
     p = bold_p if bold else reg_p
     return ImageFont.truetype(str(p), sz)
 
@@ -291,7 +293,7 @@ def render_frame(scene: dict, logo: Image.Image) -> Image.Image:
     bar = Image.new("RGBA", (W, bar_h), C["glass"])
     bd = ImageDraw.Draw(bar)
     bd.line([(0, 0), (W, 0)], fill=rgb(C["teal"]) + (120,), width=2)
-    cap_f = font(28, bold=True)
+    cap_f = font(26, bold=True, hindi=True)
     cy = 24
     for line in wrap_lines(scene["vo_hi"], cap_f, W - 160):
         bd.text((80, cy), line, fill=rgb(C["white"]), font=cap_f)
@@ -308,11 +310,11 @@ def render_frame(scene: dict, logo: Image.Image) -> Image.Image:
 
 
 async def make_vo(text: str, path: Path) -> float:
-    await edge_tts.Communicate(text, VOICE, rate="+6%", pitch="+2Hz").save(str(path))
+    await edge_tts.Communicate(text, VOICE, rate="+8%", pitch="+0Hz").save(str(path))
     tmp = path.with_suffix(".boost.mp3")
     run([
         "ffmpeg", "-y", "-i", str(path),
-        "-af", "highpass=f=80,compand=0.3|0.8:6:-70/-60|-20/-15|0/-10,volume=3.5,alimiter=limit=0.97",
+        "-af", "highpass=f=90,compand=0.3|0.8:6:-70/-60|-20/-12|0/-8,volume=3.2,alimiter=limit=0.97",
         "-ar", "44100", "-ac", "2", "-b:a", "192k", str(tmp),
     ])
     tmp.replace(path)
@@ -320,59 +322,119 @@ async def make_vo(text: str, path: Path) -> float:
     return float(json.loads(r.stdout)["format"]["duration"])
 
 
-def make_bgm(dur: float, path: Path) -> None:
-    """Layered ambient piano pad — soft, not cartoon beeps."""
-    chords = [
-        (261.63, 329.63, 392.00),
-        (293.66, 369.99, 440.00),
-        (329.63, 415.30, 493.88),
-        (261.63, 329.63, 392.00),
-    ]
-    seg_dur = 5.5
-    segs: list[Path] = []
-    n = int(dur / seg_dur) + 2
-    for i in range(n):
-        f1, f2, f3 = chords[i % len(chords)]
-        s = AUDIO / f"ch{i}.wav"
-        run([
-            "ffmpeg", "-y",
-            "-f", "lavfi", "-i", f"sine=f={f1}:duration={seg_dur}",
-            "-f", "lavfi", "-i", f"sine=f={f2}:duration={seg_dur}",
-            "-f", "lavfi", "-i", f"sine=f={f3}:duration={seg_dur}",
-            "-filter_complex",
-            f"[0][1][2]amix=inputs=3:duration=first,volume=0.07,"
-            f"lowpass=f=900,afade=t=in:d=0.8,afade=t=out:st={seg_dur - 1.2}:d=1.2,"
-            f"aecho=0.7:0.85:800:0.25[out]",
-            "-map", "[out]", "-ar", "44100", "-ac", "2", str(s),
-        ])
-        segs.append(s)
-    inp: list[str] = []
-    for s in segs:
-        inp += ["-i", str(s)]
-    filt = "".join(f"[{j}:a]" for j in range(len(segs))) + f"concat=n={len(segs)}:v=0:a=1[out]"
-    raw = AUDIO / "bgm_raw.wav"
-    run(["ffmpeg", "-y", *inp, "-filter_complex", filt, "-map", "[out]", str(raw)])
+def _piano_note(freq: float, duration: float, out: Path) -> None:
+    """Single piano-like note with harmonics and soft decay."""
+    d = duration
     run([
-        "ffmpeg", "-y", "-i", str(raw), "-t", f"{dur + 2:.2f}",
-        "-af", f"volume=0.55,afade=t=in:d=2,afade=t=out:st={max(0, dur - 2):.2f}:d=2",
+        "ffmpeg", "-y",
+        "-f", "lavfi", "-i", f"sine=f={freq}:duration={d}",
+        "-f", "lavfi", "-i", f"sine=f={freq * 2}:duration={d}",
+        "-f", "lavfi", "-i", f"sine=f={freq * 3}:duration={d}",
+        "-filter_complex",
+        "[0]volume=1[a];[1]volume=0.35[b];[2]volume=0.15[c];"
+        "[a][b][c]amix=inputs=3:duration=first,"
+        "lowpass=f=2800,afade=t=in:d=0.008,afade=t=out:st=" + f"{max(0.05, d - 0.45):.3f}" + ":d=0.45,"
+        "aecho=0.6:0.7:60:0.18,volume=0.11[out]",
+        "-map", "[out]", "-ar", "44100", "-ac", "2", str(out),
+    ])
+
+
+def _drum_hit(kind: str, out: Path) -> None:
+    if kind == "kick":
+        run([
+            "ffmpeg", "-y", "-f", "lavfi", "-i", "sine=f=55:duration=0.18",
+            "-af", "volume=0.55,lowpass=f=120,afade=t=out:st=0.06:d=0.12", "-ar", "44100", "-ac", "2", str(out),
+        ])
+    else:
+        run([
+            "ffmpeg", "-y", "-f", "lavfi", "-i", "anoisesrc=d=0.12:c=pink",
+            "-af", "highpass=f=800,lowpass=f=4500,volume=0.35,afade=t=out:st=0.04:d=0.08",
+            "-ar", "44100", "-ac", "2", str(out),
+        ])
+
+
+def make_bgm(dur: float, path: Path, drum_times: list[float] | None = None) -> None:
+    """Soft piano arpeggio loop + dramatic drum hits at scene changes."""
+    melody = [
+        (261.63, 0.65), (329.63, 0.55), (392.00, 0.55), (523.25, 0.85),
+        (293.66, 0.65), (349.23, 0.55), (440.00, 0.55), (587.33, 0.85),
+        (349.23, 0.65), (440.00, 0.55), (523.25, 0.55), (698.46, 0.85),
+        (392.00, 0.65), (493.88, 0.55), (587.33, 0.55), (783.99, 0.90),
+    ]
+    piano_parts: list[Path] = []
+    for i, (freq, nd) in enumerate(melody):
+        p = AUDIO / f"pn_{i}.wav"
+        _piano_note(freq, nd, p)
+        piano_parts.append(p)
+
+    inp = []
+    for j, p in enumerate(piano_parts):
+        inp += ["-i", str(p)]
+    filt = "".join(f"[{j}:a]" for j in range(len(piano_parts))) + f"concat=n={len(piano_parts)}:v=0:a=1[piano]"
+    piano_loop = AUDIO / "piano_loop.wav"
+    run(["ffmpeg", "-y", *inp, "-filter_complex", filt, "-map", "[piano]", str(piano_loop)])
+    for p in piano_parts:
+        p.unlink(missing_ok=True)
+
+    piano_wav = AUDIO / "piano_full.wav"
+    run([
+        "ffmpeg", "-y", "-stream_loop", "-1", "-i", str(piano_loop),
+        "-t", f"{dur + 2:.2f}", "-af", "volume=0.85", str(piano_wav),
+    ])
+    piano_loop.unlink(missing_ok=True)
+
+    drum_times = drum_times or [12, 24, 36, 48, 60]
+    drum_wav = AUDIO / "drums_raw.wav"
+    run([
+        "ffmpeg", "-y", "-f", "lavfi", "-i", f"anullsrc=r=44100:cl=stereo:d={dur + 2:.2f}",
+        "-filter_complex", "anull[out]", "-map", "[out]", str(drum_wav),
+    ])
+    for di, dt in enumerate(drum_times):
+        if dt >= dur:
+            continue
+        kick = AUDIO / f"dk{di}.wav"
+        snare = AUDIO / f"ds{di}.wav"
+        _drum_hit("kick", kick)
+        _drum_hit("snare", snare)
+        merged_drums = AUDIO / f"dm{di}.wav"
+        run([
+            "ffmpeg", "-y", "-i", str(drum_wav), "-i", str(kick), "-i", str(snare),
+            "-filter_complex",
+            f"[1]adelay={int(dt * 1000)}|{int(dt * 1000)}[k];"
+            f"[2]adelay={int((dt + 0.22) * 1000)}|{int((dt + 0.22) * 1000)}[s];"
+            "[0][k][s]amix=inputs=3:duration=first:dropout_transition=0[out]",
+            "-map", "[out]", str(merged_drums),
+        ])
+        drum_wav.unlink(missing_ok=True)
+        drum_wav = merged_drums
+        kick.unlink(missing_ok=True)
+        snare.unlink(missing_ok=True)
+
+    mixed = AUDIO / "bgm_mix.wav"
+    run([
+        "ffmpeg", "-y", "-i", str(piano_wav), "-i", str(drum_wav),
+        "-filter_complex",
+        "[0]volume=0.9[p];[1]volume=0.5[d];[p][d]amix=inputs=2:duration=first:dropout_transition=0[out]",
+        "-map", "[out]", str(mixed),
+    ])
+    run([
+        "ffmpeg", "-y", "-i", str(mixed), "-t", f"{dur + 1:.2f}",
+        "-af", f"volume=0.72,afade=t=in:d=2.5,afade=t=out:st={max(0, dur - 2.5):.2f}:d=2.5",
         "-ar", "44100", "-ac", "2", str(path),
     ])
-    for s in segs:
-        s.unlink(missing_ok=True)
-    raw.unlink(missing_ok=True)
+    piano_wav.unlink(missing_ok=True)
+    drum_wav.unlink(missing_ok=True)
+    mixed.unlink(missing_ok=True)
 
 
 def render_clip(frame: Path, vo: Path, dur: float, idx: int) -> Path:
+    """Stable static frame — no zoompan (prevents screen shake/vibration)."""
     CLIPS.mkdir(parents=True, exist_ok=True)
     out = CLIPS / f"scene_{idx:02d}.mp4"
     total = dur + 0.55
-    frames = max(int(total * FPS), 1)
-    z_end = 1.045
-    z_expr = f"1+{z_end - 1:.4f}*on/{frames}"
     vf = (
-        f"scale={W}:{H},"
-        f"zoompan=z='{z_expr}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':"
-        f"d={frames}:s={W}x{H}:fps={FPS},"
+        f"scale={W}:{H}:flags=lanczos,"
+        f"fps={FPS},"
         f"fade=t=in:st=0:d=0.35,fade=t=out:st={total - 0.4:.3f}:d=0.4"
     )
     run([
@@ -432,14 +494,16 @@ async def main() -> None:
     logo = load_logo()
     clips: list[Path] = []
     vo_files: list[Path] = []
-    total_dur = 0.0
+    scene_ends: list[float] = []
+    acc = 0.0
 
-    print("=== Premium VO + Frames ===")
+    print("=== Premium VO + Frames (stable video) ===")
     for i, scene in enumerate(SCENES):
         vo = AUDIO / f"vo_{scene['id']}.mp3"
         dur = await make_vo(scene["vo"], vo)
         vo_files.append(vo)
-        total_dur += dur + 0.55
+        acc += dur + 0.55
+        scene_ends.append(acc)
         fr = FRAMES / f"premium_{i:02d}.png"
         render_frame(scene, logo).save(fr, quality=95)
         clips.append(render_clip(fr, vo, dur, i))
@@ -456,13 +520,14 @@ async def main() -> None:
     bgm = AUDIO / "bgm_premium.mp3"
     r = run(["ffprobe", "-v", "quiet", "-print_format", "json", "-show_format", str(merged)], capture_output=True, text=True)
     vid_dur = float(json.loads(r.stdout)["format"]["duration"])
-    make_bgm(vid_dur, bgm)
+    drum_times = [max(2.0, t - 0.3) for t in scene_ends[1:-1]]
+    make_bgm(vid_dur, bgm, drum_times=drum_times)
 
     h_out = DOWNLOAD / "NeerCred-Promo-PREMIUM-16x9.mp4"
     run([
         "ffmpeg", "-y", "-i", str(merged), "-i", str(bgm),
         "-filter_complex",
-        "[0:a]volume=2.2[va];[1:a]volume=0.35,aloop=loop=-1:size=2e+09[vb];"
+        "[0:a]volume=2.0[va];[1:a]volume=0.42,aloop=loop=-1:size=2e+09[vb];"
         "[va][vb]amix=inputs=2:duration=first:dropout_transition=0[aout]",
         "-map", "0:v:0", "-map", "[aout]",
         "-c:v", "copy", "-c:a", "aac", "-b:a", "320k", "-ar", "44100", "-ac", "2",
