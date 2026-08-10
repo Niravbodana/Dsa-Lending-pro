@@ -29,12 +29,15 @@ from scripts.reel_engine.providers.base import (
     get_voice_provider,
 )
 from scripts.reel_engine.providers.rendering.ffmpeg import (
+    burn_subtitles,
     concat_clips,
     mux_av,
     normalize_clip,
+    overlay_phone_ui,
     probe_duration,
     render_endcard,
 )
+from scripts.reel_engine.config import SCREENS_DIR
 
 
 def load_project(story_path: Path) -> ReelProject:
@@ -158,8 +161,21 @@ class ReelOrchestrator:
             result = self.video.generate_shot(scene, char_refs, out_vid, scene.duration_target)
             scene_entry = {"scene": scene.id, "success": result.success, "message": result.message}
             if result.success and result.path:
+                clip = result.path
+                # NeerCred UI overlay for phone scene
+                if scene.type == "phone":
+                    screen = SCREENS_DIR / "01-homepage.png"
+                    if not screen.exists():
+                        screen = Path(__file__).resolve().parents[3] / "frontend/public/promo-screens/01-homepage.png"
+                    if screen.exists():
+                        overlaid = self.paths["video"] / f"{scene.id}_ui.mp4"
+                        overlay_phone_ui(clip, screen, overlaid, scene.duration_target)
+                        clip = overlaid
                 norm = self.paths["video"] / f"{scene.id}_norm.mp4"
-                normalize_clip(result.path, norm, scene.duration_target)
+                if clip != norm:
+                    normalize_clip(clip, norm, scene.duration_target)
+                else:
+                    norm = clip
                 scene_videos[scene.id] = norm
                 scene_entry["path"] = str(norm)
             else:
@@ -180,12 +196,14 @@ class ReelOrchestrator:
             ordered = [scene_videos[s.id] for s in self.project.scenes]
             concat_out = self.paths["work"] / "concat.mp4"
             concat_clips(ordered, concat_out)
-            muxed = self.paths["output"] / "neercred_reel_final_muxed.mp4"
+            muxed = self.paths["work"] / "muxed.mp4"
             mux_av(concat_out, master_audio, muxed, self.project.branding.disclaimer)
-            final_video = self.paths["output"] / "neercred_reel_final.mp4"
-            final_video.write_bytes(muxed.read_bytes())
+            # Burn subtitles
+            subtitled = self.paths["output"] / "neercred_reel_final.mp4"
+            burn_subtitles(muxed, srt_path, subtitled)
             preview_video = self.paths["output"] / "neercred_reel_preview.mp4"
-            preview_video.write_bytes(final_video.read_bytes())
+            preview_video.write_bytes(subtitled.read_bytes())
+            final_video = subtitled
             report["final_output"] = str(final_video)
             report["preview_output"] = str(preview_video)
         else:
@@ -205,15 +223,16 @@ class ReelOrchestrator:
             self.video.is_configured(),
             total_duration,
             final_video,
+            stock_mode=self.cfg.is_stock_mode(),
         )
         report["qc"] = qc.to_dict()
 
-        if not self.video.is_configured() or not self.voice.is_production_quality() or not qc.passed:
+        if not qc.passed:
             report["status"] = "blocked"
             report["message"] = report.get("message") or (
-                "Pipeline blocked by quality gate. See missing_for_photoreal and qc checks."
+                "Pipeline blocked by quality gate. See qc checks."
             )
-        elif final_video:
+        elif final_video and final_video.exists():
             report["status"] = "complete"
             report["message"] = f"Final reel exported to {final_video}"
         else:

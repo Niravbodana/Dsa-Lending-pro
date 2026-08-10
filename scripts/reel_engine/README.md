@@ -32,20 +32,26 @@ ReelProject
 
 **No silent fallback to cartoon/Ken Burns.** If `VIDEO_PROVIDER` is not configured, the pipeline generates all production artifacts but blocks final video export.
 
-## Run
+## Default mode — NO API keys required
+
+The engine ships with free, local providers:
+
+| Provider | Default | What it does |
+|----------|---------|--------------|
+| `VIDEO_PROVIDER=stock` | ✅ | Photoreal Mixkit stock footage (royalty-free) |
+| `VOICE_PROVIDER=piper` | ✅ | Local neural TTS (offline, no API) |
+| `IMAGE_PROVIDER=stock` | ✅ | Character refs from stock frame extraction |
+| `MUSIC_PROVIDER=local` | ✅ | Licensed BGM from promo library |
 
 ```bash
-cd backend && source .venv/bin/activate
-pip install -r ../scripts/reel_engine/requirements.txt
-
-# Configure providers (see .env.example)
-cp scripts/reel_engine/.env.example scripts/reel_engine/.env
-# Edit with API keys
-
+pip install -r scripts/reel_engine/requirements.txt
+python -m piper.download_voices --download-dir scripts/reel_engine/.voices en_US-lessac-medium en_GB-alan-medium
 python scripts/generate_reel_v2.py
-# or
-python -m scripts.reel_engine
 ```
+
+Output: `/output/neercred_reel_final.mp4` (1080×1920, 45s)
+
+## Optional upgrades (paid APIs)
 
 ## Output (`/output/`)
 

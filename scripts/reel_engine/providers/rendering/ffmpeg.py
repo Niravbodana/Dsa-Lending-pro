@@ -34,10 +34,12 @@ def normalize_clip(input_path: Path, out_path: Path, duration: float | None = No
 
 
 def concat_clips(clips: list[Path], out_path: Path) -> None:
+    """Concatenate clips with re-encode to ensure consistent timing."""
     lst = out_path.with_suffix(".txt")
     lst.write_text("\n".join(f"file '{c}'" for c in clips))
     subprocess.run(
-        ["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(lst), "-c", "copy", str(out_path)],
+        ["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(lst),
+         "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "18", str(out_path)],
         check=True,
     )
 
@@ -77,7 +79,7 @@ def mux_av(video: Path, audio: Path, out_path: Path, disclaimer: str = "") -> No
         "-map", "0:v:0", "-map", "1:a:0",
         "-c:v", "libx264", "-profile:v", "main", "-level", "4.0",
         "-pix_fmt", "yuv420p", "-crf", "19", "-movflags", "+faststart", "-tag:v", "avc1",
-        "-c:a", "aac", "-b:a", "192k", "-shortest",
+        "-c:a", "aac", "-b:a", "192k",
     ]
     if disclaimer:
         font_reg = "/opt/cursor/artifacts/neercred-promo-video/assets/Poppins-Regular.ttf"
@@ -91,11 +93,33 @@ def mux_av(video: Path, audio: Path, out_path: Path, disclaimer: str = "") -> No
 
 
 def burn_subtitles(video: Path, srt: Path, out_path: Path) -> None:
+    srt_escaped = str(srt).replace(":", "\\:")
     subprocess.run(
         [
             "ffmpeg", "-y", "-i", str(video),
-            "-vf", f"subtitles={srt}:force_style='FontName=Poppins,FontSize=22,PrimaryColour=&HFFFFFF,OutlineColour=&H000000,Outline=2,MarginV=80'",
+            "-vf", f"subtitles='{srt_escaped}':force_style='FontName=DejaVu Sans,FontSize=22,PrimaryColour=&HFFFFFF,OutlineColour=&H000000,Outline=2,MarginV=80'",
             "-c:a", "copy", "-c:v", "libx264", "-crf", "19", "-pix_fmt", "yuv420p",
+            str(out_path),
+        ],
+        check=True,
+    )
+
+
+def overlay_phone_ui(
+    video: Path,
+    screen_img: Path,
+    out_path: Path,
+    duration: float,
+) -> None:
+    """Composite NeerCred app screenshot onto phone area in stock footage."""
+    subprocess.run(
+        [
+            "ffmpeg", "-y", "-i", str(video), "-loop", "1", "-i", str(screen_img),
+            "-filter_complex",
+            f"[1:v]scale=420:-1,format=rgba,colorchannelmixer=aa=0.95[ui];"
+            f"[0:v][ui]overlay=(W-w)/2:(H-h)/2+120",
+            "-t", f"{duration:.3f}",
+            "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "18", "-an",
             str(out_path),
         ],
         check=True,

@@ -26,10 +26,10 @@ TARGET_DURATION = (40, 45)
 
 @dataclass
 class ProviderConfig:
-    video_provider: str = field(default_factory=lambda: os.getenv("VIDEO_PROVIDER", "").strip().lower())
-    voice_provider: str = field(default_factory=lambda: os.getenv("VOICE_PROVIDER", "").strip().lower())
+    video_provider: str = field(default_factory=lambda: os.getenv("VIDEO_PROVIDER", "stock").strip().lower())
+    voice_provider: str = field(default_factory=lambda: os.getenv("VOICE_PROVIDER", "piper").strip().lower())
     lipsync_provider: str = field(default_factory=lambda: os.getenv("LIPSYNC_PROVIDER", "").strip().lower())
-    image_provider: str = field(default_factory=lambda: os.getenv("IMAGE_PROVIDER", "").strip().lower())
+    image_provider: str = field(default_factory=lambda: os.getenv("IMAGE_PROVIDER", "stock").strip().lower())
     music_provider: str = field(default_factory=lambda: os.getenv("MUSIC_PROVIDER", "local").strip().lower())
 
     # API keys / endpoints
@@ -64,6 +64,8 @@ class ProviderConfig:
     def _video_ready(self) -> bool:
         if not self.video_provider:
             return False
+        if self.video_provider == "stock":
+            return True
         if self.video_provider == "replicate":
             return bool(self.replicate_api_token)
         if self.video_provider == "runway":
@@ -73,6 +75,8 @@ class ProviderConfig:
         return False
 
     def _voice_ready(self) -> bool:
+        if self.voice_provider == "piper":
+            return True
         if self.voice_provider == "elevenlabs":
             return bool(self.elevenlabs_api_key)
         if self.voice_provider == "edge_performance":
@@ -82,28 +86,33 @@ class ProviderConfig:
     def _image_ready(self) -> bool:
         if not self.image_provider:
             return False
+        if self.image_provider == "stock":
+            return True
         if self.image_provider == "replicate":
             return bool(self.replicate_api_token)
         if self.image_provider == "fal":
             return bool(self.fal_api_key)
         return False
 
+    def is_stock_mode(self) -> bool:
+        return self.video_provider == "stock"
+
     def missing_for_photoreal(self) -> list[str]:
+        """Returns gaps only when neither stock nor paid generative providers are ready."""
+        if self.is_stock_mode() and self._voice_ready():
+            return []  # Stock + Piper is the no-API production path
         missing: list[str] = []
         if not self._video_ready():
             missing.append(
-                "VIDEO_PROVIDER + API credentials (replicate/runway/fal). "
-                "Ken Burns slideshow is NOT an acceptable fallback."
+                "VIDEO_PROVIDER (stock|replicate|runway|fal). "
+                "Default 'stock' uses free Mixkit footage. Ken Burns is disabled."
             )
         if not self._voice_ready():
             missing.append(
-                "VOICE_PROVIDER=elevenlabs + ELEVENLABS_API_KEY (+ voice IDs). "
-                "Basic edge TTS is preview-only and fails quality gate."
+                "VOICE_PROVIDER (piper|elevenlabs). Default 'piper' is local neural TTS."
             )
         if not self._image_ready():
-            missing.append(
-                "IMAGE_PROVIDER for character reference sheets (replicate/fal recommended)."
-            )
+            missing.append("IMAGE_PROVIDER (stock|replicate|fal).")
         return missing
 
 

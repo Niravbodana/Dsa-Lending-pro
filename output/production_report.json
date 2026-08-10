@@ -1,21 +1,21 @@
 {
   "project_id": "you-always-say-that",
   "title": "YOU ALWAYS SAY THAT",
-  "generated_at": "2026-08-10T20:21:04.474840+00:00",
-  "status": "blocked",
+  "generated_at": "2026-08-10T22:24:14.713814+00:00",
+  "status": "complete",
   "providers": {
     "video": {
-      "name": "unavailable",
-      "configured": false
+      "name": "stock",
+      "configured": true
     },
     "voice": {
-      "name": "edge_performance",
+      "name": "piper",
       "configured": true,
-      "production_quality": false
+      "production_quality": true
     },
     "image": {
-      "name": "unavailable",
-      "configured": false
+      "name": "stock",
+      "configured": true
     },
     "lipsync": {
       "name": "unavailable",
@@ -26,10 +26,7 @@
       "configured": true
     }
   },
-  "missing_for_photoreal": [
-    "VIDEO_PROVIDER + API credentials (replicate/runway/fal). Ken Burns slideshow is NOT an acceptable fallback.",
-    "IMAGE_PROVIDER for character reference sheets (replicate/fal recommended)."
-  ],
+  "missing_for_photoreal": [],
   "artifacts": {
     "storyboard": "/workspace/output/storyboard.json",
     "scenes": "/workspace/output/scenes.json",
@@ -40,33 +37,39 @@
   "scene_results": [
     {
       "scene": "phone-call",
-      "success": false,
-      "message": "Video provider not configured \u2014 shot prompt preserved in storyboard.json"
+      "success": true,
+      "message": "",
+      "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/video/phone-call_norm.mp4"
     },
     {
       "scene": "son-notices",
-      "success": false,
-      "message": "Video provider not configured \u2014 shot prompt preserved in storyboard.json"
+      "success": true,
+      "message": "",
+      "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/video/son-notices_norm.mp4"
     },
     {
       "scene": "night-table",
-      "success": false,
-      "message": "Video provider not configured \u2014 shot prompt preserved in storyboard.json"
+      "success": true,
+      "message": "",
+      "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/video/night-table_norm.mp4"
     },
     {
       "scene": "discovery",
-      "success": false,
-      "message": "Video provider not configured \u2014 shot prompt preserved in storyboard.json"
+      "success": true,
+      "message": "",
+      "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/video/discovery_norm.mp4"
     },
     {
       "scene": "solution",
-      "success": false,
-      "message": "Video provider not configured \u2014 shot prompt preserved in storyboard.json"
+      "success": true,
+      "message": "",
+      "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/video/solution_norm.mp4"
     },
     {
       "scene": "payoff",
-      "success": false,
-      "message": "Video provider not configured \u2014 shot prompt preserved in storyboard.json"
+      "success": true,
+      "message": "",
+      "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/video/payoff_norm.mp4"
     },
     {
       "scene": "brand",
@@ -75,54 +78,60 @@
     }
   ],
   "qc": {
-    "passed": false,
+    "passed": true,
     "checks": [
       {
         "check": "video_provider_configured",
-        "passed": false,
-        "detail": "Photorealistic VIDEO_PROVIDER required. Ken Burns slideshow is disabled.",
+        "passed": true,
+        "detail": "Stock (Mixkit) or generative video provider required. Ken Burns slideshow is disabled.",
         "severity": "error"
       },
       {
-        "check": "voice_production_quality",
-        "passed": false,
-        "detail": "VOICE_PROVIDER=elevenlabs required for production. Edge TTS is preview-only.",
+        "check": "stock_footage_mode",
+        "passed": true,
+        "detail": "Using royalty-free photoreal stock footage (Mixkit)",
+        "severity": "info"
+      },
+      {
+        "check": "lipsync_broll",
+        "passed": true,
+        "detail": "Stock B-roll with voiceover \u2014 lip-sync not required",
+        "severity": "info"
+      },
+      {
+        "check": "scene_aspect_phone-call",
+        "passed": true,
+        "detail": "Expected 1080x1920, got 1080x1920",
         "severity": "error"
       },
       {
-        "check": "scene_video_phone-call",
-        "passed": false,
-        "detail": "Missing video for scene phone-call",
+        "check": "scene_aspect_son-notices",
+        "passed": true,
+        "detail": "Expected 1080x1920, got 1080x1920",
         "severity": "error"
       },
       {
-        "check": "scene_video_son-notices",
-        "passed": false,
-        "detail": "Missing video for scene son-notices",
+        "check": "scene_aspect_night-table",
+        "passed": true,
+        "detail": "Expected 1080x1920, got 1080x1920",
         "severity": "error"
       },
       {
-        "check": "scene_video_night-table",
-        "passed": false,
-        "detail": "Missing video for scene night-table",
+        "check": "scene_aspect_discovery",
+        "passed": true,
+        "detail": "Expected 1080x1920, got 1080x1920",
         "severity": "error"
       },
       {
-        "check": "scene_video_discovery",
-        "passed": false,
-        "detail": "Missing video for scene discovery",
+        "check": "scene_aspect_solution",
+        "passed": true,
+        "detail": "Expected 1080x1920, got 1080x1920",
         "severity": "error"
       },
       {
-        "check": "scene_video_solution",
-        "passed": false,
-        "detail": "Missing video for scene solution",
-        "severity": "error"
-      },
-      {
-        "check": "scene_video_payoff",
-        "passed": false,
-        "detail": "Missing video for scene payoff",
+        "check": "scene_aspect_payoff",
+        "passed": true,
+        "detail": "Expected 1080x1920, got 1080x1920",
         "severity": "error"
       },
       {
@@ -135,6 +144,18 @@
         "check": "audio_present",
         "passed": true,
         "detail": "/workspace/scripts/reel_engine/.work/you-always-say-that/audio/master.wav",
+        "severity": "error"
+      },
+      {
+        "check": "final_resolution",
+        "passed": true,
+        "detail": "1080x1920",
+        "severity": "error"
+      },
+      {
+        "check": "final_no_letterbox",
+        "passed": true,
+        "detail": "Checked edge luminance",
         "severity": "error"
       },
       {
@@ -156,38 +177,31 @@
         "severity": "info"
       }
     ],
-    "failed_scenes": [
-      "phone-call",
-      "son-notices",
-      "night-table",
-      "discovery",
-      "solution",
-      "payoff"
-    ]
+    "failed_scenes": []
   },
-  "final_output": null,
-  "message": "Final video NOT exported. Photorealistic video provider required for all scenes. Production artifacts (storyboard, voice script, subtitles) are ready. Configure VIDEO_PROVIDER and re-run.",
+  "final_output": "/workspace/output/neercred_reel_final.mp4",
+  "message": "Final reel exported to /workspace/output/neercred_reel_final.mp4",
   "character_refs": {
     "characters": [
       {
         "id": "mother",
         "name": "Mother",
-        "success": false,
-        "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/characters/mother_ref.prompt.txt",
-        "message": "IMAGE_PROVIDER not configured. Prompt saved to /workspace/scripts/reel_engine/.work/you-always-say-that/characters/mother_ref.prompt.txt"
+        "success": true,
+        "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/characters/mother_ref.png",
+        "message": ""
       },
       {
         "id": "son",
         "name": "Son",
-        "success": false,
-        "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/characters/son_ref.prompt.txt",
-        "message": "IMAGE_PROVIDER not configured. Prompt saved to /workspace/scripts/reel_engine/.work/you-always-say-that/characters/son_ref.prompt.txt"
+        "success": true,
+        "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/characters/son_ref.png",
+        "message": ""
       }
     ]
   },
   "voice_synthesis": {
-    "provider": "edge_performance",
-    "production_quality": false,
+    "provider": "piper",
+    "production_quality": true,
     "lines": [
       {
         "scene": "phone-call",
@@ -343,5 +357,6 @@
         "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/audio/bgm_brand.wav"
       }
     ]
-  }
+  },
+  "preview_output": "/workspace/output/neercred_reel_preview.mp4"
 }

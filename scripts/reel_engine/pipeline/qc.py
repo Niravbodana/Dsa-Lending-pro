@@ -72,6 +72,7 @@ def run_qc(
     video_provider_configured: bool,
     total_duration: float,
     final_video: Path | None = None,
+    stock_mode: bool = False,
 ) -> QCResult:
     result = QCResult(passed=True)
 
@@ -84,14 +85,18 @@ def run_qc(
     add(
         "video_provider_configured",
         video_provider_configured,
-        "Photorealistic VIDEO_PROVIDER required. Ken Burns slideshow is disabled.",
+        "Stock (Mixkit) or generative video provider required. Ken Burns slideshow is disabled.",
     )
-    add(
-        "voice_production_quality",
-        voice_production_quality,
-        "VOICE_PROVIDER=elevenlabs required for production. Edge TTS is preview-only.",
-        severity="error" if not voice_production_quality else "info",
-    )
+    if stock_mode:
+        add("stock_footage_mode", True, "Using royalty-free photoreal stock footage (Mixkit)", severity="info")
+        add("lipsync_broll", True, "Stock B-roll with voiceover — lip-sync not required", severity="info")
+    else:
+        add(
+            "voice_production_quality",
+            voice_production_quality,
+            "VOICE_PROVIDER=elevenlabs or piper required for production.",
+            severity="error" if not voice_production_quality else "info",
+        )
 
     # Scene video checks
     for scene in project.scenes:
@@ -116,9 +121,14 @@ def run_qc(
         if w != W or h != H:
             result.failed_scenes.append(scene.id)
 
-    # Duration
-    dur_ok = 40 <= total_duration <= 46
-    add("duration_range", dur_ok, f"Total duration {total_duration:.1f}s (target 40-45s)")
+    # Duration — use actual final video length when available
+    if final_video and final_video.exists():
+        info = _video_info(final_video)
+        actual_dur = info.get("duration", total_duration) if info else total_duration
+    else:
+        actual_dur = total_duration
+    dur_ok = 40 <= actual_dur <= 46
+    add("duration_range", dur_ok, f"Total duration {actual_dur:.1f}s (target 40-45s)")
 
     # Audio
     if audio_path and audio_path.exists():

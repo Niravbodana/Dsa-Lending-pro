@@ -93,8 +93,10 @@ def get_video_provider(cfg: ProviderConfig) -> VideoProvider:
     from scripts.reel_engine.providers.video.replicate import ReplicateVideoProvider
     from scripts.reel_engine.providers.video.runway import RunwayVideoProvider
     from scripts.reel_engine.providers.video.fal import FalVideoProvider
+    from scripts.reel_engine.providers.video.stock import StockFootageVideoProvider
 
     mapping = {
+        "stock": StockFootageVideoProvider(cfg),
         "replicate": ReplicateVideoProvider(cfg),
         "runway": RunwayVideoProvider(cfg),
         "fal": FalVideoProvider(cfg),
@@ -108,8 +110,13 @@ def get_video_provider(cfg: ProviderConfig) -> VideoProvider:
 def get_voice_provider(cfg: ProviderConfig) -> VoiceProvider:
     from scripts.reel_engine.providers.voice.elevenlabs import ElevenLabsVoiceProvider
     from scripts.reel_engine.providers.voice.edge_performance import EdgePerformanceVoiceProvider
+    from scripts.reel_engine.providers.voice.piper import PiperVoiceProvider
     from scripts.reel_engine.providers.voice.unavailable import UnavailableVoiceProvider
 
+    if cfg.voice_provider == "piper":
+        p = PiperVoiceProvider(cfg)
+        if p.is_configured():
+            return p
     if cfg.voice_provider == "elevenlabs":
         p = ElevenLabsVoiceProvider(cfg)
         if p.is_configured():
@@ -123,8 +130,11 @@ def get_voice_provider(cfg: ProviderConfig) -> VoiceProvider:
 
 def get_image_provider(cfg: ProviderConfig) -> ImageProvider:
     from scripts.reel_engine.providers.image.replicate import ReplicateImageProvider
+    from scripts.reel_engine.providers.image.stock import StockFrameImageProvider
     from scripts.reel_engine.providers.image.unavailable import UnavailableImageProvider
 
+    if cfg.image_provider == "stock":
+        return StockFrameImageProvider(cfg)
     if cfg.image_provider == "replicate":
         p = ReplicateImageProvider(cfg)
         if p.is_configured():
