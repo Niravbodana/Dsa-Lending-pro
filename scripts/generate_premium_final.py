@@ -304,19 +304,15 @@ def render_frame(scene: dict, logo: Image.Image) -> Image.Image:
 
 
 async def make_vo(text: str, path: Path) -> float:
-    """Warm, conversational TTS with natural pacing."""
-    ssml = (
-        f'<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-IN">'
-        f'<prosody rate="-6%" pitch="-2%">{text}</prosody></speak>'
-    )
-    await edge_tts.Communicate(ssml, VOICE).save(str(path))
+    """Warm, conversational TTS — slower pace, subtle room warmth."""
+    await edge_tts.Communicate(text, VOICE, rate="-4%", pitch="-1Hz").save(str(path))
     tmp = path.with_suffix(".boost.mp3")
     run([
         "ffmpeg", "-y", "-i", str(path),
         "-af",
-        "highpass=f=80,afftdn=nr=6:nf=-22,"
-        "aecho=0.35:0.45:35:0.12,"
-        "compand=0.3|0.8:6:-70/-60|-20/-10|0/-6,volume=2.8,alimiter=limit=0.95",
+        "highpass=f=80,afftdn=nr=5:nf=-24,"
+        "aecho=0.3:0.4:30:0.1,"
+        "compand=0.3|0.8:6:-70/-60|-20/-10|0/-6,volume=2.9,alimiter=limit=0.95",
         "-ar", "44100", "-ac", "2", "-b:a", "192k", str(tmp),
     ])
     tmp.replace(path)
@@ -461,8 +457,8 @@ async def main() -> None:
     run([
         "ffmpeg", "-y", "-i", str(merged), "-i", str(bgm),
         "-filter_complex",
-        "[0:a]volume=1.4[va];[1:a]volume=1.0,aloop=loop=-1:size=2e+09[vb];"
-        "[va][vb]amix=inputs=2:duration=first:weights=1 0.5:normalize=0[aout]",
+        "[0:a]volume=1.8[va];[1:a]volume=1.1,aloop=loop=-1:size=2e+09[vb];"
+        "[va][vb]amix=inputs=2:duration=first:weights=1 0.55:normalize=0,alimiter=limit=0.98[aout]",
         "-map", "0:v:0", "-map", "[aout]",
         "-c:v", "copy", "-c:a", "aac", "-b:a", "320k", "-ar", "44100", "-ac", "2",
         "-movflags", "+faststart", str(h_out),
