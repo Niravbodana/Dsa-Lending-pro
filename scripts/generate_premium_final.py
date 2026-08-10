@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""NeerCred Premium Promo v15 — brand style guide compliant."""
+"""NeerCred Premium Promo v16 — premium endcard + full mobile screen."""
 
 from __future__ import annotations
 
@@ -27,8 +27,9 @@ BGM_SOURCE = ASSETS / "soft_morning_keys_piano.mp3"
 W, H = 1920, 1080
 FPS = 30
 VOICE = "en-IN-NeerjaNeural"
-PHONE_W, PHONE_H = 448, 970
-PHONE_X_RATIO = 0.655
+PHONE_W, PHONE_H = 400, 844
+PHONE_X_RATIO = 0.62
+CAPTION_RESERVE = 200
 
 # NeerCred Brand & Video Style Guide (dev.neercred.com)
 SCENES = [
@@ -104,7 +105,7 @@ SCENES = [
         "vo_hi": "Transferring to your bank.\nReal-time.\nSecure disbursal.",
     },
     {
-        "id": "endcard", "layout": "endcard", "step": "NEERCRED",
+        "id": "endcard", "layout": "endcard_full", "animation": "endcard", "step": "NEERCRED",
         "title": "Dream Big.\nBorrow Smart.",
         "subtitle": "neercred.com",
         "bullets": [],
@@ -191,7 +192,15 @@ def load_logo() -> Image.Image:
     return img
 
 
-def ensure_animation_frames(cache_name: str, url: str, n: int = 54) -> list[Path]:
+def ensure_animation_frames(
+    cache_name: str,
+    url: str,
+    n: int = 54,
+    *,
+    viewport_w: int = 420,
+    viewport_h: int = 720,
+    device_scale: int = 2,
+) -> list[Path]:
     """Capture animated promo page frames (cached)."""
     cache = ASSETS / f"{cache_name}_frames"
     cache.mkdir(parents=True, exist_ok=True)
@@ -204,25 +213,37 @@ def ensure_animation_frames(cache_name: str, url: str, n: int = 54) -> list[Path
     print(f"  Capturing {cache_name} animation frames...")
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        ctx = browser.new_context(viewport={"width": 420, "height": 720}, device_scale_factor=2)
+        ctx = browser.new_context(
+            viewport={"width": viewport_w, "height": viewport_h},
+            device_scale_factor=device_scale,
+        )
         ctx.add_init_script("""
             localStorage.setItem('neer_cookie_consent_v1', JSON.stringify({
               essential: true, analytics: false, savedAt: new Date().toISOString()
             }));
         """)
+        if cache_name == "endcard":
+            ctx.add_init_script("""
+                document.addEventListener('DOMContentLoaded', () => {
+                  document.querySelectorAll('.loan-guide-root, [class*="cookie"], [class*="Cookie"]')
+                    .forEach(e => e.remove());
+                });
+            """)
         page = ctx.new_page()
         page.goto(url, wait_until="domcontentloaded", timeout=30000)
         page.wait_for_function("document.fonts.ready", timeout=15000)
         page.evaluate("""() => {
-          document.querySelectorAll('[class*="cookie"], [class*="Cookie"], [aria-label*="Cookie"]')
-            .forEach(e => e.remove());
+          document.querySelectorAll(
+            '[class*="cookie"], [class*="Cookie"], [aria-label*="Cookie"], ' +
+            '.loan-guide-root, nextjs-portal, [data-nextjs-toast], [data-next-mark]'
+          ).forEach(e => e.remove());
         }""")
         page.wait_for_timeout(800)
         paths: list[Path] = []
         for i in range(n):
             fp = cache / f"frame_{i:03d}.png"
             page.screenshot(path=str(fp), type="png", animations="allow")
-            page.wait_for_timeout(65 if cache_name == "transfer" else 70)
+            page.wait_for_timeout(55 if cache_name == "endcard" else (65 if cache_name == "transfer" else 70))
             paths.append(fp)
         browser.close()
     return paths
@@ -236,6 +257,18 @@ def ensure_transfer_frames() -> list[Path]:
     return ensure_animation_frames("transfer", "http://localhost:3000/promo-transfer", n=60)
 
 
+def ensure_endcard_frames() -> list[Path]:
+    """Full HD end-card — vector-sharp logo + premium entrance animation."""
+    return ensure_animation_frames(
+        "endcard",
+        "http://localhost:3000/promo-endcard",
+        n=72,
+        viewport_w=960,
+        viewport_h=540,
+        device_scale=2,
+    )
+
+
 def celebration_panel_at(frame_paths: list[Path], t: float) -> Image.Image:
     """Pick celebration frame by animation time (loops every ~3.4s)."""
     if not frame_paths:
@@ -246,9 +279,19 @@ def celebration_panel_at(frame_paths: list[Path], t: float) -> Image.Image:
 
 
 def phone_position(phone_w: int, phone_h: int) -> tuple[int, int]:
-    px = int(W * PHONE_X_RATIO) - phone_w // 2 + 18
-    py = (H - phone_h) // 2 + 4
+    px = int(W * PHONE_X_RATIO) - phone_w // 2 + 12
+    py = max(16, (H - CAPTION_RESERVE - phone_h) // 2)
     return px, py
+
+
+def fit_phone_frame(phone: Image.Image) -> Image.Image:
+    """Scale phone mockup so full device + footer stays above caption bar."""
+    max_h = H - CAPTION_RESERVE - 24
+    if phone.height <= max_h:
+        return phone
+    scale = max_h / phone.height
+    nw, nh = int(phone.width * scale), int(phone.height * scale)
+    return phone.resize((nw, nh), Image.Resampling.LANCZOS)
 
 
 _bg_cache: Image.Image | None = None
@@ -282,12 +325,14 @@ def bg_canvas() -> Image.Image:
 
 
 def fit_screen(path: Path) -> Image.Image:
+    """Fit mobile screenshot — 1:1 viewport, no letterboxing."""
     src = Image.open(path).convert("RGB")
     scale = min(PHONE_W / src.width, PHONE_H / src.height)
     nw, nh = int(src.width * scale), int(src.height * scale)
     r = src.resize((nw, nh), Image.Resampling.LANCZOS)
-    canvas = Image.new("RGB", (PHONE_W, PHONE_H), "#0A0F1A")
-    canvas.paste(r, ((PHONE_W - nw) // 2, (PHONE_H - nh) // 2))
+    canvas = Image.new("RGB", (PHONE_W, PHONE_H), "#F8FAFC")
+    ox, oy = (PHONE_W - nw) // 2, (PHONE_H - nh) // 2
+    canvas.paste(r, (ox, oy))
     return canvas
 
 
@@ -332,42 +377,17 @@ def wrap_lines(text: str, fnt: ImageFont.FreeTypeFont, max_w: int) -> list[str]:
     return lines or [text]
 
 
-def render_endcard(scene: dict, logo: Image.Image) -> Image.Image:
-    """Full-frame brand end-card per style guide."""
-    c = bg_canvas()
-    rgba = c.convert("RGBA")
-    d = ImageDraw.Draw(rgba)
-
-    lg = logo.copy()
-    scale = 72 / lg.height
-    lg = lg.resize((int(lg.width * scale), 72), Image.Resampling.LANCZOS)
-    rgba.paste(lg, ((W - lg.width) // 2, H // 2 - 160), lg)
-
-    tag_f = font(18, bold=True)
-    tag = "DREAM BIG · BORROW SMART"
-    tw = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(tag, font=tag_f)
-    d.text(((W - tw) // 2, H // 2 - 68), tag, fill=rgb(C["gold_light"]), font=tag_f)
-
-    val_f = font(14)
-    val = "Purity & Trust"
-    vw = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(val, font=val_f)
-    d.text(((W - vw) // 2, H // 2 - 38), val, fill=rgb(C["mint"]), font=val_f)
-
-    site_f = font(42, bold=True)
-    site = "neercred.com"
-    sw = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(site, font=site_f)
-    d.text(((W - sw) // 2, H // 2 + 10), site, fill=rgb(C["white"]), font=site_f)
-
-    leg_f = font(13)
-    leg = "Nirav Enterprises, operating as NeerCred"
-    lw = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(leg, font=leg_f)
-    d.text(((W - lw) // 2, H - 100), leg, fill=rgb(C["muted"]), font=leg_f)
-
-    agg = "Digital Lending Aggregator · Financial Services Platform"
-    aw = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(agg, font=leg_f)
-    d.text(((W - aw) // 2, H - 72), agg, fill=rgb(C["muted"]), font=leg_f)
-
-    return rgba.convert("RGB")
+def render_endcard_frame(anim_frames: dict[str, list[Path]], frame_t: float) -> Image.Image:
+    """Full-frame HD end card from browser-captured animation."""
+    frames = anim_frames.get("endcard", [])
+    if not frames:
+        return bg_canvas()
+    cycle = len(frames)
+    idx = min(int(frame_t * cycle * 0.92), cycle - 1)
+    img = Image.open(frames[idx]).convert("RGB")
+    if img.size != (W, H):
+        img = img.resize((W, H), Image.Resampling.LANCZOS)
+    return img
 
 
 def render_frame(
@@ -377,8 +397,8 @@ def render_frame(
     anim_frames: dict[str, list[Path]] | None = None,
     scene_idx: int = 0,
 ) -> Image.Image:
-    if scene.get("layout") == "endcard":
-        return render_endcard(scene, logo)
+    if scene.get("layout") == "endcard_full":
+        return render_endcard_frame(anim_frames or {}, frame_t)
 
     anim_frames = anim_frames or {}
     c = bg_canvas()
@@ -418,20 +438,24 @@ def render_frame(
         frames = anim_frames.get(key, [])
         panel = celebration_panel_at(frames, frame_t)
         pw, ph = panel.width, panel.height
-        scale = min(480 / pw, 880 / ph)
+        scale = min(420 / pw, 780 / ph)
         nw, nh = int(pw * scale), int(ph * scale)
         panel = panel.resize((nw, nh), Image.Resampling.LANCZOS)
+        phone_like = Image.new("RGBA", (nw, nh), (0, 0, 0, 0))
+        phone_like.paste(panel, (0, 0), panel)
+        phone_like = fit_phone_frame(phone_like)
+        nw, nh = phone_like.width, phone_like.height
         px, py = phone_position(nw, nh)
         sh = Image.new("RGBA", (nw + 80, nh + 80), (0, 0, 0, 0))
         ImageDraw.Draw(sh).rounded_rectangle([30, 30, nw + 50, nh + 50], radius=40, fill=(15, 118, 110, 60))
         sh = sh.filter(ImageFilter.GaussianBlur(32))
         rgba.paste(sh, (px - 28, py + 12), sh)
-        rgba.paste(panel, (px, py), panel)
+        rgba.paste(phone_like, (px, py), phone_like)
     else:
         sf = SCREENS / scene["screen"]
         if not sf.exists():
             sf = SCREENS / "01-homepage.png"
-        phone = draw_phone(fit_screen(sf))
+        phone = fit_phone_frame(draw_phone(fit_screen(sf)))
         px, py = phone_position(phone.width, phone.height)
         sh = Image.new("RGBA", (phone.width + 80, phone.height + 80), (0, 0, 0, 0))
         ImageDraw.Draw(sh).rounded_rectangle([30, 30, phone.width + 50, phone.height + 50], radius=60, fill=(0, 0, 0, 90))
@@ -540,7 +564,7 @@ def render_celebration_clip(
     run([
         "ffmpeg", "-y", "-framerate", str(FPS), "-i", str(seq_dir / "frame_%04d.png"),
         "-i", str(vo),
-        "-vf", vf, "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "14", "-preset", "medium",
+        "-vf", vf, "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "12", "-preset", "medium",
         "-c:a", "aac", "-b:a", "256k", "-ar", "44100", "-ac", "2",
         "-shortest", "-t", f"{total:.3f}", str(out),
     ])
@@ -562,7 +586,7 @@ def render_clip(frame: Path, vo: Path, dur: float, idx: int) -> Path:
     )
     run([
         "ffmpeg", "-y", "-loop", "1", "-i", str(frame), "-i", str(vo),
-        "-vf", vf, "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "14", "-preset", "medium",
+        "-vf", vf, "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "12", "-preset", "medium",
         "-c:a", "aac", "-b:a", "256k", "-ar", "44100", "-ac", "2",
         "-shortest", "-t", f"{total:.3f}", str(out),
     ])
@@ -605,7 +629,7 @@ def concat_clips(clips: list[Path], out: Path) -> None:
     run([
         "ffmpeg", "-y", *inputs, "-filter_complex", filt,
         "-map", f"[{vout}]", "-map", f"[{aprev}]",
-        "-c:v", "libx264", "-crf", "14", "-pix_fmt", "yuv420p",
+        "-c:v", "libx264", "-crf", "12", "-pix_fmt", "yuv420p",
         "-c:a", "aac", "-b:a", "256k", str(out),
     ])
 
@@ -629,7 +653,7 @@ async def main(anim_frames: dict[str, list[Path]]) -> None:
         scene_ends.append(acc)
         fr = FRAMES / f"premium_{i:02d}.png"
         render_frame(scene, logo, anim_frames=anim_frames, scene_idx=i).save(fr, quality=95)
-        if scene.get("layout") == "celebration":
+        if scene.get("layout") in ("celebration", "endcard_full"):
             clips.append(render_celebration_clip(scene, logo, vo, dur, i, anim_frames))
         else:
             clips.append(render_clip(fr, vo, dur, i))
@@ -667,7 +691,7 @@ async def main(anim_frames: dict[str, list[Path]]) -> None:
     run([
         "ffmpeg", "-y", "-i", str(h_out),
         "-vf", "scale=1080:-2,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=0x0B1220",
-        "-c:v", "libx264", "-crf", "14", "-pix_fmt", "yuv420p",
+        "-c:v", "libx264", "-crf", "12", "-pix_fmt", "yuv420p",
         "-c:a", "copy", "-movflags", "+faststart", str(v_out),
     ])
 
@@ -690,5 +714,6 @@ async def main(anim_frames: dict[str, list[Path]]) -> None:
 if __name__ == "__main__":
     ekyc_frames = ensure_celebration_frames()
     transfer_frames = ensure_transfer_frames()
-    anim_frames = {"ekyc": ekyc_frames, "transfer": transfer_frames}
+    endcard_frames = ensure_endcard_frames()
+    anim_frames = {"ekyc": ekyc_frames, "transfer": transfer_frames, "endcard": endcard_frames}
     asyncio.run(main(anim_frames))

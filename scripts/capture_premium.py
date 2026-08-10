@@ -69,7 +69,7 @@ def capture() -> None:
                 page.wait_for_timeout(700)
             clean()
             path = OUT / f"{name}.png"
-            page.screenshot(path=str(path), animations="disabled", type="png")
+            page.screenshot(path=str(path), animations="disabled", type="png", full_page=False)
             print(f"  ✓ {name} ({path.stat().st_size // 1024} KB)")
 
         # Marketing pages — new premium mobile homepage for promo
