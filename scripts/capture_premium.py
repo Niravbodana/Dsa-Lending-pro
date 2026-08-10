@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
-"""Premium NeerCred UI captures — clean, no mascot/cookie/dev banners."""
+"""Premium NeerCred UI captures — mobile homepage, email OTP, Ramprakash dashboard."""
 
 from __future__ import annotations
 
 import random
+import sys
 import time
 from pathlib import Path
 
 import requests
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
+from capture_email_js import EMAIL_APPLY_JS, EMAIL_OTP_JS  # noqa: E402
 
 OUT = Path("/opt/cursor/artifacts/neercred-promo-video/screenshots")
 BASE = "http://localhost:3000"
@@ -79,21 +84,27 @@ def capture() -> None:
         ready()
         shot("06-compliance")
 
-        # Apply flow — mobile + OTP
+        # Apply flow — email UI for promo (screenshot only, then real mobile OTP for API)
         page.goto(f"{BASE}/apply", wait_until="domcontentloaded", timeout=60000)
         ready()
-        shot("02-apply")
+        page.evaluate(EMAIL_APPLY_JS)
+        page.wait_for_timeout(500)
+        clean()
+        shot("02-apply-email")
 
+        page.goto(f"{BASE}/apply", wait_until="domcontentloaded", timeout=60000)
+        ready()
         mob = f"9{random.randint(100000000, 999999999)}"
         page.locator('input[type="tel"]').first.fill(mob)
         page.locator('input[type="checkbox"]').first.check(force=True)
         page.wait_for_timeout(300)
         page.locator('button:has-text("Continue")').first.click()
         page.locator('h2:has-text("Enter OTP")').wait_for(state="visible", timeout=20000)
-        page.wait_for_timeout(1200)
+        page.wait_for_timeout(800)
+        page.evaluate(EMAIL_OTP_JS)
         page.locator('input[placeholder*="•"]').first.fill("123456")
         clean()
-        shot("03-otp")
+        shot("03-otp-email")
 
         # API journey for profile → offers → KYC → dashboard
         try:
@@ -121,9 +132,9 @@ def capture() -> None:
             prof = {
                 "session_token": t,
                 "pan": "ABCDE1234F",
-                "full_name": "Rahul Sharma",
+                "full_name": "Ramprakash Sharma",
                 "date_of_birth": "1990-05-15",
-                "email": "rahul@email.com",
+                "email": "ramprakash@email.com",
                 "pincode": "411001",
                 "gender": "male",
                 "monthly_income": 85000,

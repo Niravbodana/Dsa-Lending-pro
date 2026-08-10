@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""NeerCred Premium Promo v9 — clear VO mix, fixed caption bar."""
+"""NeerCred Premium Promo v10 — email OTP, original logo bar, premium audio."""
 
 from __future__ import annotations
 
@@ -21,8 +21,8 @@ FRAMES = OUT / "frames"
 CLIPS = OUT / "clips"
 DOWNLOAD = Path("/opt/cursor/artifacts")
 
-# Pixabay — "Piano Soft Gentle Morning Keys" by alex-morgan (royalty-free)
 BGM_SOURCE = ASSETS / "soft_morning_keys_piano.mp3"
+LOGO_BAR_H = 92
 
 W, H = 1920, 1080
 FPS = 30
@@ -42,24 +42,24 @@ SCENES = [
         "title": "One Platform.\nEvery Goal.",
         "subtitle": "Personal loans up to ₹20 Lakhs",
         "bullets": ["Compare HDFC, ICICI, Bajaj and more", "Fully online — no branch visits", "Rates from 10.99%"],
-        "vo": "Whether it's a wedding, a home upgrade, or that trip you've been planning... one platform brings every option to you.",
+        "vo": "Whether it's a wedding, a home upgrade, or that dream trip... one platform brings every option to you.",
         "vo_hi": "One platform, every goal.\nUp to twenty lakhs — fully digital.",
     },
     {
-        "id": "apply", "screen": "02-apply.png", "step": "APPLY",
-        "title": "Mobile\nVerification",
-        "subtitle": "Secure OTP in 30 seconds",
-        "bullets": ["Quick mobile verification", "Encrypted and private", "No spam, ever"],
-        "vo": "Just tap Apply, enter your mobile number, and allow SMS consent. That's it — quick and completely secure.",
-        "vo_hi": "Enter your mobile.\nAllow SMS consent.\nQuick and secure.",
+        "id": "apply", "screen": "02-apply-email.png", "step": "APPLY",
+        "title": "Email\nVerification",
+        "subtitle": "Secure OTP in your inbox",
+        "bullets": ["Quick email verification", "Encrypted and private", "No spam, ever"],
+        "vo": "Enter your email address and we'll send a secure OTP straight to your inbox. Quick, easy, and completely safe.",
+        "vo_hi": "Enter your email.\nOTP to your inbox.\nQuick and secure.",
     },
     {
-        "id": "otp", "screen": "03-otp.png", "step": "VERIFY",
+        "id": "otp", "screen": "03-otp-email.png", "step": "VERIFY",
         "title": "OTP\nConfirmed",
-        "subtitle": "Instant identity verification",
+        "subtitle": "Instant email verification",
         "bullets": ["6-digit secure OTP", "Session protected", "Continue in one tap"],
-        "vo": "Pop in your OTP, hit verify, and you're in. Takes less than a minute — we promise.",
-        "vo_hi": "Enter OTP and verify.\nLess than a minute.",
+        "vo": "Check your email, enter the OTP, and you're in. Takes less than a minute — we promise.",
+        "vo_hi": "Enter OTP from email.\nLess than a minute.",
     },
     {
         "id": "profile", "screen": "04-profile.png", "step": "PROFILE",
@@ -87,11 +87,11 @@ SCENES = [
     },
     {
         "id": "close", "screen": "11-dashboard.png", "step": "START NOW",
-        "title": "Track &\nDisburse",
+        "title": "Welcome Back,\nRamprakash",
         "subtitle": "Real-time loan dashboard",
         "bullets": ["Live application status", "Pre-approved offers", "Apply in 5 minutes"],
-        "vo": "Ready to get started? Visit NeerCred today. Dream big, borrow smart — your loan journey begins right here.",
-        "vo_hi": "Start on NeerCred today.\nDream Big. Borrow Smart.",
+        "vo": "Welcome back, Ramprakash! Track your loan in real time on NeerCred. Dream big, borrow smart — your journey starts here.",
+        "vo_hi": "Welcome back, Ramprakash.\nDream Big. Borrow Smart.",
     },
 ]
 
@@ -139,30 +139,20 @@ def font(sz: int, bold: bool = False, hindi: bool = False) -> ImageFont.FreeType
 
 
 def load_logo() -> Image.Image:
-    p = ASSETS / "logo_white.png"
+    p = ASSETS / "logo_header.png"
     if not p.exists():
-        src = ASSETS / "logo.png"
-        if not src.exists():
-            svg = ROOT / "frontend/public/neercred-logo-header.svg"
-            html = ASSETS / "logo_render.html"
-            html.write_text(
-                f'<!DOCTYPE html><html><head><style>body{{margin:0;background:#070D18;width:520px;height:110px;display:flex;align-items:center;justify-content:center}}</style></head><body>{svg.read_text(encoding="utf-8", errors="replace")}</body></html>'
-            )
-            run(
-                ["npx", "playwright", "screenshot", "--browser", "chromium",
-                 f"file://{html.resolve()}", str(src), "--viewport-size=520,110"],
-                cwd=ROOT / "frontend",
-            )
-        img = Image.open(src).convert("RGBA")
-        px = img.load()
-        for y in range(img.height):
-            for x in range(img.width):
-                r, g, b, a = px[x, y]
-                if r > 240 and g > 240 and b > 240:
-                    px[x, y] = (0, 0, 0, 0)
-        if img.getbbox():
-            img = img.crop(img.getbbox())
-        img.save(p)
+        svg = ROOT / "frontend/public/neercred-logo-header.svg"
+        html = ASSETS / "logo_header_render.html"
+        html.write_text(
+            f'<!DOCTYPE html><html><head><style>'
+            f'body{{margin:0;background:#070D18;width:420px;height:90px;display:flex;align-items:center;justify-content:center}}'
+            f'</style></head><body>{svg.read_text(encoding="utf-8", errors="replace")}</body></html>'
+        )
+        run(
+            ["npx", "playwright", "screenshot", "--browser", "chromium",
+             f"file://{html.resolve()}", str(p), "--viewport-size=420,90"],
+            cwd=ROOT / "frontend",
+        )
     return Image.open(p).convert("RGBA")
 
 
@@ -241,8 +231,17 @@ def render_frame(scene: dict, logo: Image.Image) -> Image.Image:
     c = bg_canvas()
     rgba = c.convert("RGBA")
 
+    # Top brand strip — original logo, one line, centred
+    strip = Image.new("RGBA", (W, LOGO_BAR_H), (7, 13, 24, 245))
+    sd = ImageDraw.Draw(strip)
+    sd.line([(0, LOGO_BAR_H - 1), (W, LOGO_BAR_H - 1)], fill=rgb(C["teal"]) + (80,), width=1)
+    lg = logo.copy()
+    lg.thumbnail((360, 64), Image.Resampling.LANCZOS)
+    rgba.paste(strip, (0, 0), strip)
+    rgba.paste(lg, ((W - lg.width) // 2, (LOGO_BAR_H - lg.height) // 2), lg)
+
     # Left copy
-    lx, ly = 72, 130
+    lx, ly = 72, LOGO_BAR_H + 38
     d = ImageDraw.Draw(rgba)
     step_f = font(13, bold=True)
     d.text((lx, ly), scene["step"], fill=rgb(C["teal"]), font=step_f)
@@ -264,18 +263,13 @@ def render_frame(scene: dict, logo: Image.Image) -> Image.Image:
         d.text((lx + 22, y), b, fill=rgb(C["white"]), font=bullet_f)
         y += 38
 
-    # Logo top-right area
-    lg = logo.copy()
-    lg.thumbnail((200, 58), Image.Resampling.LANCZOS)
-    rgba.paste(lg, (W - lg.width - 64, 48), lg)
-
     # Phone right
     sf = SCREENS / scene["screen"]
     if not sf.exists():
         sf = SCREENS / "01-homepage.png"
     phone = draw_phone(fit_screen(sf))
     px = int(W * 0.58) - phone.width // 2
-    py = (H - phone.height) // 2 + 20
+    py = (H - phone.height) // 2 + 8
     sh = Image.new("RGBA", (phone.width + 80, phone.height + 80), (0, 0, 0, 0))
     ImageDraw.Draw(sh).rounded_rectangle([30, 30, phone.width + 50, phone.height + 50], radius=60, fill=(0, 0, 0, 90))
     sh = sh.filter(ImageFilter.GaussianBlur(28))
@@ -318,9 +312,8 @@ async def make_vo(text: str, path: Path) -> float:
     run([
         "ffmpeg", "-y", "-i", str(path),
         "-af",
-        "highpass=f=80,afftdn=nr=5:nf=-24,"
-        "aecho=0.3:0.4:30:0.1,"
-        "compand=0.3|0.8:6:-70/-60|-20/-8|0/-4,volume=3.1,alimiter=limit=0.95",
+        "highpass=f=80,afftdn=nr=4:nf=-26,"
+        "compand=0.3|0.8:6:-70/-60|-18/-8|0/-4,volume=3.2,alimiter=limit=0.95",
         "-ar", "44100", "-ac", "2", "-b:a", "192k", str(tmp),
     ])
     tmp.replace(path)
@@ -345,8 +338,8 @@ def make_bgm(dur: float, path: Path, drum_times: list[float] | None = None) -> N
     run([
         "ffmpeg", "-y", "-i", str(src),
         "-af",
-        "highpass=f=80,lowpass=f=7000,"
-        "volume=0.75",
+        "highpass=f=80,lowpass=f=7500,"
+        "volume=0.9",
         str(processed),
     ])
     looped = AUDIO / "bgm_looped.wav"
@@ -354,7 +347,7 @@ def make_bgm(dur: float, path: Path, drum_times: list[float] | None = None) -> N
         "ffmpeg", "-y", "-stream_loop", "-1", "-i", str(processed),
         "-t", f"{dur + 2:.2f}",
         "-af",
-        f"loudnorm=I=-26:TP=-2:LRA=9,afade=t=in:d=3,afade=t=out:st={max(0, dur - 3):.2f}:d=3",
+        f"loudnorm=I=-22:TP=-1.5:LRA=10,afade=t=in:d=3,afade=t=out:st={max(0, dur - 3):.2f}:d=3",
         str(looped),
     ])
     run([
@@ -464,11 +457,12 @@ async def main() -> None:
     run([
         "ffmpeg", "-y", "-i", str(merged), "-i", str(bgm),
         "-filter_complex",
-        "[0:a]highpass=f=120,lowpass=f=12000,volume=2.6[sp1];"
+        "[0:a]highpass=f=120,lowpass=f=12000,volume=2.5[sp1];"
         "[sp1]asplit=2[sc][mx];"
-        "[1:a]volume=0.32,aloop=loop=-1:size=2e+09[pi1];"
-        "[pi1][sc]sidechaincompress=threshold=0.018:ratio=12:attack=20:release=800:makeup=1[du1];"
-        "[mx][du1]amix=inputs=2:duration=first:weights=1 0.55:normalize=0,alimiter=limit=0.95[aout]",
+        "[1:a]volume=0.42,aloop=loop=-1:size=2e+09[pi1];"
+        "[pi1][sc]sidechaincompress=threshold=0.02:ratio=8:attack=30:release=600:makeup=2[du1];"
+        "[mx][du1]amix=inputs=2:duration=first:weights=1 0.68:normalize=0,"
+        "loudnorm=I=-17:TP=-1.2:LRA=11,alimiter=limit=0.95[aout]",
         "-map", "0:v:0", "-map", "[aout]",
         "-c:v", "copy", "-c:a", "aac", "-b:a", "320k", "-ar", "44100", "-ac", "2",
         "-movflags", "+faststart", str(h_out),

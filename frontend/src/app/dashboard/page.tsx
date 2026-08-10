@@ -151,7 +151,7 @@ function DashboardContent() {
     if (isDemo) {
       setApplications(DEMO_APPLICATIONS);
       setOffers(DEMO_OFFERS);
-      setUserName("Rahul");
+      setUserName("Ramprakash");
       setLoading(false);
       return;
     }
