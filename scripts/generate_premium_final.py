@@ -39,7 +39,7 @@ SCENES = [
     {
         "id": "home", "screen": "01-homepage.png", "step": "EXPLORE",
         "title": "One Platform.\nEvery Goal.",
-        "subtitle": "Personal loans up to ₹20 Lakhs",
+        "subtitle": "Loans live today — up to ₹20 Lakhs",
         "bullets": ["Compare HDFC, ICICI, Bajaj and more", "Fully online — no branch visits", "Rates from 10.99%"],
         "vo": "Whether it's a wedding, a home upgrade, or that dream trip... one platform brings every option to you.",
         "vo_hi": "One platform, every goal.\nUp to twenty lakhs — fully digital.",
@@ -153,13 +153,13 @@ def load_logo() -> Image.Image:
         html.write_text(
             f'<!DOCTYPE html><html><head>'
             f'<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">'
-            f'<style>body{{margin:0;padding:8px 6px;background:#070D18;width:240px;height:72px;'
+            f'<style>body{{margin:0;padding:18px 10px 12px;background:#070D18;width:260px;height:96px;'
             f'display:flex;align-items:center;justify-content:flex-start;box-sizing:border-box}}</style>'
             f'</head><body>{svg.read_text(encoding="utf-8", errors="replace")}</body></html>'
         )
         run(
             ["npx", "playwright", "screenshot", "--browser", "chromium",
-             f"file://{html.resolve()}", str(p), "--viewport-size=240,72"],
+             f"file://{html.resolve()}", str(p), "--viewport-size=260,96"],
             cwd=ROOT / "frontend",
         )
     img = Image.open(p).convert("RGBA")
@@ -172,10 +172,14 @@ def load_logo() -> Image.Image:
                 px[x, y] = (r, g, b, 0)
     if img.getbbox():
         img = img.crop(img.getbbox())
-    # Add breathing room so star/icon never clips in video overlay
-    pad = 6
-    padded = Image.new("RGBA", (img.width + pad * 2, img.height + pad * 2), (0, 0, 0, 0))
-    padded.paste(img, (pad, pad), img)
+    # Generous transparent padding — star/icon must never clip at video edge
+    pad_x, pad_top, pad_bottom = 10, 22, 12
+    padded = Image.new(
+        "RGBA",
+        (img.width + pad_x * 2, img.height + pad_top + pad_bottom),
+        (0, 0, 0, 0),
+    )
+    padded.paste(img, (pad_x, pad_top), img)
     return padded
 
 
@@ -254,15 +258,16 @@ def render_frame(scene: dict, logo: Image.Image) -> Image.Image:
     c = bg_canvas()
     rgba = c.convert("RGBA")
 
-    # Original logo — top-left corner with safe padding (no clipping)
+    # Original logo — top-left with generous safe margin (never clip at frame edge)
     lg = logo.copy()
-    target_h = 54
+    target_h = 48
     scale = target_h / lg.height
     lg = lg.resize((int(lg.width * scale), target_h), Image.Resampling.LANCZOS)
-    rgba.paste(lg, (56, 52), lg)
+    logo_x, logo_y = 64, 88
+    rgba.paste(lg, (logo_x, logo_y), lg)
 
-    # Left copy — below logo
-    lx, ly = 72, 132
+    # Left copy — starts below logo block
+    lx, ly = 72, logo_y + target_h + 28
     d = ImageDraw.Draw(rgba)
     step_f = font(13, bold=True)
     d.text((lx, ly), scene["step"], fill=rgb(C["teal"]), font=step_f)

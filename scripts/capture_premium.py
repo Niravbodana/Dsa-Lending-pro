@@ -70,8 +70,8 @@ def capture() -> None:
             page.screenshot(path=str(path), animations="disabled", type="png")
             print(f"  ✓ {name} ({path.stat().st_size // 1024} KB)")
 
-        # Marketing pages
-        page.goto(BASE, wait_until="domcontentloaded", timeout=60000)
+        # Marketing pages — new premium mobile homepage for promo
+        page.goto(f"{BASE}/promo-homepage", wait_until="domcontentloaded", timeout=60000)
         ready()
         shot("01-homepage")
         shot("01b-how-it-works", scroll=650)
