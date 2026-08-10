@@ -23,81 +23,80 @@ DOWNLOAD = Path("/opt/cursor/artifacts")
 
 W, H = 1920, 1080
 FPS = 30
-VOICE = "hi-IN-SwaraNeural"
+VOICE = "en-IN-NeerjaNeural"
 PHONE_W, PHONE_H = 400, 866
 
-# Devanagari VO — SwaraNeural pronounces Hindi correctly (no broken roman words)
 SCENES = [
     {
         "id": "intro", "screen": "01-homepage.png", "step": "WELCOME",
         "title": "NeerCred", "subtitle": "Dream Big. Borrow Smart.",
         "bullets": ["RBI LSP Registered Platform", "15+ Regulated Lenders", "Bank-grade Security"],
-        "vo": "नीर क्रेड पर आपका स्वागत है। भारत का प्रीमियम पर्सनल लोन मार्केटप्लेस।",
-        "vo_hi": "नीर क्रेड पर आपका स्वागत है।\nप्रीमियम लोन मार्केटप्लेस।",
+        "vo": "Welcome to NeerCred. India's premium personal loan marketplace.",
+        "vo_hi": "Welcome to NeerCred.\nPremium loan marketplace.",
     },
     {
         "id": "home", "screen": "01-homepage.png", "step": "EXPLORE",
         "title": "One Platform.\nEvery Goal.",
         "subtitle": "Personal loans up to ₹20 Lakhs",
         "bullets": ["Compare HDFC, ICICI, Bajaj & more", "100% digital journey", "Rates from 10.99%"],
-        "vo": "एक प्लेटफॉर्म, हर वित्तीय लक्ष्य के लिए। बीस लाख रुपये तक पर्सनल लोन, पूरी तरह डिजिटल।",
-        "vo_hi": "एक प्लेटफॉर्म, हर लक्ष्य के लिए।\n₹20 लाख तक — पूरी तरह डिजिटल।",
+        "vo": "One platform for every financial goal. Personal loans up to twenty lakhs, fully digital.",
+        "vo_hi": "One platform, every goal.\nUp to ₹20 lakhs — fully digital.",
     },
     {
         "id": "apply", "screen": "02-apply.png", "step": "APPLY",
         "title": "Mobile\nVerification",
         "subtitle": "Secure OTP in 30 seconds",
         "bullets": ["DPDP Act compliant", "Encrypted session", "No spam ever"],
-        "vo": "अप्लाई पर जाइए और मोबाइल नंबर डालिए। एसएमएस की अनुमति देकर कंटिन्यू कीजिए। बिल्कुल सुरक्षित।",
-        "vo_hi": "मोबाइल नंबर डालिए।\nएसएमएस अनुमति दें।\nबिल्कुल सुरक्षित।",
+        "vo": "Go to Apply and enter your mobile number. Allow SMS consent and continue. Completely secure.",
+        "vo_hi": "Enter mobile number.\nAllow SMS consent.\nCompletely secure.",
     },
     {
         "id": "otp", "screen": "03-otp.png", "step": "VERIFY",
         "title": "OTP\nConfirmed",
         "subtitle": "Instant identity verification",
         "bullets": ["6-digit secure OTP", "Session protected", "Continue in one tap"],
-        "vo": "ओटीपी डालकर वेरिफाई कीजिए। सुरक्षित और तेज़ — एक मिनट में आगे बढ़िए।",
-        "vo_hi": "ओटीपी डालें, वेरिफाई करें।\nसुरक्षित और तेज़।",
+        "vo": "Enter your OTP and verify. Safe and fast — move ahead in one minute.",
+        "vo_hi": "Enter OTP, verify.\nSafe and fast.",
     },
     {
         "id": "profile", "screen": "04-profile.png", "step": "PROFILE",
         "title": "Smart\nProfile",
         "subtitle": "PAN auto-fill from records",
         "bullets": ["One form, no repeat entry", "Minimal documentation", "Guided step by step"],
-        "vo": "प्रोफाइल पूरी कीजिए। पैन से डिटेल्स ऑटो फिल होती हैं। एक बार भरिए, बार बार नहीं।",
-        "vo_hi": "प्रोफाइल पूरी करें।\nपैन से ऑटो फिल।\nएक बार भरिए।",
+        "vo": "Complete your profile. Details auto-fill from PAN. Fill once, not again and again.",
+        "vo_hi": "Complete your profile.\nPAN auto-fill.\nFill once only.",
     },
     {
         "id": "offers", "screen": "09-offers.png", "step": "COMPARE",
         "title": "Best Offers.\nOne Screen.",
         "subtitle": "Lowest rate · Lowest EMI",
         "bullets": ["50+ partner offers", "Transparent fees", "Select in one tap"],
-        "vo": "कई लेंडर्स के ऑफर्स एक स्क्रीन पर। सबसे अच्छी दर और ईएमआई तुलना करके चुनिए।",
-        "vo_hi": "कई लेंडर्स के ऑफर्स।\nसबसे अच्छी दर चुनिए।\nएक टैप में सेलेक्ट।",
+        "vo": "Multiple lender offers on one screen. Compare the best rate and EMI, then select.",
+        "vo_hi": "Multiple lender offers.\nCompare best rates.\nSelect in one tap.",
     },
     {
         "id": "kyc", "screen": "10-kyc.png", "step": "KYC",
         "title": "Digital\nKYC",
         "subtitle": "Aadhaar · Bank · eSign",
         "bullets": ["UIDAI Aadhaar OTP", "Penny drop verify", "RBI compliant eSign"],
-        "vo": "केवाईसी पूरी तरह डिजिटल। आधार ओटीपी, बैंक वेरिफाई, और ई साइन — घर बैठे।",
-        "vo_hi": "केवाईसी 100% डिजिटल।\nआधार, बैंक, ई साइन।\nघर बैठे पूरा करें।",
+        "vo": "KYC is fully digital. Aadhaar OTP, bank verification, and eSign — all from home.",
+        "vo_hi": "KYC 100% digital.\nAadhaar, bank, eSign.\nComplete from home.",
     },
     {
         "id": "trust", "screen": "06-compliance.png", "step": "TRUST",
         "title": "Built on\nTrust",
         "subtitle": "RBI LSP · DPDP · Transparent",
         "bullets": ["RBI LSP registered", "DPDP Act 2023", "Dedicated grievance redressal"],
-        "vo": "आरबीआई एलएसपी रजिस्टर्ड, डीपीडीपी कंप्लायंट, दो सौ छप्पन बिट एन्क्रिप्शन। आपका डेटा पूरी तरह सुरक्षित।",
-        "vo_hi": "आरबीआई एलएसपी रजिस्टर्ड।\nडीपीडीपी कंप्लायंट।\nडेटा पूरी तरह सुरक्षित।",
+        "vo": "RBI LSP registered, DPDP compliant, two fifty six bit encryption. Your data is fully safe.",
+        "vo_hi": "RBI LSP registered.\nDPDP compliant.\nYour data is safe.",
     },
     {
         "id": "close", "screen": "11-dashboard.png", "step": "START NOW",
         "title": "Track &\nDisburse",
         "subtitle": "Real-time loan dashboard",
         "bullets": ["Live application status", "Pre-approved offers", "Apply in 5 minutes"],
-        "vo": "अभी नीर क्रेड पर अप्लाई करें। ड्रीम बिग, बॉरो स्मार्ट। आपका लोन, आपके हाथ में।",
-        "vo_hi": "अभी नीर क्रेड पर अप्लाई करें।\nड्रीम बिग, बॉरो स्मार्ट।",
+        "vo": "Apply now on NeerCred. Dream Big, Borrow Smart. Your loan, in your hands.",
+        "vo_hi": "Apply now on NeerCred.\nDream Big. Borrow Smart.",
     },
 ]
 
@@ -293,7 +292,7 @@ def render_frame(scene: dict, logo: Image.Image) -> Image.Image:
     bar = Image.new("RGBA", (W, bar_h), C["glass"])
     bd = ImageDraw.Draw(bar)
     bd.line([(0, 0), (W, 0)], fill=rgb(C["teal"]) + (120,), width=2)
-    cap_f = font(26, bold=True, hindi=True)
+    cap_f = font(26, bold=True)
     cy = 24
     for line in wrap_lines(scene["vo_hi"], cap_f, W - 160):
         bd.text((80, cy), line, fill=rgb(C["white"]), font=cap_f)
@@ -323,18 +322,18 @@ async def make_vo(text: str, path: Path) -> float:
 
 
 def _piano_note(freq: float, duration: float, out: Path) -> None:
-    """Single piano-like note with harmonics and soft decay."""
     d = duration
+    fade_out = max(0.05, d - 0.35)
     run([
         "ffmpeg", "-y",
         "-f", "lavfi", "-i", f"sine=f={freq}:duration={d}",
         "-f", "lavfi", "-i", f"sine=f={freq * 2}:duration={d}",
         "-f", "lavfi", "-i", f"sine=f={freq * 3}:duration={d}",
         "-filter_complex",
-        "[0]volume=1[a];[1]volume=0.35[b];[2]volume=0.15[c];"
+        "[0]volume=1[a];[1]volume=0.4[b];[2]volume=0.2[c];"
         "[a][b][c]amix=inputs=3:duration=first,"
-        "lowpass=f=2800,afade=t=in:d=0.008,afade=t=out:st=" + f"{max(0.05, d - 0.45):.3f}" + ":d=0.45,"
-        "aecho=0.6:0.7:60:0.18,volume=0.11[out]",
+        f"lowpass=f=3200,afade=t=in:d=0.01,afade=t=out:st={fade_out:.3f}:d=0.35,"
+        "aecho=0.5:0.6:80:0.2,volume=0.55[out]",
         "-map", "[out]", "-ar", "44100", "-ac", "2", str(out),
     ])
 
@@ -342,13 +341,13 @@ def _piano_note(freq: float, duration: float, out: Path) -> None:
 def _drum_hit(kind: str, out: Path) -> None:
     if kind == "kick":
         run([
-            "ffmpeg", "-y", "-f", "lavfi", "-i", "sine=f=55:duration=0.18",
-            "-af", "volume=0.55,lowpass=f=120,afade=t=out:st=0.06:d=0.12", "-ar", "44100", "-ac", "2", str(out),
+            "ffmpeg", "-y", "-f", "lavfi", "-i", "sine=f=55:duration=0.2",
+            "-af", "volume=0.9,lowpass=f=140,afade=t=out:st=0.05:d=0.15", "-ar", "44100", "-ac", "2", str(out),
         ])
     else:
         run([
-            "ffmpeg", "-y", "-f", "lavfi", "-i", "anoisesrc=d=0.12:c=pink",
-            "-af", "highpass=f=800,lowpass=f=4500,volume=0.35,afade=t=out:st=0.04:d=0.08",
+            "ffmpeg", "-y", "-f", "lavfi", "-i", "anoisesrc=d=0.14:c=pink",
+            "-af", "highpass=f=700,lowpass=f=5000,volume=0.7,afade=t=out:st=0.03:d=0.11",
             "-ar", "44100", "-ac", "2", str(out),
         ])
 
@@ -379,7 +378,7 @@ def make_bgm(dur: float, path: Path, drum_times: list[float] | None = None) -> N
     piano_wav = AUDIO / "piano_full.wav"
     run([
         "ffmpeg", "-y", "-stream_loop", "-1", "-i", str(piano_loop),
-        "-t", f"{dur + 2:.2f}", "-af", "volume=0.85", str(piano_wav),
+        "-t", f"{dur + 2:.2f}", "-af", "volume=1.2", str(piano_wav),
     ])
     piano_loop.unlink(missing_ok=True)
 
@@ -414,12 +413,12 @@ def make_bgm(dur: float, path: Path, drum_times: list[float] | None = None) -> N
     run([
         "ffmpeg", "-y", "-i", str(piano_wav), "-i", str(drum_wav),
         "-filter_complex",
-        "[0]volume=0.9[p];[1]volume=0.5[d];[p][d]amix=inputs=2:duration=first:dropout_transition=0[out]",
+        "[0]volume=1[p];[1]volume=0.85[d];[p][d]amix=inputs=2:duration=first:dropout_transition=0[out]",
         "-map", "[out]", str(mixed),
     ])
     run([
         "ffmpeg", "-y", "-i", str(mixed), "-t", f"{dur + 1:.2f}",
-        "-af", f"volume=0.72,afade=t=in:d=2.5,afade=t=out:st={max(0, dur - 2.5):.2f}:d=2.5",
+        "-af", f"loudnorm=I=-18:TP=-1.5:LRA=11,afade=t=in:d=2,afade=t=out:st={max(0, dur - 2):.2f}:d=2",
         "-ar", "44100", "-ac", "2", str(path),
     ])
     piano_wav.unlink(missing_ok=True)
@@ -527,8 +526,8 @@ async def main() -> None:
     run([
         "ffmpeg", "-y", "-i", str(merged), "-i", str(bgm),
         "-filter_complex",
-        "[0:a]volume=2.0[va];[1:a]volume=0.42,aloop=loop=-1:size=2e+09[vb];"
-        "[va][vb]amix=inputs=2:duration=first:dropout_transition=0[aout]",
+        "[0:a]volume=1.5[va];[1:a]volume=1.0,aloop=loop=-1:size=2e+09[vb];"
+        "[va][vb]amix=inputs=2:duration=first:weights=1 0.45:normalize=0[aout]",
         "-map", "0:v:0", "-map", "[aout]",
         "-c:v", "copy", "-c:a", "aac", "-b:a", "320k", "-ar", "44100", "-ac", "2",
         "-movflags", "+faststart", str(h_out),
