@@ -21,13 +21,13 @@ const CARDS = [
 export default function PromoHomepage() {
   return (
     <div
-      className="h-dvh overflow-hidden"
+      className="min-h-dvh overflow-x-hidden"
       style={{ background: "linear-gradient(165deg, #DBEAFE 0%, #E0F2FE 25%, #F0F9FF 50%, #ECFEFF 75%, #F8FAFC 100%)" }}
     >
-      <div className="mx-auto flex h-full max-w-md flex-col px-4 pb-4 pt-3">
-        <div className="mb-3 flex items-start justify-between gap-2">
+      <div className="mx-auto flex min-h-dvh max-w-md flex-col px-4 pb-5 pt-3">
+        <div className="mb-2 flex items-start justify-between gap-2">
           <Link href="/" className="shrink-0">
-            <Image src="/neercred-logo-header.svg" alt="NeerCred" width={168} height={56} priority className="h-14 w-auto" />
+            <Image src="/neercred-logo-header.svg" alt="NeerCred™" width={168} height={56} priority className="h-11 w-auto" />
           </Link>
           <Link
             href="/apply"
@@ -38,11 +38,11 @@ export default function PromoHomepage() {
           </Link>
         </div>
 
-        <div className="mb-4 inline-flex w-fit items-center gap-1.5 rounded-full border border-[#0F766E]/20 bg-white/80 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-wide text-[#0F766E]">
+        <div className="mb-3 inline-flex w-fit items-center gap-1.5 rounded-full border border-[#0F766E]/20 bg-white/80 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-wide text-[#0F766E]">
           <span>✓</span> Digital Lending Aggregator · Financial Services Platform
         </div>
 
-        <h1 className="text-[2rem] font-extrabold leading-[1.1] tracking-tight text-[#0B1220]">
+        <h1 className="text-[1.75rem] font-extrabold leading-[1.12] tracking-tight text-[#0B1220]">
           One Platform.
           <br />
           Every Financial Goal.
@@ -52,7 +52,7 @@ export default function PromoHomepage() {
           NeerCred matches you with trusted lending partners — borrow smart with a transparent, fully digital journey.
         </p>
 
-        <ul className="mt-4 space-y-2.5">
+        <ul className="mt-3 space-y-2">
           {FEATURES.map((f) => (
             <li key={f.title} className="flex gap-3">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/90 text-base shadow-sm">{f.icon}</span>
@@ -64,7 +64,7 @@ export default function PromoHomepage() {
           ))}
         </ul>
 
-        <div className="mt-4 space-y-2">
+        <div className="mt-3 space-y-2">
           <Link
             href="/apply"
             className="flex w-full items-center justify-center rounded-2xl py-4 text-sm font-bold text-white shadow-lg"
@@ -80,7 +80,7 @@ export default function PromoHomepage() {
 
         <p className="mt-3 text-center text-[10px] text-slate-400">Rates from 10.99% p.a. · indicative only</p>
 
-        <div className="mt-3 grid flex-1 grid-cols-2 gap-2 content-end">
+        <div className="mt-3 grid grid-cols-2 gap-2">
           {CARDS.map((card) => (
             <div key={card.title} className="rounded-2xl border border-white/80 bg-white/70 p-3 backdrop-blur-sm">
               <p className="text-[11px] font-bold leading-tight text-[#0B1220]">{card.title}</p>

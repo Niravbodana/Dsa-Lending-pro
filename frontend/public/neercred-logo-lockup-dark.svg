@@ -25,6 +25,6 @@
     <path d="M48 9.5 L49.8 13.8 L54.4 13.8 L50.8 16.6 L52.2 21 L48 18.4 L43.8 21 L45.2 16.6 L41.6 13.8 L46.2 13.8 Z" fill="url(#ld-gold)"/>
   </g>
   <text x="64" y="38" font-family="Poppins, system-ui, sans-serif" font-size="26" font-weight="700" letter-spacing="-0.3" dominant-baseline="middle">
-    <tspan fill="#F8FAFC">Neer</tspan><tspan fill="url(#ld-cred)">Cred</tspan>
+    <tspan fill="#F8FAFC">Neer</tspan><tspan fill="url(#ld-cred)">Cred</tspan><tspan fill="#94A3B8" font-size="13" font-weight="600" dx="2">™</tspan>
   </text>
 </svg>

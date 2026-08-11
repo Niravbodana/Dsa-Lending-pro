@@ -93,10 +93,10 @@ SCENES = [
     {
         "id": "approved", "screen": "12-approved.png", "step": "APPROVED",
         "title": "You May\nQualify! 🎉",
-        "subtitle": "Up to ₹5,00,000 · indicative offer",
+        "subtitle": "Up to ₹15,00,000 · indicative offer",
         "bullets": ["Select your loan amount", "Disbursal via lender", "Funds to your bank"],
-        "vo": "Great news! You may qualify for up to five lakhs. Select your loan amount and move closer to disbursal on NeerCred.",
-        "vo_hi": "You may qualify!\nUp to five lakhs.\nSelect your amount.",
+        "vo": "Great news! You may qualify for up to fifteen lakhs. Select your loan amount and move closer to disbursal on NeerCred.",
+        "vo_hi": "You may qualify!\nUp to fifteen lakhs.\nSelect your amount.",
     },
     {
         "id": "kyc", "layout": "celebration", "animation": "ekyc", "step": "KYC",
@@ -587,20 +587,14 @@ def render_frame_vertical(
 
 
 def fit_screen(path: Path) -> Image.Image:
-    """Fit mobile screenshot — crisp 1:1 viewport match."""
+    """Fit mobile screenshot — contain within phone, top-aligned (header never clipped)."""
     src = Image.open(path).convert("RGB")
-    # Screenshots are 390×844 @3x — scale to phone canvas with minimal resample
-    if src.width > PHONE_W * 2:
-        # Downscale in steps for sharper result
-        scale = PHONE_W / src.width
-        nw, nh = int(src.width * scale), int(src.height * scale)
-        r = src.resize((nw, nh), Image.Resampling.LANCZOS)
-    else:
-        r = src
-        nw, nh = r.width, r.height
+    scale = min(PHONE_W / src.width, PHONE_H / src.height)
+    nw, nh = int(src.width * scale), int(src.height * scale)
+    r = src.resize((nw, nh), Image.Resampling.LANCZOS)
     canvas = Image.new("RGB", (PHONE_W, PHONE_H), "#F8FAFC")
-    ox, oy = (PHONE_W - nw) // 2, (PHONE_H - nh) // 2
-    canvas.paste(r, (ox, oy))
+    ox = (PHONE_W - nw) // 2
+    canvas.paste(r, (ox, 0))
     return canvas
 
 

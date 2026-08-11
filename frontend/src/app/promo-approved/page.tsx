@@ -11,7 +11,7 @@ export default function PromoApprovedPage() {
     >
       <div className="relative mx-auto flex min-h-dvh max-w-md flex-col px-5 pb-8 pt-5">
         <Link href="/" className="mb-6 inline-flex w-fit items-center">
-          <Image src="/neercred-logo-header.svg" alt="NeerCred" width={168} height={56} priority className="h-12 w-auto" />
+          <Image src="/neercred-logo-header.svg" alt="NeerCred™" width={168} height={56} priority className="h-12 w-auto" />
         </Link>
 
         <div className="relative flex flex-1 flex-col items-center text-center">
@@ -34,19 +34,19 @@ export default function PromoApprovedPage() {
           <div className="mt-8 w-full rounded-3xl border border-[#0F766E]/20 bg-white p-6 shadow-[0_12px_40px_-16px_rgba(15,118,110,0.25)]">
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Eligible amount</p>
             <p className="mt-1 text-5xl font-extrabold text-transparent" style={{ background: "linear-gradient(135deg, #0D5C56, #0F766E, #2DD4BF)", WebkitBackgroundClip: "text" }}>
-              ₹5,00,000
+              ₹15,00,000
             </p>
             <p className="mt-1 text-sm text-slate-500">Indicative · subject to lender approval</p>
 
             <div className="mt-6 text-left">
               <label className="text-xs font-semibold text-slate-600">Select your loan amount</label>
               <div className="mt-3 h-2 rounded-full bg-slate-100">
-                <div className="h-2 w-[72%] rounded-full" style={{ background: "linear-gradient(90deg, #0F766E, #5EEAD4)" }} />
+                <div className="h-2 w-full rounded-full" style={{ background: "linear-gradient(90deg, #0F766E, #5EEAD4)" }} />
               </div>
               <div className="mt-2 flex justify-between text-xs text-slate-500">
                 <span>₹1L</span>
-                <span className="font-bold text-[#0F766E]">₹5,00,000</span>
-                <span>₹5L</span>
+                <span className="font-bold text-[#0F766E]">₹15,00,000</span>
+                <span>₹15L</span>
               </div>
             </div>
 
@@ -58,7 +58,7 @@ export default function PromoApprovedPage() {
           <div className="mt-6 grid w-full grid-cols-3 gap-2 text-center">
             {[
               { label: "Rate", value: "10.99%*" },
-              { label: "EMI", value: "₹11,247*" },
+              { label: "EMI", value: "₹38,761*" },
               { label: "Tenure", value: "48 mo" },
             ].map((item) => (
               <div key={item.label} className="rounded-xl border border-slate-100 bg-white/80 px-2 py-3">

@@ -3,14 +3,15 @@
 function GreetingLogo() {
   return (
     <svg
-      width="520"
-      height="176"
+      width="100%"
+      height="auto"
       viewBox="0 0 320 108"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       role="img"
-      aria-label="NeerCred"
+      aria-label="NeerCred™"
       className="drop-shadow-2xl"
+      preserveAspectRatio="xMidYMid meet"
     >
       <defs>
         <linearGradient id="gr-blue" x1="8" y1="8" x2="36" y2="52" gradientUnits="userSpaceOnUse">
@@ -55,6 +56,7 @@ function GreetingLogo() {
       <text x="78" y="48" fontFamily="Poppins, system-ui, sans-serif" fontSize="34" fontWeight="800" letterSpacing="-0.5" dominantBaseline="middle">
         <tspan fill="#0F172A">Neer</tspan>
         <tspan fill="url(#gr-cred)">Cred</tspan>
+        <tspan fill="#64748B" fontSize="16" fontWeight="600" dx="2">™</tspan>
       </text>
       <text x="78" y="78" fontFamily="Poppins, system-ui, sans-serif" fontSize="11" fontWeight="600" fill="url(#gr-gold-text)" letterSpacing="3.2">
         DREAM BIG · BORROW SMART
@@ -68,7 +70,7 @@ export default function PromoGreetingPage() {
     <>
       <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
       <div
-        className="promo-no-chrome promo-greeting-root relative flex min-h-dvh flex-col items-center justify-center overflow-hidden"
+        className="promo-no-chrome promo-greeting-root relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-6 py-10"
         style={{
           background: "linear-gradient(160deg, #F0FDF9 0%, #D1FAE5 38%, #A7F3D0 72%, #86EFAC 100%)",
           fontFamily: "Poppins, system-ui, sans-serif",
@@ -76,24 +78,24 @@ export default function PromoGreetingPage() {
       >
         <div className="pointer-events-none absolute inset-0">
           <div
-            className="absolute left-1/2 top-1/2 h-[560px] w-[560px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-60 blur-3xl"
+            className="absolute left-1/2 top-1/2 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-60 blur-3xl"
             style={{ background: "radial-gradient(circle, #BBF7D0 0%, #ECFDF5 45%, transparent 72%)" }}
           />
           <div
-            className="absolute -right-20 top-10 h-72 w-72 rounded-full opacity-40 blur-3xl"
+            className="absolute -right-16 top-8 h-48 w-48 rounded-full opacity-40 blur-3xl"
             style={{ background: "radial-gradient(circle, #6EE7B7 0%, transparent 70%)" }}
           />
         </div>
 
-        <p className="greeting-welcome relative z-10 text-5xl font-extrabold tracking-tight text-[#047857] sm:text-6xl">
+        <p className="greeting-welcome relative z-10 text-center text-4xl font-extrabold tracking-tight text-[#047857] sm:text-5xl">
           Welcome to
         </p>
 
-        <div className="greeting-logo relative z-10 mt-10">
+        <div className="greeting-logo relative z-10 mt-6 max-w-[min(100%,320px)]">
           <GreetingLogo />
         </div>
 
-        <p className="greeting-trust relative z-10 mt-10 text-sm font-semibold uppercase tracking-[0.35em] text-[#475569]">
+        <p className="greeting-trust relative z-10 mt-6 text-center text-xs font-semibold uppercase tracking-[0.3em] text-[#475569] sm:text-sm">
           Purity &amp; Trust
         </p>
 

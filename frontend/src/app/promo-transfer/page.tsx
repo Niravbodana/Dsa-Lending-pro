@@ -35,7 +35,7 @@ export default function PromoTransferPage() {
         </h1>
         <p className="mt-2 text-sm text-slate-300">HDFC Bank · **** 4521</p>
 
-        <p className="mt-6 text-4xl font-extrabold text-white">₹5,00,000</p>
+        <p className="mt-6 text-4xl font-extrabold text-white">₹15,00,000</p>
         <p className="mt-1 text-xs text-slate-400">Indicative disbursal amount</p>
 
         <div className="mt-8">

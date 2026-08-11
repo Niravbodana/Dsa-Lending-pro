@@ -28,7 +28,7 @@
     <path d="M48 9.5 L49.8 13.8 L54.4 13.8 L50.8 16.6 L52.2 21 L48 18.4 L43.8 21 L45.2 16.6 L41.6 13.8 L46.2 13.8 Z" fill="url(#hd-gold)"/>
   </g>
   <text x="78" y="48" font-family="Poppins, system-ui, sans-serif" font-size="34" font-weight="800" letter-spacing="-0.5" dominant-baseline="middle">
-    <tspan fill="#F8FAFC">Neer</tspan><tspan fill="url(#hd-cred)">Cred</tspan>
+    <tspan fill="#F8FAFC">Neer</tspan><tspan fill="url(#hd-cred)">Cred</tspan><tspan fill="#94A3B8" font-size="16" font-weight="600" dx="2">™</tspan>
   </text>
   <text x="78" y="78" font-family="Poppins, system-ui, sans-serif" font-size="11" font-weight="600" fill="url(#hd-gold-text)" letter-spacing="3.2">DREAM BIG · BORROW SMART</text>
 </svg>

@@ -3,14 +3,15 @@
 function EndcardLogo() {
   return (
     <svg
-      width="480"
-      height="162"
+      width="100%"
+      height="auto"
       viewBox="0 0 320 108"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       role="img"
-      aria-label="NeerCred — Dream Big. Borrow Smart."
+      aria-label="NeerCred™ — Dream Big. Borrow Smart."
       className="drop-shadow-2xl"
+      preserveAspectRatio="xMidYMid meet"
     >
       <defs>
         <linearGradient id="ec-blue" x1="8" y1="8" x2="36" y2="52" gradientUnits="userSpaceOnUse">
@@ -55,6 +56,7 @@ function EndcardLogo() {
       <text x="78" y="48" fontFamily="Poppins, system-ui, sans-serif" fontSize="34" fontWeight="800" letterSpacing="-0.5" dominantBaseline="middle">
         <tspan fill="#0F172A">Neer</tspan>
         <tspan fill="url(#ec-cred)">Cred</tspan>
+        <tspan fill="#64748B" fontSize="16" fontWeight="600" dx="2">™</tspan>
       </text>
       <text x="78" y="78" fontFamily="Poppins, system-ui, sans-serif" fontSize="11" fontWeight="600" fill="url(#ec-gold-text)" letterSpacing="3.2">
         DREAM BIG · BORROW SMART
@@ -82,7 +84,7 @@ export default function PromoEndcardPage() {
     <>
       <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
       <div
-        className="promo-no-chrome promo-endcard-root relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-8"
+        className="promo-no-chrome promo-endcard-root relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-6 py-10"
         style={{
           background: "linear-gradient(160deg, #F0FDF9 0%, #D1FAE5 38%, #A7F3D0 72%, #86EFAC 100%)",
           fontFamily: "Poppins, system-ui, sans-serif",
@@ -99,7 +101,7 @@ export default function PromoEndcardPage() {
           />
         </div>
 
-        <div className="endcard-logo relative z-10 flex flex-col items-center text-center">
+        <div className="endcard-logo relative z-10 flex max-w-[min(100%,300px)] flex-col items-center text-center">
           <EndcardLogo />
         </div>
 

@@ -160,53 +160,21 @@ def capture() -> None:
                 json={"session_token": t, "loan_purpose": "wedding", "existing_emi": 0},
                 timeout=15,
             )
-            offers = requests.get(
-                f"{API}/leads/offers", params={"session_token": t}, timeout=15
-            ).json()
-
-            page.goto(f"{BASE}/apply", wait_until="domcontentloaded", timeout=30000)
-            ready(2000)
-            page.evaluate("window.scrollTo(0, 280)")
-            shot("09-offers")
-
-            internal = [
-                o for o in offers.get("offers", [])
-                if o.get("workflow_mode") != "external_handoff"
-            ]
-            if internal:
-                o = internal[0]
-                sel = requests.post(
-                    f"{API}/leads/select-offer",
-                    json={
-                        "session_token": t,
-                        "offer_id": o["offer_id"],
-                        "lender_name": o["lender_name"],
-                        "loan_amount": o["loan_amount"],
-                        "interest_rate": o["interest_rate"],
-                        "tenure_months": o["tenure_months"],
-                        "emi": o["emi"],
-                        "lender_data_sharing_consent": True,
-                    },
-                    timeout=15,
-                ).json()
-                aid = sel.get("application_id")
-                if aid:
-                    pass  # KYC happens on lender platform — no mobile screenshot
-
-            page.goto(f"{BASE}/dashboard?demo=1", wait_until="domcontentloaded", timeout=20000)
-            ready()
-            shot("11-dashboard")
 
         except Exception as e:
             print(f"  ! api flow: {e}")
 
-        # Approved scene — always capture (no API dependency)
+        # Promo offers + approved — dedicated pages (HDFC, ₹15L)
         try:
+            page.goto(f"{BASE}/promo-offers", wait_until="domcontentloaded", timeout=20000)
+            ready(2000)
+            shot("09-offers")
+
             page.goto(f"{BASE}/promo-approved", wait_until="domcontentloaded", timeout=20000)
             ready(2000)
             shot("12-approved")
         except Exception as e:
-            print(f"  ! approved page: {e}")
+            print(f"  ! promo pages: {e}")
 
         browser.close()
     print("Done")
