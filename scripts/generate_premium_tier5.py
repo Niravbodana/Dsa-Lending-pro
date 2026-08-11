@@ -241,22 +241,7 @@ def write_ab_manifest(path_a: Path, path_b: Path, audit_a: dict, audit_b: dict) 
     return out
 
 
-async def main() -> None:
-    for d in (OUT, AUDIO, CLIPS, FRAMES, DOWNLOAD):
-        d.mkdir(parents=True, exist_ok=True)
-
-    print("=== Tier 5: Capturing interactive Story frames ===")
-    story_frames = ensure_story_frames()
-
-    base_anim_v = {
-        "ekyc": gpf.ensure_celebration_frames(),
-        "transfer": gpf.ensure_transfer_frames(),
-        "endcard": gpf.ensure_endcard_frames_vertical(),
-        "greeting": gpf.ensure_greeting_frames_vertical(),
-    }
-    anim_a = merge_anim_frames(base_anim_v, {})
-    anim_b = merge_anim_frames(base_anim_v, story_frames)
-
+async def _build_all(anim_a: dict, anim_b: dict) -> None:
     # Version A — UI-only full promo
     path_a = await build_vertical_variant(
         "a",
@@ -309,4 +294,18 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    for d in (OUT, AUDIO, CLIPS, FRAMES, DOWNLOAD):
+        d.mkdir(parents=True, exist_ok=True)
+
+    print("=== Tier 5: Capturing frames (sync) ===")
+    story_frames = ensure_story_frames()
+    base_anim_v = {
+        "ekyc": gpf.ensure_celebration_frames(),
+        "transfer": gpf.ensure_transfer_frames(),
+        "endcard": gpf.ensure_endcard_frames_vertical(),
+        "greeting": gpf.ensure_greeting_frames_vertical(),
+    }
+    anim_a = merge_anim_frames(base_anim_v, {})
+    anim_b = merge_anim_frames(base_anim_v, story_frames)
+
+    asyncio.run(_build_all(anim_a, anim_b))
