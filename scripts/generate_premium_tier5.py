@@ -33,8 +33,8 @@ STORY_HOOK = [
         "title": "",
         "subtitle": "",
         "bullets": [],
-        "vo": "Need a loan but don't have time for the bank branch?",
-        "vo_hi": "Loan chahiye?\nBank jaane ka time nahi.",
+        "vo": "Loan chahiye, par bank branch jaane ka time nahi hai?",
+        "vo_hi": "लोन चाहिए?\nबैंक जाने का टाइम नहीं",
         "duration": 5.5,
     },
     {
@@ -45,8 +45,8 @@ STORY_HOOK = [
         "title": "",
         "subtitle": "",
         "bullets": [],
-        "vo": "Swipe up — your fully digital loan journey starts here.",
-        "vo_hi": "Swipe up karo.\nDigital loan journey.",
+        "vo": "Swipe up kijiye — aapki poori digital loan journey yahin se shuru hoti hai.",
+        "vo_hi": "Swipe up करें\nडिजिटल लोन जर्नी",
         "duration": 5.0,
     },
     {
@@ -57,8 +57,8 @@ STORY_HOOK = [
         "title": "",
         "subtitle": "",
         "bullets": [],
-        "vo": "NeerCred — dream big, borrow smart. Compare eligible offers up to fifteen lakhs, fully online.",
-        "vo_hi": "NeerCred™\nDream Big. Borrow Smart.\nUp to fifteen lakhs.",
+        "vo": "Neer Cred — Dream Big, Borrow Smart. Pandrah lakh tak ke eligible offers, poora online.",
+        "vo_hi": "NeerCred™\nसपने बड़े · स्मार्ट लोन\nपंद्रह लाख तक",
         "duration": 6.5,
     },
 ]
