@@ -53,7 +53,7 @@ function GreetingLogo() {
         />
       </g>
       <text x="78" y="48" fontFamily="Poppins, system-ui, sans-serif" fontSize="34" fontWeight="800" letterSpacing="-0.5" dominantBaseline="middle">
-        <tspan fill="#F8FAFC">Neer</tspan>
+        <tspan fill="#0F172A">Neer</tspan>
         <tspan fill="url(#gr-cred)">Cred</tspan>
       </text>
       <text x="78" y="78" fontFamily="Poppins, system-ui, sans-serif" fontSize="11" fontWeight="600" fill="url(#gr-gold-text)" letterSpacing="3.2">
@@ -70,18 +70,22 @@ export default function PromoGreetingPage() {
       <div
         className="promo-no-chrome promo-greeting-root relative flex min-h-dvh flex-col items-center justify-center overflow-hidden"
         style={{
-          background: "linear-gradient(135deg, #0B1220 0%, #0F766E 50%, #0891B2 100%)",
+          background: "linear-gradient(160deg, #F0FDF9 0%, #D1FAE5 38%, #A7F3D0 72%, #86EFAC 100%)",
           fontFamily: "Poppins, system-ui, sans-serif",
         }}
       >
         <div className="pointer-events-none absolute inset-0">
           <div
-            className="absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-25 blur-3xl"
-            style={{ background: "radial-gradient(circle, #5EEAD4 0%, transparent 68%)" }}
+            className="absolute left-1/2 top-1/2 h-[560px] w-[560px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-60 blur-3xl"
+            style={{ background: "radial-gradient(circle, #BBF7D0 0%, #ECFDF5 45%, transparent 72%)" }}
+          />
+          <div
+            className="absolute -right-20 top-10 h-72 w-72 rounded-full opacity-40 blur-3xl"
+            style={{ background: "radial-gradient(circle, #6EE7B7 0%, transparent 70%)" }}
           />
         </div>
 
-        <p className="greeting-welcome relative z-10 text-5xl font-extrabold tracking-tight text-[#5EEAD4] sm:text-6xl">
+        <p className="greeting-welcome relative z-10 text-5xl font-extrabold tracking-tight text-[#047857] sm:text-6xl">
           Welcome to
         </p>
 
@@ -89,7 +93,7 @@ export default function PromoGreetingPage() {
           <GreetingLogo />
         </div>
 
-        <p className="greeting-trust relative z-10 mt-10 text-sm font-semibold uppercase tracking-[0.35em] text-slate-300">
+        <p className="greeting-trust relative z-10 mt-10 text-sm font-semibold uppercase tracking-[0.35em] text-[#475569]">
           Purity &amp; Trust
         </p>
 

@@ -53,7 +53,7 @@ function EndcardLogo() {
         />
       </g>
       <text x="78" y="48" fontFamily="Poppins, system-ui, sans-serif" fontSize="34" fontWeight="800" letterSpacing="-0.5" dominantBaseline="middle">
-        <tspan fill="#F8FAFC">Neer</tspan>
+        <tspan fill="#0F172A">Neer</tspan>
         <tspan fill="url(#ec-cred)">Cred</tspan>
       </text>
       <text x="78" y="78" fontFamily="Poppins, system-ui, sans-serif" fontSize="11" fontWeight="600" fill="url(#ec-gold-text)" letterSpacing="3.2">
@@ -84,18 +84,18 @@ export default function PromoEndcardPage() {
       <div
         className="promo-no-chrome promo-endcard-root relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-8"
         style={{
-          background: "linear-gradient(135deg, #0B1220 0%, #0F766E 48%, #0891B2 100%)",
+          background: "linear-gradient(160deg, #F0FDF9 0%, #D1FAE5 38%, #A7F3D0 72%, #86EFAC 100%)",
           fontFamily: "Poppins, system-ui, sans-serif",
         }}
       >
         <div className="pointer-events-none absolute inset-0">
           <div
-            className="absolute -right-24 -top-24 h-96 w-96 rounded-full opacity-30 blur-3xl"
-            style={{ background: "radial-gradient(circle, #5EEAD4 0%, transparent 70%)" }}
+            className="absolute -right-24 -top-24 h-96 w-96 rounded-full opacity-50 blur-3xl"
+            style={{ background: "radial-gradient(circle, #BBF7D0 0%, #ECFDF5 50%, transparent 72%)" }}
           />
           <div
-            className="absolute -bottom-32 -left-24 h-80 w-80 rounded-full opacity-20 blur-3xl"
-            style={{ background: "radial-gradient(circle, #D4A017 0%, transparent 70%)" }}
+            className="absolute -bottom-32 -left-24 h-80 w-80 rounded-full opacity-35 blur-3xl"
+            style={{ background: "radial-gradient(circle, #6EE7B7 0%, transparent 70%)" }}
           />
         </div>
 
@@ -104,8 +104,8 @@ export default function PromoEndcardPage() {
         </div>
 
         <p
-          className="endcard-tag relative z-10 mt-5 text-center text-base font-semibold uppercase tracking-[0.35em] text-[#FDE68A]"
-          style={{ textShadow: "0 2px 24px rgba(212,160,23,0.35)" }}
+          className="endcard-tag relative z-10 mt-5 text-center text-base font-semibold uppercase tracking-[0.35em] text-[#B45309]"
+          style={{ textShadow: "0 1px 12px rgba(212,160,23,0.25)" }}
         >
           Purity &amp; Trust
         </p>
@@ -113,7 +113,7 @@ export default function PromoEndcardPage() {
         <div className="endcard-link-wrap relative z-10 mt-8">
           <a
             href="https://www.neercred.com"
-            className="endcard-link group relative inline-block text-5xl font-extrabold tracking-tight text-white no-underline sm:text-[3.25rem]"
+            className="endcard-link group relative inline-block text-5xl font-extrabold tracking-tight text-[#134E4A] no-underline sm:text-[3.25rem]"
           >
             <span className="relative z-10">www.neercred.com</span>
             <span className="endcard-link-underline absolute -bottom-1 left-0 h-1 w-full rounded-full bg-gradient-to-r from-[#5EEAD4] to-[#FDE68A]" />
@@ -128,14 +128,14 @@ export default function PromoEndcardPage() {
           type="button"
           className="endcard-cta relative z-10 mt-8 rounded-2xl px-12 py-4 text-lg font-bold text-white shadow-2xl"
           style={{
-            background: "linear-gradient(135deg, #0B1220 0%, #134E4A 50%, #0F766E 100%)",
-            boxShadow: "0 12px 40px -8px rgba(15,118,110,0.65), 0 0 0 1px rgba(94,234,212,0.25)",
+            background: "linear-gradient(135deg, #047857 0%, #0F766E 50%, #14B8A6 100%)",
+            boxShadow: "0 12px 40px -8px rgba(15,118,110,0.45), 0 0 0 1px rgba(94,234,212,0.35)",
           }}
         >
           Apply Now →
         </button>
 
-        <p className="endcard-legal relative z-10 mt-12 max-w-xl text-center text-sm leading-relaxed text-slate-300">
+        <p className="endcard-legal relative z-10 mt-12 max-w-xl text-center text-sm leading-relaxed text-[#475569]">
           Nirav Enterprises, operating as NeerCred
           <br />
           Digital Lending Aggregator · Financial Services Platform
