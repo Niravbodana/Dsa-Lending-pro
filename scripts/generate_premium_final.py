@@ -450,6 +450,19 @@ def fit_phone_frame_vertical(phone: Image.Image) -> Image.Image:
     return phone.resize((nw, nh), Image.Resampling.LANCZOS)
 
 
+def render_story_frame_vertical(anim_frames: dict[str, list[Path]], key: str, frame_t: float) -> Image.Image:
+    """Full-frame Instagram Story beat — problem / swipe / solution."""
+    frames = anim_frames.get(key, [])
+    if not frames:
+        return bg_canvas_vertical()
+    cycle = len(frames)
+    idx = min(int(frame_t * cycle * 0.92), cycle - 1)
+    img = Image.open(frames[idx]).convert("RGB")
+    if img.size != (W_V, H_V):
+        img = img.resize((W_V, H_V), Image.Resampling.LANCZOS)
+    return img
+
+
 def render_greeting_frame_vertical(anim_frames: dict[str, list[Path]], frame_t: float) -> Image.Image:
     frames = anim_frames.get("greeting", [])
     if not frames:
@@ -481,14 +494,17 @@ def render_frame_vertical(
     anim_frames: dict[str, list[Path]] | None = None,
     scene_idx: int = 0,
     logo_hires: Image.Image | None = None,
+    total_scenes: int | None = None,
 ) -> Image.Image:
     """Mobile-first 9:16 layout — full screen, no letterboxing."""
     if scene.get("layout") == "greeting_full":
         return render_greeting_frame_vertical(anim_frames or {}, frame_t)
     if scene.get("layout") == "endcard_full":
         return render_endcard_frame_vertical(anim_frames or {}, frame_t)
+    if scene.get("layout") == "story_full":
+        return render_story_frame_vertical(anim_frames or {}, scene.get("animation", ""), frame_t)
 
-    anim_frames = anim_frames or {}
+    n_scenes = total_scenes or len(SCENES)
     rgba = bg_canvas_vertical().convert("RGBA")
     d = ImageDraw.Draw(rgba)
 
@@ -579,7 +595,7 @@ def render_frame_vertical(
         cy += line_h
     rgba.paste(bar, (0, bar_y), bar)
 
-    prog_w = int((W_V - 96) * (scene_idx + 1) / len(SCENES))
+    prog_w = int((W_V - 96) * (scene_idx + 1) / n_scenes)
     bd2 = ImageDraw.Draw(rgba)
     bd2.rounded_rectangle([(W_V - prog_w) // 2, bar_y - 12, (W_V + prog_w) // 2, bar_y - 6], radius=3, fill=rgb(C["gold"]))
 
@@ -988,7 +1004,7 @@ async def build_vertical_promo(
     for i, (scene, dur, vo) in enumerate(scene_durations):
         fr = FRAMES / f"premium_v_{i:02d}.png"
         render_frame_vertical(scene, logo, anim_frames=anim_frames, scene_idx=i, logo_hires=logo_hires).save(fr, quality=95)
-        if scene.get("layout") in ("celebration", "endcard_full", "greeting_full"):
+        if scene.get("layout") in ("celebration", "endcard_full", "greeting_full", "story_full"):
             v_clips.append(render_celebration_clip_vertical(scene, logo, vo, dur, i, anim_frames, logo_hires))
         else:
             v_clips.append(render_clip_vertical(fr, vo, dur, i))
@@ -1130,7 +1146,7 @@ async def main(anim_frames: dict[str, list[Path]], anim_frames_v: dict[str, list
         scene_ends.append(acc)
         fr = FRAMES / f"premium_{i:02d}.png"
         render_frame(scene, logo, anim_frames=anim_frames, scene_idx=i, logo_hires=logo_hires).save(fr, quality=95)
-        if scene.get("layout") in ("celebration", "endcard_full", "greeting_full"):
+        if scene.get("layout") in ("celebration", "endcard_full", "greeting_full", "story_full"):
             clips.append(render_celebration_clip(scene, logo, vo, dur, i, anim_frames, logo_hires))
         else:
             clips.append(render_clip(fr, vo, dur, i))
