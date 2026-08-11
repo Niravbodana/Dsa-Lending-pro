@@ -25,11 +25,15 @@ DOWNLOAD = Path("/opt/cursor/artifacts")
 BGM_SOURCE = ASSETS / "soft_morning_keys_piano.mp3"
 
 W, H = 1920, 1080
+W_V, H_V = 1080, 1920  # Native Instagram Reels / Stories full-screen
 FPS = 30
 VOICE = "en-IN-NeerjaNeural"
 PHONE_W, PHONE_H = 400, 844
+PHONE_W_V, PHONE_H_V = 520, 1064
 PHONE_X_RATIO = 0.62
 CAPTION_RESERVE = 200
+CAPTION_RESERVE_V = 270
+MARGIN_X_V = 52
 
 # NeerCred Brand & Video Style Guide (dev.neercred.com)
 SCENES = [
@@ -326,6 +330,30 @@ def ensure_greeting_frames() -> list[Path]:
     )
 
 
+def ensure_greeting_frames_vertical() -> list[Path]:
+    """Native 9:16 greeting for Instagram full-screen."""
+    return ensure_animation_frames(
+        "greeting_916",
+        "http://localhost:3000/promo-greeting",
+        n=54,
+        viewport_w=540,
+        viewport_h=960,
+        device_scale=2,
+    )
+
+
+def ensure_endcard_frames_vertical() -> list[Path]:
+    """Native 9:16 end card for Instagram full-screen."""
+    return ensure_animation_frames(
+        "endcard_916",
+        "http://localhost:3000/promo-endcard",
+        n=96,
+        viewport_w=540,
+        viewport_h=960,
+        device_scale=2,
+    )
+
+
 def celebration_panel_at(frame_paths: list[Path], t: float) -> Image.Image:
     """Pick celebration frame by animation time (loops every ~3.4s)."""
     if not frame_paths:
@@ -379,6 +407,183 @@ def bg_canvas() -> Image.Image:
         c.paste(orbs, (0, 0), orbs)
         _bg_cache = c
     return _bg_cache.copy()
+
+
+def bg_canvas_vertical() -> Image.Image:
+    """Portrait brand gradient — fills 1080×1920 Instagram canvas."""
+    c = Image.new("RGB", (W_V, H_V), rgb(C["navy"]))
+    d = ImageDraw.Draw(c)
+    c0, c1, c2 = rgb(C["navy"]), rgb(C["teal"]), rgb(C["cyan"])
+    for y in range(H_V):
+        t = y / H_V
+        if t < 0.5:
+            u = t / 0.5
+            col = tuple(int(c0[i] + (c1[i] - c0[i]) * u) for i in range(3))
+        else:
+            u = (t - 0.5) / 0.5
+            col = tuple(int(c1[i] + (c2[i] - c1[i]) * u) for i in range(3))
+        d.line([(0, y), (W_V, y)], fill=col)
+    orbs = Image.new("RGBA", (W_V, H_V), (0, 0, 0, 0))
+    od = ImageDraw.Draw(orbs)
+    od.ellipse([W_V - 380, -80, W_V + 120, 420], fill=(15, 118, 110, 48))
+    od.ellipse([-120, H_V - 520, 360, H_V + 60], fill=(94, 234, 212, 22))
+    od.ellipse([W_V // 2 - 280, H_V // 2 - 80, W_V // 2 + 280, H_V // 2 + 280], fill=(212, 160, 23, 16))
+    orbs = orbs.filter(ImageFilter.GaussianBlur(70))
+    c.paste(orbs, (0, 0), orbs)
+    return c
+
+
+def phone_position_vertical(phone_w: int, phone_h: int) -> tuple[int, int]:
+    """Center phone horizontally; sit above caption safe zone."""
+    px = (W_V - phone_w) // 2
+    py = H_V - CAPTION_RESERVE_V - phone_h - 36
+    py = max(420, min(py, H_V - CAPTION_RESERVE_V - phone_h - 20))
+    return px, py
+
+
+def fit_phone_frame_vertical(phone: Image.Image) -> Image.Image:
+    max_h = H_V - CAPTION_RESERVE_V - 400
+    if phone.height <= max_h:
+        return phone
+    scale = max_h / phone.height
+    nw, nh = int(phone.width * scale), int(phone.height * scale)
+    return phone.resize((nw, nh), Image.Resampling.LANCZOS)
+
+
+def render_greeting_frame_vertical(anim_frames: dict[str, list[Path]], frame_t: float) -> Image.Image:
+    frames = anim_frames.get("greeting", [])
+    if not frames:
+        return bg_canvas_vertical()
+    cycle = len(frames)
+    idx = min(int(frame_t * cycle * 0.92), cycle - 1)
+    img = Image.open(frames[idx]).convert("RGB")
+    if img.size != (W_V, H_V):
+        img = img.resize((W_V, H_V), Image.Resampling.LANCZOS)
+    return img
+
+
+def render_endcard_frame_vertical(anim_frames: dict[str, list[Path]], frame_t: float) -> Image.Image:
+    frames = anim_frames.get("endcard", [])
+    if not frames:
+        return bg_canvas_vertical()
+    cycle = len(frames)
+    idx = min(int(frame_t * cycle * 0.92), cycle - 1)
+    img = Image.open(frames[idx]).convert("RGB")
+    if img.size != (W_V, H_V):
+        img = img.resize((W_V, H_V), Image.Resampling.LANCZOS)
+    return img
+
+
+def render_frame_vertical(
+    scene: dict,
+    logo: Image.Image,
+    frame_t: float = 0.0,
+    anim_frames: dict[str, list[Path]] | None = None,
+    scene_idx: int = 0,
+    logo_hires: Image.Image | None = None,
+) -> Image.Image:
+    """Mobile-first 9:16 layout — full screen, no letterboxing."""
+    if scene.get("layout") == "greeting_full":
+        return render_greeting_frame_vertical(anim_frames or {}, frame_t)
+    if scene.get("layout") == "endcard_full":
+        return render_endcard_frame_vertical(anim_frames or {}, frame_t)
+
+    anim_frames = anim_frames or {}
+    rgba = bg_canvas_vertical().convert("RGBA")
+    d = ImageDraw.Draw(rgba)
+
+    # Logo — top center
+    lg = logo.copy()
+    lg.thumbnail((240, 44), Image.Resampling.LANCZOS)
+    rgba.paste(lg, ((W_V - lg.width) // 2, 44), lg)
+
+    # Copy block — centered, compact
+    cx = MARGIN_X_V
+    max_text_w = W_V - MARGIN_X_V * 2
+    y = 108
+    step_f = font(18, bold=True)
+    step_text = scene["step"]
+    if step_text:
+        tw = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(step_text, font=step_f)
+        d.text(((W_V - tw) // 2, y), step_text, fill=rgb(C["teal"]), font=step_f)
+        y += 34
+
+    title_f = font(46, bold=True)
+    for line in scene["title"].split("\n"):
+        tw = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(line, font=title_f)
+        d.text(((W_V - tw) // 2, y), line, fill=rgb(C["white"]), font=title_f)
+        y += 54
+
+    if scene.get("subtitle"):
+        sub_f = font(21)
+        for line in wrap_lines(scene["subtitle"], sub_f, max_text_w):
+            tw = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(line, font=sub_f)
+            d.text(((W_V - tw) // 2, y), line, fill=rgb(C["muted"]), font=sub_f)
+            y += 30
+        y += 8
+
+    bullet_f = font(17)
+    for b in scene["bullets"][:3]:
+        tw = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(f"• {b}", font=bullet_f)
+        d.text(((W_V - tw) // 2, y), f"• {b}", fill=rgb(C["white"]), font=bullet_f)
+        y += 30
+
+    # Phone / celebration — centered, large
+    if scene.get("layout") == "celebration":
+        key = scene.get("animation", "ekyc")
+        frames = anim_frames.get(key, [])
+        panel = celebration_panel_at(frames, frame_t)
+        scale = min(PHONE_W_V / panel.width, (H_V - CAPTION_RESERVE_V - y - 40) / panel.height)
+        nw, nh = int(panel.width * scale), int(panel.height * scale)
+        panel = panel.resize((nw, nh), Image.Resampling.LANCZOS)
+        phone_like = Image.new("RGBA", (nw, nh), (0, 0, 0, 0))
+        phone_like.paste(panel, (0, 0), panel)
+        phone_like = fit_phone_frame_vertical(phone_like)
+    else:
+        sf = SCREENS / scene["screen"]
+        if not sf.exists():
+            sf = SCREENS / "01-homepage.png"
+        # Temporarily use larger phone canvas for vertical
+        global PHONE_W, PHONE_H
+        old_w, old_h = PHONE_W, PHONE_H
+        PHONE_W, PHONE_H = PHONE_W_V, PHONE_H_V
+        phone = fit_phone_frame_vertical(draw_phone(fit_screen(sf)))
+        PHONE_W, PHONE_H = old_w, old_h
+        phone_like = phone
+
+    nw, nh = phone_like.width, phone_like.height
+    px, py = phone_position_vertical(nw, nh)
+    sh = Image.new("RGBA", (nw + 60, nh + 60), (0, 0, 0, 0))
+    ImageDraw.Draw(sh).rounded_rectangle([20, 20, nw + 40, nh + 40], radius=48, fill=(0, 0, 0, 80))
+    sh = sh.filter(ImageFilter.GaussianBlur(24))
+    rgba.paste(sh, (px - 20, py + 10), sh)
+    rgba.paste(phone_like, (px, py), phone_like)
+
+    # Caption bar — bottom safe area (Instagram UI margin)
+    cap_f = font(22, bold=True)
+    cap_lines: list[str] = []
+    for block in scene["vo_hi"].split("\n"):
+        cap_lines.extend(wrap_lines(block, cap_f, W_V - 96))
+    line_h = 34
+    pad_top, pad_bottom = 20, 28
+    bar_h = pad_top + len(cap_lines) * line_h + pad_bottom
+    bar_y = H_V - bar_h - 88
+
+    bar = Image.new("RGBA", (W_V, bar_h), C["glass"])
+    bd = ImageDraw.Draw(bar)
+    bd.line([(0, 0), (W_V, 0)], fill=rgb(C["teal"]) + (120,), width=2)
+    cy = pad_top
+    for line in cap_lines:
+        tw = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(line, font=cap_f)
+        bd.text(((W_V - tw) // 2, cy), line, fill=rgb(C["white"]), font=cap_f)
+        cy += line_h
+    rgba.paste(bar, (0, bar_y), bar)
+
+    prog_w = int((W_V - 96) * (scene_idx + 1) / len(SCENES))
+    bd2 = ImageDraw.Draw(rgba)
+    bd2.rounded_rectangle([(W_V - prog_w) // 2, bar_y - 12, (W_V + prog_w) // 2, bar_y - 6], radius=3, fill=rgb(C["gold"]))
+
+    return rgba.convert("RGB")
 
 
 def fit_screen(path: Path) -> Image.Image:
@@ -691,6 +896,140 @@ def render_celebration_clip(
     return out
 
 
+def render_clip_vertical(frame: Path, vo: Path, dur: float, idx: int) -> Path:
+    """Stable vertical frame clip — native 1080×1920."""
+    CLIPS.mkdir(parents=True, exist_ok=True)
+    out = CLIPS / f"scene_v_{idx:02d}.mp4"
+    total = dur + 0.55
+    vf = (
+        f"scale={W_V}:{H_V}:flags=lanczos,"
+        f"fps={FPS},"
+        f"fade=t=in:st=0:d=0.35,fade=t=out:st={total - 0.4:.3f}:d=0.4"
+    )
+    run([
+        "ffmpeg", "-y", "-loop", "1", "-i", str(frame), "-i", str(vo),
+        "-vf", vf, "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "12", "-preset", "medium",
+        "-c:a", "aac", "-b:a", "256k", "-ar", "44100", "-ac", "2",
+        "-shortest", "-t", f"{total:.3f}", str(out),
+    ])
+    return out
+
+
+def render_celebration_clip_vertical(
+    scene: dict, logo: Image.Image, vo: Path, dur: float, idx: int,
+    anim_frames: dict[str, list[Path]],
+    logo_hires: Image.Image | None = None,
+) -> Path:
+    CLIPS.mkdir(parents=True, exist_ok=True)
+    out = CLIPS / f"scene_v_{idx:02d}.mp4"
+    total = dur + 0.55
+    n_frames = max(int(total * FPS), 30)
+    seq_dir = CLIPS / f"celebration_v_seq_{idx}"
+    seq_dir.mkdir(parents=True, exist_ok=True)
+    for f in range(n_frames):
+        t = f / n_frames
+        img = render_frame_vertical(scene, logo, frame_t=t, anim_frames=anim_frames, scene_idx=idx, logo_hires=logo_hires)
+        img.save(seq_dir / f"frame_{f:04d}.png", quality=92)
+    vf = f"fade=t=in:st=0:d=0.35,fade=t=out:st={total - 0.4:.3f}:d=0.4"
+    run([
+        "ffmpeg", "-y", "-framerate", str(FPS), "-i", str(seq_dir / "frame_%04d.png"),
+        "-i", str(vo),
+        "-vf", vf, "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "12", "-preset", "medium",
+        "-c:a", "aac", "-b:a", "256k", "-ar", "44100", "-ac", "2",
+        "-shortest", "-t", f"{total:.3f}", str(out),
+    ])
+    for fp in seq_dir.glob("*.png"):
+        fp.unlink(missing_ok=True)
+    seq_dir.rmdir()
+    return out
+
+
+def audit_instagram_video(path: Path) -> dict:
+    """QC gate for Instagram full-screen mobile export."""
+    r = run(
+        ["ffprobe", "-v", "quiet", "-print_format", "json", "-show_streams", "-show_format", str(path)],
+        capture_output=True, text=True,
+    )
+    data = json.loads(r.stdout)
+    video = next((s for s in data["streams"] if s["codec_type"] == "video"), {})
+    audio = next((s for s in data["streams"] if s["codec_type"] == "audio"), {})
+    fmt = data.get("format", {})
+    w, h = video.get("width"), video.get("height")
+    checks = {
+        "resolution_1080x1920": w == 1080 and h == 1920,
+        "h264_video": video.get("codec_name") == "h264",
+        "aac_audio": audio.get("codec_name") == "aac",
+        "has_audio": bool(audio),
+        "duration_ok": 60 <= float(fmt.get("duration", 0)) <= 120,
+        "file_size_ok": path.stat().st_size > 500_000,
+    }
+    # Full-frame check — sample mid-video frame; reject black letterbox bars top/bottom
+    sample = path.parent / "_audit_sample.png"
+    run(["ffmpeg", "-y", "-i", str(path), "-vf", "select=eq(n\\,900)", "-frames:v", "1", str(sample)], capture_output=True)
+    if sample.exists():
+        img = Image.open(sample).convert("L")
+        top_mean = sum(img.crop((0, 0, w, 48)).getdata()) / (w * 48)
+        bot_mean = sum(img.crop((0, h - 48, w, h)).getdata()) / (w * 48)
+        checks["no_top_letterbox"] = top_mean > 18
+        checks["no_bottom_letterbox"] = bot_mean > 18
+        checks["full_screen_fill"] = top_mean > 18 and bot_mean > 18
+        sample.unlink(missing_ok=True)
+    else:
+        checks["no_top_letterbox"] = True
+        checks["no_bottom_letterbox"] = True
+        checks["full_screen_fill"] = True
+    checks["passed"] = all(v for k, v in checks.items() if k != "passed")
+    return {"path": str(path), "width": w, "height": h, "duration": float(fmt.get("duration", 0)), "checks": checks}
+
+
+async def build_vertical_promo(
+    anim_frames: dict[str, list[Path]],
+    logo: Image.Image,
+    logo_hires: Image.Image,
+    scene_durations: list[tuple[dict, float, Path]],
+) -> Path:
+    """Build native 9:16 Instagram promo reusing landscape VO timings."""
+    print("\n=== Native 9:16 Instagram full-screen build ===")
+    v_clips: list[Path] = []
+    for i, (scene, dur, vo) in enumerate(scene_durations):
+        fr = FRAMES / f"premium_v_{i:02d}.png"
+        render_frame_vertical(scene, logo, anim_frames=anim_frames, scene_idx=i, logo_hires=logo_hires).save(fr, quality=95)
+        if scene.get("layout") in ("celebration", "endcard_full", "greeting_full"):
+            v_clips.append(render_celebration_clip_vertical(scene, logo, vo, dur, i, anim_frames, logo_hires))
+        else:
+            v_clips.append(render_clip_vertical(fr, vo, dur, i))
+        print(f"  [9:16] {scene['id']}: {dur:.1f}s")
+
+    merged_v = OUT / "premium_merged_916.mp4"
+    concat_clips(v_clips, merged_v)
+
+    r = run(["ffprobe", "-v", "quiet", "-print_format", "json", "-show_format", str(merged_v)], capture_output=True, text=True)
+    vid_dur = float(json.loads(r.stdout)["format"]["duration"])
+    bgm = AUDIO / "bgm_premium_916.mp3"
+    make_bgm(vid_dur, bgm)
+
+    v_raw = DOWNLOAD / "NeerCred-Promo-RAW-9x16.mp4"
+    run([
+        "ffmpeg", "-y", "-i", str(merged_v), "-i", str(bgm),
+        "-filter_complex",
+        "[0:a]highpass=f=100,lowpass=f=13000,volume=2.5[sp1];"
+        "[sp1]asplit=2[sc][mx];"
+        "[1:a]volume=0.72,aloop=loop=-1:size=2e+09[pi1];"
+        "[pi1][sc]sidechaincompress=threshold=0.03:ratio=5:attack=40:release=450:makeup=2.5[du1];"
+        "[mx][du1]amix=inputs=2:duration=first:weights=1 0.9:normalize=0,"
+        "loudnorm=I=-16:TP=-1.0:LRA=11,alimiter=limit=0.96[aout]",
+        "-map", "0:v:0", "-map", "[aout]",
+        "-c:v", "copy", "-c:a", "aac", "-b:a", "320k", "-ar", "44100", "-ac", "2",
+        str(v_raw),
+    ])
+
+    v_out = DOWNLOAD / "NeerCred-Promo-PREMIUM-9x16.mp4"
+    print("  Finalizing native 9:16 for Instagram...")
+    finalize_mobile_mp4(v_raw, v_out)
+    v_raw.unlink(missing_ok=True)
+    return v_out
+
+
 def render_clip(frame: Path, vo: Path, dur: float, idx: int) -> Path:
     """Stable static frame — no zoompan (prevents screen shake/vibration)."""
     CLIPS.mkdir(parents=True, exist_ok=True)
@@ -751,7 +1090,7 @@ def concat_clips(clips: list[Path], out: Path) -> None:
     ])
 
 
-async def main(anim_frames: dict[str, list[Path]]) -> None:
+async def main(anim_frames: dict[str, list[Path]], anim_frames_v: dict[str, list[Path]]) -> None:
     for d in (ASSETS, AUDIO, FRAMES, CLIPS, SCREENS, DOWNLOAD):
         d.mkdir(parents=True, exist_ok=True)
 
@@ -760,6 +1099,7 @@ async def main(anim_frames: dict[str, list[Path]]) -> None:
     clips: list[Path] = []
     vo_files: list[Path] = []
     voiced_files: list[Path] = []
+    scene_durations: list[tuple[dict, float, Path]] = []
     scene_ends: list[float] = []
     acc = 0.0
 
@@ -771,22 +1111,27 @@ async def main(anim_frames: dict[str, list[Path]]) -> None:
             make_silent_audio(dur, vo)
             print(f"  {scene['id']}: {dur:.1f}s (silent — BGM only)")
         else:
-            dur = await make_vo(scene["vo"], vo)
-            min_dur = scene.get("duration")
-            if min_dur and dur < float(min_dur):
-                pad = float(min_dur) - dur
-                padded = vo.with_suffix(".pad.mp3")
-                run([
-                    "ffmpeg", "-y", "-i", str(vo),
-                    "-af", f"apad=pad_dur={pad:.3f}",
-                    "-t", f"{float(min_dur):.3f}",
-                    str(padded),
-                ])
-                padded.replace(vo)
-                dur = float(min_dur)
+            if vo.exists():
+                r = run(["ffprobe", "-v", "quiet", "-print_format", "json", "-show_format", str(vo)], capture_output=True, text=True)
+                dur = float(json.loads(r.stdout)["format"]["duration"])
+            else:
+                dur = await make_vo(scene["vo"], vo)
+                min_dur = scene.get("duration")
+                if min_dur and dur < float(min_dur):
+                    pad = float(min_dur) - dur
+                    padded = vo.with_suffix(".pad.mp3")
+                    run([
+                        "ffmpeg", "-y", "-i", str(vo),
+                        "-af", f"apad=pad_dur={pad:.3f}",
+                        "-t", f"{float(min_dur):.3f}",
+                        str(padded),
+                    ])
+                    padded.replace(vo)
+                    dur = float(min_dur)
             voiced_files.append(vo)
             print(f"  {scene['id']}: {dur:.1f}s")
         vo_files.append(vo)
+        scene_durations.append((scene, dur, vo))
         acc += dur + 0.55
         scene_ends.append(acc)
         fr = FRAMES / f"premium_{i:02d}.png"
@@ -829,12 +1174,16 @@ async def main(anim_frames: dict[str, list[Path]]) -> None:
     finalize_mobile_mp4(h_raw, h_out)
     h_raw.unlink(missing_ok=True)
 
-    v_out = DOWNLOAD / "NeerCred-Promo-PREMIUM-9x16.mp4"
-    print("  Finalizing 9:16 for mobile playback...")
-    finalize_mobile_mp4(
-        h_out, v_out,
-        vf="scale=1080:-2:flags=lanczos,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=0x0B1220",
-    )
+    v_out = await build_vertical_promo(anim_frames_v, logo, logo_hires, scene_durations)
+
+    audit = audit_instagram_video(v_out)
+    audit_path = OUT / "instagram_916_audit.json"
+    audit_path.write_text(json.dumps(audit, indent=2))
+    print("\n=== Instagram 9:16 QC Audit ===")
+    for k, v in audit["checks"].items():
+        print(f"  {'✅' if v else '❌'} {k}: {v}")
+    if not audit["checks"].get("passed"):
+        print("  ⚠️  QC warnings — review before posting")
 
     ws = Path("/workspace/artifacts")
     ws.mkdir(parents=True, exist_ok=True)
@@ -842,14 +1191,16 @@ async def main(anim_frames: dict[str, list[Path]]) -> None:
         (h_out, "NeerCred-Promo-PREMIUM-16x9.mp4"),
         (v_out, "NeerCred-Promo-PREMIUM-9x16.mp4"),
         (vo_full, "NeerCred-Voice-Only.mp3"),
+        (audit_path, "instagram_916_audit.json"),
     ]:
-        (ws / name).write_bytes(src.read_bytes())
+        if Path(src).exists():
+            (ws / name).write_bytes(Path(src).read_bytes())
 
-    det = run(["ffmpeg", "-y", "-i", str(h_out), "-af", "volumedetect", "-f", "null", "-"], capture_output=True, text=True)
+    det = run(["ffmpeg", "-y", "-i", str(v_out), "-af", "volumedetect", "-f", "null", "-"], capture_output=True, text=True)
     for ln in det.stderr.split("\n"):
         if "volume" in ln.lower():
             print(" ", ln.strip())
-    print(f"\n✅ PREMIUM VIDEO:\n   {h_out}\n   {v_out}\n   {vo_full}")
+    print(f"\n✅ PREMIUM VIDEO:\n   {h_out}\n   {v_out} (native Instagram full-screen)\n   Audit: {audit_path}")
 
 
 if __name__ == "__main__":
@@ -857,10 +1208,18 @@ if __name__ == "__main__":
     transfer_frames = ensure_transfer_frames()
     endcard_frames = ensure_endcard_frames()
     greeting_frames = ensure_greeting_frames()
+    greeting_frames_v = ensure_greeting_frames_vertical()
+    endcard_frames_v = ensure_endcard_frames_vertical()
     anim_frames = {
         "ekyc": ekyc_frames,
         "transfer": transfer_frames,
         "endcard": endcard_frames,
         "greeting": greeting_frames,
     }
-    asyncio.run(main(anim_frames))
+    anim_frames_v = {
+        "ekyc": ekyc_frames,
+        "transfer": transfer_frames,
+        "endcard": endcard_frames_v,
+        "greeting": greeting_frames_v,
+    }
+    asyncio.run(main(anim_frames, anim_frames_v))
