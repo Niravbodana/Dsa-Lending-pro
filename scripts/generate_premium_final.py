@@ -27,7 +27,9 @@ BGM_SOURCE = ASSETS / "soft_morning_keys_piano.mp3"
 W, H = 1920, 1080
 W_V, H_V = 1080, 1920  # Native Instagram Reels / Stories full-screen
 FPS = 30
-VOICE = "en-IN-NeerjaNeural"
+VOICE = "en-US-AvaNeural"  # Warm, caring, premium female — expressive & pleasant
+VO_RATE = "-4%"
+VO_PITCH = "+5Hz"
 PHONE_W, PHONE_H = 400, 844
 PHONE_W_V, PHONE_H_V = 520, 1064
 PHONE_X_RATIO = 0.62
@@ -824,7 +826,7 @@ def make_silent_audio(dur: float, path: Path) -> float:
 async def make_vo(text: str, path: Path) -> float:
     """Warm TTS with correct NeerCred brand pronunciation."""
     spoken = brand_voice_text(text)
-    await edge_tts.Communicate(spoken, VOICE, rate="-5%", pitch="+0Hz").save(str(path))
+    await edge_tts.Communicate(spoken, VOICE, rate=VO_RATE, pitch=VO_PITCH).save(str(path))
     tmp = path.with_suffix(".boost.mp3")
     run([
         "ffmpeg", "-y", "-i", str(path),
