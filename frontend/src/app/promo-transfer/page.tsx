@@ -28,7 +28,7 @@ export default function PromoTransferPage() {
         </div>
 
         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#5EEAD4]">
-          {done ? "Transfer complete" : "Live transfer"}
+          {done ? "Transfer complete" : "Quick transfer"}
         </p>
         <h1 className="mt-3 text-2xl font-extrabold leading-tight text-white">
           {done ? "Money sent to your bank! 🎉" : "Transferring to your bank account"}
@@ -56,7 +56,7 @@ export default function PromoTransferPage() {
             <span className="pulse-dot h-2 w-2 rounded-full bg-[#5EEAD4]" />
             <span className="pulse-dot h-2 w-2 rounded-full bg-[#5EEAD4]" style={{ animationDelay: "0.2s" }} />
             <span className="pulse-dot h-2 w-2 rounded-full bg-[#5EEAD4]" style={{ animationDelay: "0.4s" }} />
-            <span className="ml-2">Real-time transfer in progress…</span>
+            <span className="ml-2">Fast same-day transfer in progress…</span>
           </div>
         ) : (
           <div className="mt-6 flex justify-center gap-2 text-2xl">

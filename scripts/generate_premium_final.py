@@ -105,10 +105,10 @@ SCENES = [
     {
         "id": "transfer", "layout": "celebration", "animation": "transfer", "step": "DISBURSE",
         "title": "Funds to\nYour Bank",
-        "subtitle": "Real-time transfer in progress",
-        "bullets": ["Direct to your bank account", "Secure lender disbursal", "Track every step"],
-        "vo": "And just like that — funds are transferring straight to your bank account. Real-time, secure, and seamless.",
-        "vo_hi": "Transferring to your bank.\nReal-time.\nSecure disbursal.",
+        "subtitle": "Quick same-day transfer in progress",
+        "bullets": ["Direct to your bank account", "Fast lender disbursal", "Track every step"],
+        "vo": "And just like that — funds are transferring straight to your bank account. Quick, secure, and often same-day.",
+        "vo_hi": "Transferring to your bank.\nQuick and secure.\nSame-day disbursal.",
     },
     {
         "id": "endcard", "layout": "endcard_full", "animation": "endcard", "step": "NEERCRED",
