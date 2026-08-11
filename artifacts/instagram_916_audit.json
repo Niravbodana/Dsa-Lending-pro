@@ -2,7 +2,7 @@
   "path": "/opt/cursor/artifacts/NeerCred-Promo-PREMIUM-9x16.mp4",
   "width": 1080,
   "height": 1920,
-  "duration": 88.4,
+  "duration": 88.5,
   "checks": {
     "resolution_1080x1920": true,
     "h264_video": true,
