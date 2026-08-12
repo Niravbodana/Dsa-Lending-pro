@@ -60,26 +60,38 @@ def font(sz: int, bold: bool = False) -> ImageFont.FreeTypeFont:
     return ImageFont.truetype(str(bold_p if bold else reg_p), sz)
 
 
-def render_svg_logo(svg_name: str, cache_key: str, viewport_w: int, viewport_h: int, bg: str = "transparent") -> Image.Image:
-    """Render official NeerCred SVG via Playwright — same path as promo video."""
+def render_svg_logo(svg_name: str, cache_key: str, target_h: int, bg: str = "transparent", scale: int = 3) -> Image.Image:
+    """Render official NeerCred SVG at native target height with high DPI (no upscale blur)."""
+    from playwright.sync_api import sync_playwright
+
     ASSETS.mkdir(parents=True, exist_ok=True)
     svg = ROOT / f"frontend/public/{svg_name}"
-    out = ASSETS / f"{cache_key}.png"
+    out = ASSETS / f"{cache_key}_h{target_h}_s{scale}.png"
     if not out.exists() or out.stat().st_mtime < svg.stat().st_mtime:
+        # SVG viewBox aspect ~ 320:108 (dark) / 248:84 (light) ≈ 2.96:1
+        aspect = 320 / 108 if "dark" in svg_name else 248 / 84
+        vp_h = target_h
+        vp_w = max(int(target_h * aspect) + 40, 280)
         bg_css = "transparent" if bg == "transparent" else bg
         html = ASSETS / f"{cache_key}_render.html"
         html.write_text(
             f'<!DOCTYPE html><html><head>'
             f'<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">'
-            f'<style>html,body{{margin:0;padding:0;background:{bg_css};width:{viewport_w}px;height:{viewport_h}px;'
-            f'display:flex;align-items:center;justify-content:center;overflow:hidden}}</style>'
+            f'<style>html,body{{margin:0;padding:0;background:{bg_css};width:{vp_w}px;height:{vp_h}px;'
+            f'display:flex;align-items:center;justify-content:flex-start;overflow:hidden}}'
+            f'svg{{width:100%;height:100%;display:block}}</style>'
             f'</head><body>{svg.read_text(encoding="utf-8", errors="replace")}</body></html>'
         )
-        run(
-            ["npx", "playwright", "screenshot", "--browser", "chromium",
-             f"file://{html.resolve()}", str(out), f"--viewport-size={viewport_w},{viewport_h}"],
-            cwd=ROOT / "frontend",
-        )
+        with sync_playwright() as p:
+            browser = p.chromium.launch()
+            page = browser.new_page(
+                viewport={"width": vp_w, "height": vp_h},
+                device_scale_factor=scale,
+            )
+            page.goto(f"file://{html.resolve()}")
+            page.wait_for_timeout(400)
+            page.screenshot(path=str(out), omit_background=(bg == "transparent"))
+            browser.close()
     img = Image.open(out).convert("RGBA")
     if bg != "transparent":
         bg_rgb = rgb(bg)
@@ -94,18 +106,22 @@ def render_svg_logo(svg_name: str, cache_key: str, viewport_w: int, viewport_h: 
     return img
 
 
-def load_logo_dark(h: int = 280) -> Image.Image:
-    """Official promo-video lockup — neercred-logo-header-dark.svg + tagline."""
-    raw = render_svg_logo("neercred-logo-header-dark.svg", "logo_header_dark_8k", 1280, 432, C["navy"])
-    ratio = h / raw.height
-    return raw.resize((int(raw.width * ratio), h), Image.Resampling.LANCZOS)
+def load_logo_dark(h: int = 480) -> Image.Image:
+    """Official dark-bg lockup — crisp at target height for 8K canvas."""
+    raw = render_svg_logo("neercred-logo-header-dark.svg", "logo_header_dark_8k", h, "transparent", scale=3)
+    if raw.height != h:
+        ratio = h / raw.height
+        raw = raw.resize((int(raw.width * ratio), h), Image.Resampling.LANCZOS)
+    return raw
 
 
-def load_logo_light(h: int = 280) -> Image.Image:
-    """Official light-background lockup."""
-    raw = render_svg_logo("neercred-logo-header.svg", "logo_header_light_8k", 1280, 432, "#F0FDF9")
-    ratio = h / raw.height
-    return raw.resize((int(raw.width * ratio), h), Image.Resampling.LANCZOS)
+def load_logo_light(h: int = 480) -> Image.Image:
+    """Official light-bg lockup — crisp at target height for 8K canvas."""
+    raw = render_svg_logo("neercred-logo-header.svg", "logo_header_light_8k", h, "transparent", scale=3)
+    if raw.height != h:
+        ratio = h / raw.height
+        raw = raw.resize((int(raw.width * ratio), h), Image.Resampling.LANCZOS)
+    return raw
 
 
 def load_hdfc_logo(h: int = 120) -> Image.Image:
@@ -209,7 +225,41 @@ def paste_logo(canvas: Image.Image, logo: Image.Image, x: int, y: int, center: b
     canvas.paste(rgba.convert("RGB"))
 
 
-def draw_text_centered(d: ImageDraw.ImageDraw, y: int, text: str, fnt: ImageFont.FreeTypeFont, fill: tuple, max_w: int = W - 320) -> int:
+def paste_logo_branded(
+    canvas: Image.Image,
+    logo: Image.Image,
+    x: int = 100,
+    y: int = 90,
+    *,
+    glass: bool = True,
+    dark_glass: bool = False,
+) -> None:
+    """Top-left logo placement with optional frosted pill for readability."""
+    rgba = canvas.convert("RGBA")
+    pad_x, pad_y = 28, 18
+    if glass:
+        pill = Image.new("RGBA", (logo.width + pad_x * 2, logo.height + pad_y * 2), (0, 0, 0, 0))
+        pd = ImageDraw.Draw(pill)
+        fill = (11, 18, 32, 120) if dark_glass else (248, 250, 252, 95)
+        pd.rounded_rectangle([0, 0, pill.width - 1, pill.height - 1], radius=24, fill=fill)
+        rgba.paste(pill, (x - pad_x, y - pad_y), pill)
+    rgba.paste(logo, (x, y), logo)
+    canvas.paste(rgba.convert("RGB"))
+
+
+def draw_text_centered(
+    d: ImageDraw.ImageDraw,
+    y: int,
+    text: str,
+    fnt: ImageFont.FreeTypeFont,
+    fill: tuple,
+    max_w: int = W - 320,
+    *,
+    shadow: bool = False,
+    shadow_rgba: tuple[int, int, int, int] = (11, 18, 32, 140),
+    align: str = "center",
+    x_anchor: int | None = None,
+) -> int:
     lines: list[str] = []
     for block in text.split("\n"):
         words, cur = block.split(), ""
@@ -227,7 +277,14 @@ def draw_text_centered(d: ImageDraw.ImageDraw, y: int, text: str, fnt: ImageFont
     lh = int(fnt.size * 1.25)
     for line in lines:
         tw = d.textlength(line, font=fnt)
-        d.text(((W - tw) // 2, y), line, fill=fill, font=fnt)
+        if align == "left" and x_anchor is not None:
+            tx = x_anchor
+        else:
+            tx = (W - tw) // 2
+        if shadow:
+            for ox, oy in ((0, 4), (2, 6), (0, 8)):
+                d.text((tx + ox, y + oy), line, fill=shadow_rgba[:3], font=fnt)
+        d.text((tx, y), line, fill=fill, font=fnt)
         y += lh
     return y
 
