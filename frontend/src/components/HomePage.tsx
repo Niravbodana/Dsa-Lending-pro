@@ -37,6 +37,7 @@ import { FALLBACK_CONFIG, fetchSiteConfig, type SiteConfig } from "@/lib/cms";
 import { SiteConfigProvider } from "@/lib/visual-editor/SiteConfigContext";
 import { themeStyleVars } from "@/lib/site-theme";
 import { ProfessionalBackground } from "@/components/ProfessionalBackground";
+import { FounderStrip } from "@/components/FounderProfile";
 
 type Props = {
   previewConfig?: SiteConfig;
@@ -114,6 +115,7 @@ export function HomePage({ previewConfig, isPreview = false, visualEdit = false 
       <LiveSocialProof config={config} />
       <DynamicHero config={config} />
       <HeroTrustBand config={config} />
+      <FounderStrip />
       {config.sections.metrics_ticker !== false && <MetricsTicker config={config} />}
       {config.sections.dream_section !== false && <DreamSection config={config} />}
       <BusinessModelFlow config={config} />
