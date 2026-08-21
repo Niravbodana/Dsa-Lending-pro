@@ -28,9 +28,9 @@ W, H = 1920, 1080
 V_SCALE = 2  # 4K vertical export: 2160×3840
 W_V, H_V = 1080 * V_SCALE, 1920 * V_SCALE
 FPS = 30
-VOICE = "hi-IN-SwaraNeural"  # Premium Hindi female — warm, clear, natural
-VO_RATE = "+5%"
-VO_PITCH = "+4Hz"
+VOICE = "en-US-AvaNeural"  # Warm premium English female — same as pre-Hindi promo
+VO_RATE = "-4%"
+VO_PITCH = "+5Hz"
 PHONE_W, PHONE_H = 400, 844
 PHONE_W_V, PHONE_H_V = 520 * V_SCALE, 1064 * V_SCALE
 PHONE_X_RATIO = 0.62
@@ -51,88 +51,88 @@ SCENES = [
     {
         "id": "greeting", "layout": "greeting_full", "animation": "greeting", "step": "",
         "title": "", "subtitle": "", "bullets": [],
-        "vo": "Neer Cred mein aapka swagat hai.",
+        "vo": "Welcome to NeerCred.",
         "vo_hi": "",
     },
     {
         "id": "intro", "screen": "01-homepage.png", "step": "WELCOME",
         "title": "NeerCred", "subtitle": "Dream Big · Borrow Smart",
         "bullets": ["Digital Lending Aggregator", "Purity & Trust", "100% digital journey"],
-        "vo": "Aapka digital lending aggregator. Sapne bade dekho, smart borrow karo — trusted partners se eligible loan offers paein.",
-        "vo_hi": "सपने बड़े देखो · स्मार्ट लोन\nपार्टनर्स से बेस्ट ऑफ़र",
+        "vo": "Your digital lending aggregator. Dream big, borrow smart, and discover eligible loan offers from trusted partners.",
+        "vo_hi": "Dream Big · Borrow Smart.\nEligible offers from partners.",
     },
     {
         "id": "home", "screen": "01-homepage.png", "step": "EXPLORE",
         "title": "One Platform.\nEvery Goal.",
-        "subtitle": "Eligible offers up to ₹20 Lakhs · indicative",
+        "subtitle": "Eligible offers up to ₹15 Lakhs · indicative",
         "bullets": ["Compare HDFC, ICICI, Bajaj & more", "Fully online — no branch visits", "Rates from 10.99% p.a.*"],
-        "vo": "Shaadi ho, ghar upgrade, ya dream trip — ek platform par har eligible option seedha aapke paas.",
-        "vo_hi": "एक प्लेटफॉर्म, हर लक्ष्य\nपूरी तरह डिजिटल ऑफ़र",
+        "vo": "Whether it's a wedding, a home upgrade, or that dream trip — one platform brings every eligible option to you.",
+        "vo_hi": "One platform, every goal.\nEligible offers — fully digital.",
     },
     {
         "id": "apply", "screen": "02-apply-email.png", "step": "APPLY",
         "title": "Email\nVerification",
         "subtitle": "Secure OTP in your inbox",
         "bullets": ["Quick email verification", "Encrypted and private", "No spam, ever"],
-        "vo": "Apna email daaliye — secure OTP seedha aapke inbox mein. Quick, aasan aur bilkul safe.",
-        "vo_hi": "ईमेल डालें\nOTP इनबॉक्स में\nतेज़ और सुरक्षित",
+        "vo": "Enter your email and we'll send a secure OTP straight to your inbox. Quick, easy, and completely safe.",
+        "vo_hi": "Enter your email.\nOTP to your inbox.\nQuick and secure.",
     },
     {
         "id": "otp", "screen": "03-otp-email.png", "step": "VERIFY",
         "title": "OTP\nConfirmed",
         "subtitle": "Instant email verification",
         "bullets": ["6-digit secure OTP", "Session protected", "Continue in one tap"],
-        "vo": "Email check kijiye, OTP daaliye — ek minute se kam mein aap andar hain.",
-        "vo_hi": "OTP डालें\nएक मिनट से कम",
+        "vo": "Check your email, enter the OTP, and you're in. Takes less than a minute.",
+        "vo_hi": "Enter OTP from email.\nLess than a minute.",
     },
     {
         "id": "profile", "screen": "04-profile.png", "step": "PROFILE",
         "title": "PAN\nVerification",
         "subtitle": "Enter PAN to verify identity",
         "bullets": ["Secure identity check", "Minimal documentation", "Guided step by step"],
-        "vo": "PAN number daal kar profile complete kijiye — ek simple form, step by step guide ke saath.",
-        "vo_hi": "PAN डालें\nप्रोफाइल पूरी करें",
+        "vo": "Enter your PAN number and complete your profile — one simple form with guided steps.",
+        "vo_hi": "Enter PAN.\nComplete profile.\nOne simple form.",
     },
     {
         "id": "offers", "screen": "09-offers.png", "step": "COMPARE",
         "title": "Best Offers.\nOne Screen.",
         "subtitle": "Compare eligible rates · indicative EMI",
         "bullets": ["50+ partner offers", "Transparent fees", "Select in one tap"],
-        "vo": "Ab multiple lenders ke offers ek saath compare kijiye. Apne liye best rate aur EMI chuniye.",
-        "vo_hi": "ऑफ़र compare करें\nएक स्क्रीन पर बेस्ट रेट",
+        "vo": "Now compare eligible offers from multiple lenders side by side. Pick the rate and EMI that works best for you.",
+        "vo_hi": "Compare eligible offers.\nBest rates on one screen.",
     },
     {
         "id": "approved", "screen": "12-approved.png", "step": "APPROVED",
         "title": "You May\nQualify! 🎉",
         "subtitle": "Up to ₹15,00,000 · indicative offer",
         "bullets": ["Select your loan amount", "Disbursal via lender", "Funds to your bank"],
-        "vo": "Khushkhabri! Aap pandrah lakh tak qualify kar sakte hain. Apni loan amount select kijiye aur aage badhiye.",
-        "vo_hi": "आप qualify कर सकते हैं!\nपंद्रह लाख तक\nअपनी रकम चुनें",
+        "vo": "Great news! You may qualify for up to fifteen lakhs. Select your loan amount and move closer to disbursal on NeerCred.",
+        "vo_hi": "You may qualify!\nUp to fifteen lakhs.\nSelect your amount.",
     },
     {
         "id": "kyc", "layout": "celebration", "animation": "ekyc", "step": "KYC",
         "title": "Aadhaar\neKYC",
         "subtitle": "Verified on lender platform",
         "bullets": ["Lender-side secure verification", "Fast digital process", "Not on NeerCred app"],
-        "vo": "Aapka Aadhaar eKYC lender ke secure platform par complete ho gaya. Verified aur ready!",
-        "vo_hi": "Aadhaar eKYC verified!\nलेंडर प्लेटफॉर्म पर",
+        "vo": "Your Aadhaar eKYC is completed on your lender's secure platform. Verified and ready to go!",
+        "vo_hi": "Aadhaar eKYC verified!\nLender platform.\nDone in seconds.",
     },
     {
         "id": "transfer", "layout": "celebration", "animation": "transfer", "step": "DISBURSE",
         "title": "Funds to\nYour Bank",
         "subtitle": "Quick same-day transfer in progress",
         "bullets": ["Direct to your bank account", "Fast lender disbursal", "Track every step"],
-        "vo": "Bas — funds seedha aapke bank account mein transfer ho rahe hain. Quick, secure, aur aksar same day.",
-        "vo_hi": "बैंक में ट्रांसफर\nतेज़ और सुरक्षित",
+        "vo": "And just like that — funds are transferring straight to your bank account. Quick, secure, and often same-day.",
+        "vo_hi": "Transferring to your bank.\nQuick and secure.\nSame-day disbursal.",
     },
     {
         "id": "endcard", "layout": "endcard_full", "animation": "endcard", "step": "NEERCRED",
         "title": "Dream Big.\nBorrow Smart.",
         "subtitle": "www.neercred.com",
         "bullets": [],
-        "vo": "Abhi apply kijiye — neer cred dot com par.",
+        "vo": "Apply now on neercred.com.",
         "duration": 9.0,
-        "vo_hi": "अभी apply करें\nwww.neercred.com",
+        "vo_hi": "Apply now on NeerCred.\nwww.neercred.com",
     },
 ]
 
@@ -586,7 +586,7 @@ def render_frame_vertical(
     rgba.paste(phone_like, (px, py), phone_like)
 
     # Caption bar — bottom safe area (Instagram UI margin)
-    cap_f = vfont(22, bold=True, hindi=True)
+    cap_f = vfont(22, bold=True)
     cap_lines: list[str] = []
     for block in scene["vo_hi"].split("\n"):
         cap_lines.extend(wrap_lines(block, cap_f, W_V - vsz(96)))

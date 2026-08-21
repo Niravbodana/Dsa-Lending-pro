@@ -16,6 +16,7 @@ from capture_email_js import EMAIL_APPLY_JS, EMAIL_OTP_JS  # noqa: E402
 from capture_profile_js import PROFILE_PROMO_JS  # noqa: E402
 
 OUT = Path("/opt/cursor/artifacts/neercred-promo-video/screenshots")
+PROD = "https://neercred.com"
 BASE = "http://localhost:3000"
 API = "http://localhost:8000/api"
 VW, VH = 390, 844
@@ -77,12 +78,12 @@ def capture() -> None:
             page.screenshot(path=str(path), animations="disabled", type="png", full_page=False)
             print(f"  ✓ {name} ({path.stat().st_size // 1024} KB)")
 
-        # Live homepage hero — matches updated neercred.com mobile
-        page.goto(f"{BASE}/", wait_until="domcontentloaded", timeout=60000)
-        ready(3500)
+        # Live neercred.com homepage — latest production mobile UI
+        page.goto(f"{PROD}/", wait_until="domcontentloaded", timeout=90000)
+        ready(4500)
         shot("01-homepage")
 
-        # Promo homepage fallback + how-it-works scroll
+        # Local promo/apply pages (same codebase; apply needs dev API)
         page.goto(f"{BASE}/promo-homepage", wait_until="domcontentloaded", timeout=60000)
         ready(2500)
         shot("01c-promo-homepage")
