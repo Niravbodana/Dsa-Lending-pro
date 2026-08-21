@@ -37,8 +37,11 @@ PHONE_W, PHONE_H = 400, 844
 PHONE_W_V, PHONE_H_V = 560 * V_SCALE, 1140 * V_SCALE
 PHONE_X_RATIO = 0.62
 CAPTION_RESERVE = 200
-CAPTION_RESERVE_V = 270 * V_SCALE
-MARGIN_X_V = 52 * V_SCALE
+CAPTION_RESERVE_V = 240 * V_SCALE
+MARGIN_X_V = 44 * V_SCALE
+LOGO_TOP_V = 88
+LOGO_MAX_W_V = 980
+LOGO_MAX_H_V = 240
 
 
 _EMOJI_RE = re.compile(
@@ -74,13 +77,17 @@ def draw_title_sparkle(d: ImageDraw.ImageDraw, x: int, y: int, size: int = 14) -
 
 
 def paste_logo_vertical(rgba: Image.Image, logo: Image.Image, logo_hires: Image.Image | None) -> int:
-    """Large centred brand lockup — returns bottom Y for copy block below."""
+    """Hero centred brand lockup — nearly full width, returns bottom Y."""
     src = logo_hires if logo_hires is not None else logo
     lg = src.copy()
-    lg.thumbnail((vsz(760), vsz(152)), Image.Resampling.LANCZOS)
-    top = vsz(44)
-    rgba.paste(lg, ((W_V - lg.width) // 2, top), lg)
-    return top + lg.height
+    target_w = min(W_V - vsz(48), vsz(LOGO_MAX_W_V))
+    target_h = vsz(LOGO_MAX_H_V)
+    scale = min(target_w / lg.width, target_h / lg.height)
+    nw, nh = max(1, int(lg.width * scale)), max(1, int(lg.height * scale))
+    lg = lg.resize((nw, nh), Image.Resampling.LANCZOS)
+    top = vsz(LOGO_TOP_V)
+    rgba.paste(lg, ((W_V - nw) // 2, top), lg)
+    return top + nh
 
 
 def draw_centered_line(
@@ -103,39 +110,39 @@ def draw_vertical_copy_block(
     max_text_w: int,
 ) -> int:
     """Step → title → subtitle → bullets with fixed vertical rhythm."""
-    y = y_start + vsz(24)
-    gap_section = vsz(14)
+    y = y_start + vsz(32)
+    gap_section = vsz(18)
 
     step_text = scene.get("step", "")
     if step_text:
-        step_f = vfont(22, bold=True)
-        y = draw_centered_line(d, y, step_text, step_f, rgb(C["teal"]), vsz(38))
+        step_f = vfont(28, bold=True)
+        y = draw_centered_line(d, y, step_text, step_f, rgb(C["teal"]), vsz(44))
         y += gap_section
 
-    title_f = vfont(54, bold=True)
+    title_f = vfont(64, bold=True)
     title_lines = [strip_emoji(line) for line in scene.get("title", "").split("\n") if line.strip()]
     for i, line in enumerate(title_lines):
         tw = text_width(line, title_f)
         x = (W_V - tw) // 2
         d.text((x, y), line, fill=rgb(C["white"]), font=title_f)
         if scene.get("id") == "approved" and i == len(title_lines) - 1:
-            draw_title_sparkle(d, x + int(tw) + vsz(10), y + vsz(10), size=vsz(16))
-        y += vsz(60)
+            draw_title_sparkle(d, x + int(tw) + vsz(12), y + vsz(12), size=vsz(18))
+        y += vsz(68)
     if title_lines:
         y += gap_section
 
     subtitle = scene.get("subtitle", "")
     if subtitle:
-        sub_f = vfont(24)
+        sub_f = vfont(28)
         sub_lines = wrap_lines(subtitle, sub_f, max_text_w)
         for line in sub_lines:
-            y = draw_centered_line(d, y, line, sub_f, rgb(C["muted"]), vsz(34))
+            y = draw_centered_line(d, y, line, sub_f, rgb(C["muted"]), vsz(40))
         y += gap_section
 
-    bullet_f = vfont(20)
+    bullet_f = vfont(24)
     for b in scene.get("bullets", [])[:3]:
         label = f"• {b}"
-        y = draw_centered_line(d, y, label, bullet_f, rgb(C["white"]), vsz(30))
+        y = draw_centered_line(d, y, label, bullet_f, rgb(C["white"]), vsz(34))
 
     return y
 
@@ -171,8 +178,9 @@ SCENES = [
     },
     {
         "id": "intro", "screen": "01-homepage.png", "step": "WELCOME",
-        "title": "NeerCred", "subtitle": "Dream Big · Borrow Smart",
-        "bullets": ["Digital Lending Aggregator", "Purity & Trust", "100% digital journey"],
+        "title": "Dream Big.\nBorrow Smart.",
+        "subtitle": "Your digital lending aggregator",
+        "bullets": ["Eligible offers from partners", "Purity & Trust", "100% digital journey"],
         "vo": "Your digital lending aggregator. Dream big, borrow smart — and discover eligible loan offers from trusted partners.",
         "vo_hi": "Dream Big · Borrow Smart.\nEligible offers from partners.",
     },
@@ -339,13 +347,13 @@ def load_logo_hires() -> Image.Image:
         html.write_text(
             f'<!DOCTYPE html><html><head>'
             f'<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">'
-            f'<style>body{{margin:0;padding:0;background:{bg_hex};width:640px;height:216px;'
+            f'<style>body{{margin:0;padding:0;background:{bg_hex};width:800px;height:270px;'
             f'display:flex;align-items:center;justify-content:center}}</style>'
             f'</head><body>{svg.read_text(encoding="utf-8", errors="replace")}</body></html>'
         )
         run(
             ["npx", "playwright", "screenshot", "--browser", "chromium",
-             f"file://{html.resolve()}", str(p), "--viewport-size=640,216"],
+             f"file://{html.resolve()}", str(p), "--viewport-size=800,270"],
             cwd=ROOT / "frontend",
         )
     img = Image.open(p).convert("RGBA")
@@ -560,18 +568,18 @@ def bg_canvas_vertical() -> Image.Image:
 
 
 def phone_position_vertical(phone_w: int, phone_h: int, text_bottom_y: int) -> tuple[int, int]:
-    """Center phone horizontally; stack below copy block with even spacing."""
-    cap_reserve = CAPTION_RESERVE_V + vsz(120)
+    """Anchor phone toward bottom — uses free space above caption bar."""
+    cap_reserve = CAPTION_RESERVE_V + vsz(96)
     bar_top = H_V - cap_reserve
-    top = text_bottom_y + vsz(18)
-    available_h = max(vsz(200), bar_top - top - vsz(16))
+    min_top = text_bottom_y + vsz(24)
+    py = bar_top - phone_h - vsz(12)
+    py = max(min_top, py)
     px = (W_V - phone_w) // 2
-    py = top + max(0, (available_h - phone_h) // 2)
     return px, py
 
 
 def fit_phone_frame_vertical(phone: Image.Image, max_h: int | None = None) -> Image.Image:
-    limit = max_h if max_h is not None else H_V - CAPTION_RESERVE_V - vsz(300)
+    limit = max_h if max_h is not None else H_V - CAPTION_RESERVE_V - vsz(520)
     if phone.height <= limit:
         return phone
     scale = limit / phone.height
@@ -641,10 +649,10 @@ def render_frame_vertical(
     logo_bottom = paste_logo_vertical(rgba, logo, logo_hires)
     text_bottom = draw_vertical_copy_block(d, scene, logo_bottom, max_text_w)
 
-    # Phone / celebration — centered below copy block
-    cap_reserve = CAPTION_RESERVE_V + vsz(120)
+    # Phone / celebration — anchored low to use space above captions
+    cap_reserve = CAPTION_RESERVE_V + vsz(96)
     bar_top = H_V - cap_reserve
-    phone_max_h = max(vsz(480), bar_top - text_bottom - vsz(40))
+    phone_max_h = max(vsz(420), bar_top - text_bottom - vsz(56))
 
     if scene.get("layout") == "celebration":
         key = scene.get("animation", "ekyc")
@@ -677,12 +685,12 @@ def render_frame_vertical(
     rgba.paste(phone_like, (px, py), phone_like)
 
     # Caption bar — bottom safe area (Instagram UI margin)
-    cap_f = vfont(26, bold=True)
-    cap_lines = caption_lines_from_vo(scene["vo_hi"], cap_f, W_V - vsz(96))
-    line_h = vsz(36)
-    pad_top, pad_bottom = vsz(22), vsz(30)
+    cap_f = vfont(28, bold=True)
+    cap_lines = caption_lines_from_vo(scene["vo_hi"], cap_f, W_V - vsz(80))
+    line_h = vsz(38)
+    pad_top, pad_bottom = vsz(20), vsz(26)
     bar_h = pad_top + len(cap_lines) * line_h + pad_bottom
-    bar_y = H_V - bar_h - vsz(88)
+    bar_y = H_V - bar_h - vsz(72)
 
     bar = Image.new("RGBA", (W_V, bar_h), C["glass"])
     bd = ImageDraw.Draw(bar)

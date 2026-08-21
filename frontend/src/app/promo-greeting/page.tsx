@@ -70,7 +70,7 @@ export default function PromoGreetingPage() {
     <>
       <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
       <div
-        className="promo-no-chrome promo-greeting-root relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-6 py-10"
+        className="promo-no-chrome promo-greeting-root relative flex min-h-dvh flex-col items-center justify-end overflow-hidden px-6 pb-[14vh] pt-16"
         style={{
           background: "linear-gradient(160deg, #F0FDF9 0%, #D1FAE5 38%, #A7F3D0 72%, #86EFAC 100%)",
           fontFamily: "Poppins, system-ui, sans-serif",
@@ -87,15 +87,15 @@ export default function PromoGreetingPage() {
           />
         </div>
 
-        <p className="greeting-welcome relative z-10 text-center text-4xl font-extrabold tracking-tight text-[#047857] sm:text-5xl md:text-6xl">
+        <p className="greeting-welcome relative z-10 text-center text-5xl font-extrabold tracking-tight text-[#047857] sm:text-6xl md:text-7xl">
           Welcome to
         </p>
 
-        <div className="greeting-logo relative z-10 mt-8 w-[min(92vw,560px)] max-w-full">
+        <div className="greeting-logo relative z-10 mt-10 w-[min(96vw,840px)] max-w-full">
           <GreetingLogo />
         </div>
 
-        <p className="greeting-trust relative z-10 mt-8 text-center text-sm font-semibold uppercase tracking-[0.32em] text-[#475569] sm:text-base">
+        <p className="greeting-trust relative z-10 mt-10 text-center text-base font-semibold uppercase tracking-[0.32em] text-[#475569] sm:text-lg md:text-xl">
           Purity &amp; Trust
         </p>
 

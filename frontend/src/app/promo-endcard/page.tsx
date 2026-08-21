@@ -84,7 +84,7 @@ export default function PromoEndcardPage() {
     <>
       <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
       <div
-        className="promo-no-chrome promo-endcard-root relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-6 py-10"
+        className="promo-no-chrome promo-endcard-root relative flex min-h-dvh flex-col items-center justify-end overflow-hidden px-6 pb-[12vh] pt-14"
         style={{
           background: "linear-gradient(160deg, #F0FDF9 0%, #D1FAE5 38%, #A7F3D0 72%, #86EFAC 100%)",
           fontFamily: "Poppins, system-ui, sans-serif",
@@ -101,21 +101,21 @@ export default function PromoEndcardPage() {
           />
         </div>
 
-        <div className="endcard-logo relative z-10 flex w-[min(92vw,560px)] max-w-full flex-col items-center text-center">
+        <div className="endcard-logo relative z-10 flex w-[min(96vw,840px)] max-w-full flex-col items-center text-center">
           <EndcardLogo />
         </div>
 
         <p
-          className="endcard-tag relative z-10 mt-8 text-center text-base font-semibold uppercase tracking-[0.35em] text-[#B45309] sm:text-lg"
+          className="endcard-tag relative z-10 mt-10 text-center text-lg font-semibold uppercase tracking-[0.35em] text-[#B45309] sm:text-xl"
           style={{ textShadow: "0 1px 12px rgba(212,160,23,0.25)" }}
         >
           Purity &amp; Trust
         </p>
 
-        <div className="endcard-link-wrap relative z-10 mt-10">
+        <div className="endcard-link-wrap relative z-10 mt-12">
           <a
             href="https://www.neercred.com"
-            className="endcard-link group relative inline-block text-5xl font-extrabold tracking-tight text-[#134E4A] no-underline sm:text-6xl"
+            className="endcard-link group relative inline-block text-6xl font-extrabold tracking-tight text-[#134E4A] no-underline sm:text-7xl"
           >
             <span className="relative z-10">www.neercred.com</span>
             <span className="endcard-link-underline absolute -bottom-1 left-0 h-1 w-full rounded-full bg-gradient-to-r from-[#5EEAD4] to-[#FDE68A]" />
@@ -128,7 +128,7 @@ export default function PromoEndcardPage() {
 
         <button
           type="button"
-          className="endcard-cta relative z-10 mt-10 rounded-2xl px-14 py-5 text-xl font-bold text-white shadow-2xl"
+          className="endcard-cta relative z-10 mt-12 rounded-2xl px-16 py-6 text-2xl font-bold text-white shadow-2xl"
           style={{
             background: "linear-gradient(135deg, #047857 0%, #0F766E 50%, #14B8A6 100%)",
             boxShadow: "0 12px 40px -8px rgba(15,118,110,0.45), 0 0 0 1px rgba(94,234,212,0.35)",
@@ -137,7 +137,7 @@ export default function PromoEndcardPage() {
           Apply Now →
         </button>
 
-        <p className="endcard-legal relative z-10 mt-14 max-w-xl text-center text-base leading-relaxed text-[#475569]">
+        <p className="endcard-legal relative z-10 mt-16 max-w-xl text-center text-lg leading-relaxed text-[#475569]">
           Nirav Enterprises, operating as NeerCred
           <br />
           Digital Lending Aggregator · Financial Services Platform
