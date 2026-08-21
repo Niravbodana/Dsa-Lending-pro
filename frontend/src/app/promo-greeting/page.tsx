@@ -87,15 +87,15 @@ export default function PromoGreetingPage() {
           />
         </div>
 
-        <p className="greeting-welcome relative z-10 text-center text-4xl font-extrabold tracking-tight text-[#047857] sm:text-5xl">
+        <p className="greeting-welcome relative z-10 text-center text-4xl font-extrabold tracking-tight text-[#047857] sm:text-5xl md:text-6xl">
           Welcome to
         </p>
 
-        <div className="greeting-logo relative z-10 mt-6 max-w-[min(100%,320px)]">
+        <div className="greeting-logo relative z-10 mt-8 w-[min(92vw,560px)] max-w-full">
           <GreetingLogo />
         </div>
 
-        <p className="greeting-trust relative z-10 mt-6 text-center text-xs font-semibold uppercase tracking-[0.3em] text-[#475569] sm:text-sm">
+        <p className="greeting-trust relative z-10 mt-8 text-center text-sm font-semibold uppercase tracking-[0.32em] text-[#475569] sm:text-base">
           Purity &amp; Trust
         </p>
 

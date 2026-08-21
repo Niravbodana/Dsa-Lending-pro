@@ -101,21 +101,21 @@ export default function PromoEndcardPage() {
           />
         </div>
 
-        <div className="endcard-logo relative z-10 flex max-w-[min(100%,300px)] flex-col items-center text-center">
+        <div className="endcard-logo relative z-10 flex w-[min(92vw,560px)] max-w-full flex-col items-center text-center">
           <EndcardLogo />
         </div>
 
         <p
-          className="endcard-tag relative z-10 mt-5 text-center text-base font-semibold uppercase tracking-[0.35em] text-[#B45309]"
+          className="endcard-tag relative z-10 mt-8 text-center text-base font-semibold uppercase tracking-[0.35em] text-[#B45309] sm:text-lg"
           style={{ textShadow: "0 1px 12px rgba(212,160,23,0.25)" }}
         >
           Purity &amp; Trust
         </p>
 
-        <div className="endcard-link-wrap relative z-10 mt-8">
+        <div className="endcard-link-wrap relative z-10 mt-10">
           <a
             href="https://www.neercred.com"
-            className="endcard-link group relative inline-block text-5xl font-extrabold tracking-tight text-[#134E4A] no-underline sm:text-[3.25rem]"
+            className="endcard-link group relative inline-block text-5xl font-extrabold tracking-tight text-[#134E4A] no-underline sm:text-6xl"
           >
             <span className="relative z-10">www.neercred.com</span>
             <span className="endcard-link-underline absolute -bottom-1 left-0 h-1 w-full rounded-full bg-gradient-to-r from-[#5EEAD4] to-[#FDE68A]" />
@@ -128,7 +128,7 @@ export default function PromoEndcardPage() {
 
         <button
           type="button"
-          className="endcard-cta relative z-10 mt-8 rounded-2xl px-12 py-4 text-lg font-bold text-white shadow-2xl"
+          className="endcard-cta relative z-10 mt-10 rounded-2xl px-14 py-5 text-xl font-bold text-white shadow-2xl"
           style={{
             background: "linear-gradient(135deg, #047857 0%, #0F766E 50%, #14B8A6 100%)",
             boxShadow: "0 12px 40px -8px rgba(15,118,110,0.45), 0 0 0 1px rgba(94,234,212,0.35)",
@@ -137,7 +137,7 @@ export default function PromoEndcardPage() {
           Apply Now →
         </button>
 
-        <p className="endcard-legal relative z-10 mt-12 max-w-xl text-center text-sm leading-relaxed text-[#475569]">
+        <p className="endcard-legal relative z-10 mt-14 max-w-xl text-center text-base leading-relaxed text-[#475569]">
           Nirav Enterprises, operating as NeerCred
           <br />
           Digital Lending Aggregator · Financial Services Platform

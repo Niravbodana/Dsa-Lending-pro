@@ -32,7 +32,7 @@ FPS = 30
 VOICE = "en-IN-NeerjaNeural"  # Premium Indian English — natural fintech tone
 VO_RATE = "-2%"
 VO_PITCH = "+1Hz"
-FORCE_VO_REGEN = True
+FORCE_VO_REGEN = False
 PHONE_W, PHONE_H = 400, 844
 PHONE_W_V, PHONE_H_V = 560 * V_SCALE, 1140 * V_SCALE
 PHONE_X_RATIO = 0.62
@@ -73,12 +73,85 @@ def draw_title_sparkle(d: ImageDraw.ImageDraw, x: int, y: int, size: int = 14) -
     d.ellipse([x + r + 6, y - 2, x + r + 10, y + 2], fill=light)
 
 
-def paste_logo_vertical(rgba: Image.Image, logo: Image.Image, logo_hires: Image.Image | None) -> None:
-    """Large centred brand lockup for Instagram vertical frames."""
+def paste_logo_vertical(rgba: Image.Image, logo: Image.Image, logo_hires: Image.Image | None) -> int:
+    """Large centred brand lockup — returns bottom Y for copy block below."""
     src = logo_hires if logo_hires is not None else logo
     lg = src.copy()
-    lg.thumbnail((vsz(460), vsz(92)), Image.Resampling.LANCZOS)
-    rgba.paste(lg, ((W_V - lg.width) // 2, vsz(56)), lg)
+    lg.thumbnail((vsz(760), vsz(152)), Image.Resampling.LANCZOS)
+    top = vsz(44)
+    rgba.paste(lg, ((W_V - lg.width) // 2, top), lg)
+    return top + lg.height
+
+
+def draw_centered_line(
+    d: ImageDraw.ImageDraw,
+    y: int,
+    text: str,
+    fnt: ImageFont.FreeTypeFont,
+    fill: tuple[int, ...],
+    line_h: int,
+) -> int:
+    tw = text_width(text, fnt)
+    d.text(((W_V - tw) // 2, y), text, fill=fill, font=fnt)
+    return y + line_h
+
+
+def draw_vertical_copy_block(
+    d: ImageDraw.ImageDraw,
+    scene: dict,
+    y_start: int,
+    max_text_w: int,
+) -> int:
+    """Step → title → subtitle → bullets with fixed vertical rhythm."""
+    y = y_start + vsz(24)
+    gap_section = vsz(14)
+
+    step_text = scene.get("step", "")
+    if step_text:
+        step_f = vfont(22, bold=True)
+        y = draw_centered_line(d, y, step_text, step_f, rgb(C["teal"]), vsz(38))
+        y += gap_section
+
+    title_f = vfont(54, bold=True)
+    title_lines = [strip_emoji(line) for line in scene.get("title", "").split("\n") if line.strip()]
+    for i, line in enumerate(title_lines):
+        tw = text_width(line, title_f)
+        x = (W_V - tw) // 2
+        d.text((x, y), line, fill=rgb(C["white"]), font=title_f)
+        if scene.get("id") == "approved" and i == len(title_lines) - 1:
+            draw_title_sparkle(d, x + int(tw) + vsz(10), y + vsz(10), size=vsz(16))
+        y += vsz(60)
+    if title_lines:
+        y += gap_section
+
+    subtitle = scene.get("subtitle", "")
+    if subtitle:
+        sub_f = vfont(24)
+        sub_lines = wrap_lines(subtitle, sub_f, max_text_w)
+        for line in sub_lines:
+            y = draw_centered_line(d, y, line, sub_f, rgb(C["muted"]), vsz(34))
+        y += gap_section
+
+    bullet_f = vfont(20)
+    for b in scene.get("bullets", [])[:3]:
+        label = f"• {b}"
+        y = draw_centered_line(d, y, label, bullet_f, rgb(C["white"]), vsz(30))
+
+    return y
+
+
+def caption_lines_from_vo(vo_hi: str, cap_f: ImageFont.FreeTypeFont, max_w: int) -> list[str]:
+    """Respect explicit line breaks; wrap only when a single line is too wide."""
+    lines: list[str] = []
+    for block in vo_hi.split("\n"):
+        block = block.strip()
+        if not block:
+            continue
+        if text_width(block, cap_f) <= max_w:
+            lines.append(block)
+        else:
+            lines.extend(wrap_lines(block, cap_f, max_w))
+    return lines
 
 
 def vfont(sz: int, bold: bool = False, hindi: bool = False) -> ImageFont.FreeTypeFont:
@@ -266,13 +339,13 @@ def load_logo_hires() -> Image.Image:
         html.write_text(
             f'<!DOCTYPE html><html><head>'
             f'<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">'
-            f'<style>body{{margin:0;padding:0;background:{bg_hex};width:480px;height:162px;'
+            f'<style>body{{margin:0;padding:0;background:{bg_hex};width:640px;height:216px;'
             f'display:flex;align-items:center;justify-content:center}}</style>'
             f'</head><body>{svg.read_text(encoding="utf-8", errors="replace")}</body></html>'
         )
         run(
             ["npx", "playwright", "screenshot", "--browser", "chromium",
-             f"file://{html.resolve()}", str(p), "--viewport-size=480,162"],
+             f"file://{html.resolve()}", str(p), "--viewport-size=640,216"],
             cwd=ROOT / "frontend",
         )
     img = Image.open(p).convert("RGBA")
@@ -486,19 +559,22 @@ def bg_canvas_vertical() -> Image.Image:
     return c
 
 
-def phone_position_vertical(phone_w: int, phone_h: int) -> tuple[int, int]:
-    """Center phone horizontally; sit above caption safe zone."""
+def phone_position_vertical(phone_w: int, phone_h: int, text_bottom_y: int) -> tuple[int, int]:
+    """Center phone horizontally; stack below copy block with even spacing."""
+    cap_reserve = CAPTION_RESERVE_V + vsz(120)
+    bar_top = H_V - cap_reserve
+    top = text_bottom_y + vsz(18)
+    available_h = max(vsz(200), bar_top - top - vsz(16))
     px = (W_V - phone_w) // 2
-    py = H_V - CAPTION_RESERVE_V - phone_h - vsz(28)
-    py = max(vsz(360), min(py, H_V - CAPTION_RESERVE_V - phone_h - vsz(12)))
+    py = top + max(0, (available_h - phone_h) // 2)
     return px, py
 
 
-def fit_phone_frame_vertical(phone: Image.Image) -> Image.Image:
-    max_h = H_V - CAPTION_RESERVE_V - vsz(300)
-    if phone.height <= max_h:
+def fit_phone_frame_vertical(phone: Image.Image, max_h: int | None = None) -> Image.Image:
+    limit = max_h if max_h is not None else H_V - CAPTION_RESERVE_V - vsz(300)
+    if phone.height <= limit:
         return phone
-    scale = max_h / phone.height
+    scale = limit / phone.height
     nw, nh = int(phone.width * scale), int(phone.height * scale)
     return phone.resize((nw, nh), Image.Resampling.LANCZOS)
 
@@ -561,68 +637,39 @@ def render_frame_vertical(
     rgba = bg_canvas_vertical().convert("RGBA")
     d = ImageDraw.Draw(rgba)
 
-    paste_logo_vertical(rgba, logo, logo_hires)
-
     max_text_w = W_V - MARGIN_X_V * 2
-    y = vsz(168)
-    step_f = vfont(20, bold=True)
-    step_text = scene["step"]
-    if step_text:
-        tw = text_width(step_text, step_f)
-        d.text(((W_V - tw) // 2, y), step_text, fill=rgb(C["teal"]), font=step_f)
-        y += vsz(36)
+    logo_bottom = paste_logo_vertical(rgba, logo, logo_hires)
+    text_bottom = draw_vertical_copy_block(d, scene, logo_bottom, max_text_w)
 
-    title_f = vfont(52, bold=True)
-    title_lines = scene["title"].split("\n")
-    for i, line in enumerate(title_lines):
-        clean = strip_emoji(line)
-        tw = text_width(clean, title_f)
-        x = (W_V - tw) // 2
-        d.text((x, y), clean, fill=rgb(C["white"]), font=title_f)
-        if scene.get("id") == "approved" and i == len(title_lines) - 1:
-            draw_title_sparkle(d, x + int(tw) + vsz(10), y + vsz(10), size=vsz(16))
-        y += vsz(58)
+    # Phone / celebration — centered below copy block
+    cap_reserve = CAPTION_RESERVE_V + vsz(120)
+    bar_top = H_V - cap_reserve
+    phone_max_h = max(vsz(480), bar_top - text_bottom - vsz(40))
 
-    if scene.get("subtitle"):
-        sub_f = vfont(24)
-        for line in wrap_lines(scene["subtitle"], sub_f, max_text_w):
-            tw = text_width(line, sub_f)
-            d.text(((W_V - tw) // 2, y), line, fill=rgb(C["muted"]), font=sub_f)
-            y += vsz(32)
-        y += vsz(6)
-
-    bullet_f = vfont(19)
-    for b in scene["bullets"][:3]:
-        label = f"• {b}"
-        tw = text_width(label, bullet_f)
-        d.text(((W_V - tw) // 2, y), label, fill=rgb(C["white"]), font=bullet_f)
-        y += vsz(28)
-
-    # Phone / celebration — centered, large
     if scene.get("layout") == "celebration":
         key = scene.get("animation", "ekyc")
         frames = anim_frames.get(key, [])
         panel = celebration_panel_at(frames, frame_t)
-        scale = min(PHONE_W_V / panel.width, (H_V - CAPTION_RESERVE_V - y - vsz(40)) / panel.height)
+        scale = min(PHONE_W_V / panel.width, phone_max_h / panel.height)
         nw, nh = int(panel.width * scale), int(panel.height * scale)
         panel = panel.resize((nw, nh), Image.Resampling.LANCZOS)
         phone_like = Image.new("RGBA", (nw, nh), (0, 0, 0, 0))
         phone_like.paste(panel, (0, 0), panel)
-        phone_like = fit_phone_frame_vertical(phone_like)
+        phone_like = fit_phone_frame_vertical(phone_like, phone_max_h)
     else:
         sf = SCREENS / scene["screen"]
         if not sf.exists():
             sf = SCREENS / "01-homepage.png"
-        # Temporarily use larger phone canvas for vertical
         global PHONE_W, PHONE_H
         old_w, old_h = PHONE_W, PHONE_H
         PHONE_W, PHONE_H = PHONE_W_V, PHONE_H_V
-        phone = fit_phone_frame_vertical(draw_phone(fit_screen(sf)))
+        phone = draw_phone(fit_screen(sf))
+        phone = fit_phone_frame_vertical(phone, phone_max_h)
         PHONE_W, PHONE_H = old_w, old_h
         phone_like = phone
 
     nw, nh = phone_like.width, phone_like.height
-    px, py = phone_position_vertical(nw, nh)
+    px, py = phone_position_vertical(nw, nh, text_bottom)
     sh = Image.new("RGBA", (nw + vsz(60), nh + vsz(60)), (0, 0, 0, 0))
     ImageDraw.Draw(sh).rounded_rectangle([vsz(20), vsz(20), nw + vsz(40), nh + vsz(40)], radius=vsz(48), fill=(0, 0, 0, 80))
     sh = sh.filter(ImageFilter.GaussianBlur(vsz(24)))
@@ -631,11 +678,9 @@ def render_frame_vertical(
 
     # Caption bar — bottom safe area (Instagram UI margin)
     cap_f = vfont(26, bold=True)
-    cap_lines: list[str] = []
-    for block in scene["vo_hi"].split("\n"):
-        cap_lines.extend(wrap_lines(block, cap_f, W_V - vsz(96)))
-    line_h = vsz(34)
-    pad_top, pad_bottom = vsz(20), vsz(28)
+    cap_lines = caption_lines_from_vo(scene["vo_hi"], cap_f, W_V - vsz(96))
+    line_h = vsz(36)
+    pad_top, pad_bottom = vsz(22), vsz(30)
     bar_h = pad_top + len(cap_lines) * line_h + pad_bottom
     bar_y = H_V - bar_h - vsz(88)
 
@@ -644,7 +689,7 @@ def render_frame_vertical(
     bd.line([(0, 0), (W_V, 0)], fill=rgb(C["teal"]) + (120,), width=vsz(2))
     cy = pad_top
     for line in cap_lines:
-        tw = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(line, font=cap_f)
+        tw = text_width(line, cap_f)
         bd.text(((W_V - tw) // 2, cy), line, fill=rgb(C["white"]), font=cap_f)
         cy += line_h
     rgba.paste(bar, (0, bar_y), bar)
