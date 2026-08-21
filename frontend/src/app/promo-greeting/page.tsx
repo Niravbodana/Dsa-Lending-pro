@@ -70,7 +70,7 @@ export default function PromoGreetingPage() {
     <>
       <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
       <div
-        className="promo-no-chrome promo-greeting-root relative flex min-h-dvh flex-col items-center justify-end overflow-hidden px-6 pb-[14vh] pt-16"
+        className="promo-no-chrome promo-greeting-root relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-6 py-10"
         style={{
           background: "linear-gradient(160deg, #F0FDF9 0%, #D1FAE5 38%, #A7F3D0 72%, #86EFAC 100%)",
           fontFamily: "Poppins, system-ui, sans-serif",
@@ -91,7 +91,7 @@ export default function PromoGreetingPage() {
           Welcome to
         </p>
 
-        <div className="greeting-logo relative z-10 mt-10 w-[min(96vw,840px)] max-w-full">
+        <div className="greeting-logo relative z-10 mt-8 w-[min(88vw,640px)] max-w-full">
           <GreetingLogo />
         </div>
 
