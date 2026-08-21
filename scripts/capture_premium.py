@@ -23,12 +23,20 @@ VW, VH = 390, 844
 
 CLEAN_JS = """() => {
   document.querySelectorAll(
-    '.loan-guide-root, [class*="cookie"], [class*="Cookie"], [aria-label*="Cookie"], ' +
+    '.loan-guide-root, .loan-guide-wrap, [class*="cookie"], [class*="Cookie"], [aria-label*="Cookie"], ' +
     'nextjs-portal, [data-nextjs-toast], [data-next-mark], [data-nextjs-dev-tools-button], ' +
     '#__nextjs-dev-tools-menu, #__nextjs-build-indicator, button.fixed.bottom-6.left-6, ' +
     '[class*="BugReport"], [class*="WhatsApp"], [class*="AIChat"], [class*="FloatingCTA"], ' +
     '[class*="MobileSticky"], .fixed.bottom-0'
   ).forEach(e => e.remove());
+  // Remove duplicate compact step box (shows as empty/broken box in promo video)
+  document.querySelectorAll('.rounded-xl.border').forEach(el => {
+    const t = (el.textContent || '').trim();
+    if (/^Step \\d+\\/\\d+/.test(t) && t.length < 80) el.remove();
+  });
+  document.querySelectorAll('.mb-8.flex.items-start').forEach(el => {
+    el.querySelectorAll('.loan-guide-root, .loan-guide-wrap').forEach(n => n.remove());
+  });
   document.querySelectorAll('p, span, div').forEach(el => {
     const t = (el.textContent || '').trim();
     if (t.startsWith('Dev mode OTP') && t.length < 80) el.style.display = 'none';
@@ -78,14 +86,10 @@ def capture() -> None:
             page.screenshot(path=str(path), animations="disabled", type="png", full_page=False)
             print(f"  ✓ {name} ({path.stat().st_size // 1024} KB)")
 
-        # Live neercred.com homepage — latest production mobile UI
-        page.goto(f"{PROD}/", wait_until="domcontentloaded", timeout=90000)
-        ready(4500)
-        shot("01-homepage")
-
-        # Local promo/apply pages (same codebase; apply needs dev API)
+        # Promo homepage — matches latest neercred.com mobile UI (user screenshot)
         page.goto(f"{BASE}/promo-homepage", wait_until="domcontentloaded", timeout=60000)
-        ready(2500)
+        ready(3000)
+        shot("01-homepage")
         shot("01c-promo-homepage")
         shot("01b-how-it-works", scroll=650)
 
