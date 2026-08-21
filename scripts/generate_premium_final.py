@@ -6,6 +6,7 @@ from __future__ import annotations
 import asyncio
 import json
 import math
+import re
 import subprocess
 import urllib.request
 from pathlib import Path
@@ -28,15 +29,56 @@ W, H = 1920, 1080
 V_SCALE = 2  # 4K vertical export: 2160×3840
 W_V, H_V = 1080 * V_SCALE, 1920 * V_SCALE
 FPS = 30
-VOICE = "en-US-AvaNeural"  # Warm premium English female — same as pre-Hindi promo
-VO_RATE = "-4%"
-VO_PITCH = "+5Hz"
+VOICE = "en-IN-NeerjaNeural"  # Premium Indian English — natural fintech tone
+VO_RATE = "-2%"
+VO_PITCH = "+1Hz"
+FORCE_VO_REGEN = True
 PHONE_W, PHONE_H = 400, 844
-PHONE_W_V, PHONE_H_V = 520 * V_SCALE, 1064 * V_SCALE
+PHONE_W_V, PHONE_H_V = 560 * V_SCALE, 1140 * V_SCALE
 PHONE_X_RATIO = 0.62
 CAPTION_RESERVE = 200
 CAPTION_RESERVE_V = 270 * V_SCALE
 MARGIN_X_V = 52 * V_SCALE
+
+
+_EMOJI_RE = re.compile(
+    "["
+    "\U0001F600-\U0001F64F"
+    "\U0001F300-\U0001F5FF"
+    "\U0001F680-\U0001F6FF"
+    "\U0001F1E0-\U0001F1FF"
+    "\U00002702-\U000027B0"
+    "\U000024C2-\U0001F251"
+    "]+",
+    flags=re.UNICODE,
+)
+
+
+def strip_emoji(text: str) -> str:
+    return _EMOJI_RE.sub("", text).strip()
+
+
+def text_width(text: str, fnt: ImageFont.FreeTypeFont) -> float:
+    return ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(text, font=fnt)
+
+
+def draw_title_sparkle(d: ImageDraw.ImageDraw, x: int, y: int, size: int = 14) -> None:
+    """Gold celebration mark — replaces emoji that renders as a box in PIL."""
+    gold = rgb(C["gold"])
+    light = rgb(C["gold_light"])
+    r = max(4, size // 3)
+    d.ellipse([x, y, x + r * 2, y + r * 2], fill=gold)
+    d.line([(x + r, y - r), (x + r, y + r * 3)], fill=light, width=max(2, size // 6))
+    d.line([(x - r, y + r), (x + r * 3, y + r)], fill=light, width=max(2, size // 6))
+    d.ellipse([x + r + 6, y - 2, x + r + 10, y + 2], fill=light)
+
+
+def paste_logo_vertical(rgba: Image.Image, logo: Image.Image, logo_hires: Image.Image | None) -> None:
+    """Large centred brand lockup for Instagram vertical frames."""
+    src = logo_hires if logo_hires is not None else logo
+    lg = src.copy()
+    lg.thumbnail((vsz(460), vsz(92)), Image.Resampling.LANCZOS)
+    rgba.paste(lg, ((W_V - lg.width) // 2, vsz(56)), lg)
 
 
 def vfont(sz: int, bold: bool = False, hindi: bool = False) -> ImageFont.FreeTypeFont:
@@ -51,14 +93,14 @@ SCENES = [
     {
         "id": "greeting", "layout": "greeting_full", "animation": "greeting", "step": "",
         "title": "", "subtitle": "", "bullets": [],
-        "vo": "Welcome to NeerCred.",
+        "vo": "Welcome to Neer Cred.",
         "vo_hi": "",
     },
     {
         "id": "intro", "screen": "01-homepage.png", "step": "WELCOME",
         "title": "NeerCred", "subtitle": "Dream Big · Borrow Smart",
         "bullets": ["Digital Lending Aggregator", "Purity & Trust", "100% digital journey"],
-        "vo": "Your digital lending aggregator. Dream big, borrow smart, and discover eligible loan offers from trusted partners.",
+        "vo": "Your digital lending aggregator. Dream big, borrow smart — and discover eligible loan offers from trusted partners.",
         "vo_hi": "Dream Big · Borrow Smart.\nEligible offers from partners.",
     },
     {
@@ -103,10 +145,10 @@ SCENES = [
     },
     {
         "id": "approved", "screen": "12-approved.png", "step": "APPROVED",
-        "title": "You May\nQualify! 🎉",
+        "title": "You May\nQualify!",
         "subtitle": "Up to ₹15,00,000 · indicative offer",
         "bullets": ["Select your loan amount", "Disbursal via lender", "Funds to your bank"],
-        "vo": "Great news! You may qualify for up to fifteen lakhs. Select your loan amount and move closer to disbursal on NeerCred.",
+        "vo": "Great news! You may qualify for up to fifteen lakhs. Select your loan amount, and move closer to disbursal on Neer Cred.",
         "vo_hi": "You may qualify!\nUp to fifteen lakhs.\nSelect your amount.",
     },
     {
@@ -130,9 +172,9 @@ SCENES = [
         "title": "Dream Big.\nBorrow Smart.",
         "subtitle": "www.neercred.com",
         "bullets": [],
-        "vo": "Apply now on neercred.com.",
+        "vo": "Apply now on Neer Cred dot com.",
         "duration": 9.0,
-        "vo_hi": "Apply now on NeerCred.\nwww.neercred.com",
+        "vo_hi": "Apply now on Neer Cred.\nwww.neercred.com",
     },
 ]
 
@@ -192,13 +234,13 @@ def load_logo() -> Image.Image:
         html.write_text(
             f'<!DOCTYPE html><html><head>'
             f'<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">'
-            f'<style>body{{margin:0;padding:0;background:{bg_hex};width:220px;height:52px;'
+            f'<style>body{{margin:0;padding:0;background:{bg_hex};width:320px;height:76px;'
             f'display:flex;align-items:center;justify-content:flex-start}}</style>'
             f'</head><body>{svg.read_text(encoding="utf-8", errors="replace")}</body></html>'
         )
         run(
             ["npx", "playwright", "screenshot", "--browser", "chromium",
-             f"file://{html.resolve()}", str(p), "--viewport-size=220,52"],
+             f"file://{html.resolve()}", str(p), "--viewport-size=320,76"],
             cwd=ROOT / "frontend",
         )
     img = Image.open(p).convert("RGBA")
@@ -447,13 +489,13 @@ def bg_canvas_vertical() -> Image.Image:
 def phone_position_vertical(phone_w: int, phone_h: int) -> tuple[int, int]:
     """Center phone horizontally; sit above caption safe zone."""
     px = (W_V - phone_w) // 2
-    py = H_V - CAPTION_RESERVE_V - phone_h - vsz(36)
-    py = max(vsz(420), min(py, H_V - CAPTION_RESERVE_V - phone_h - vsz(20)))
+    py = H_V - CAPTION_RESERVE_V - phone_h - vsz(28)
+    py = max(vsz(360), min(py, H_V - CAPTION_RESERVE_V - phone_h - vsz(12)))
     return px, py
 
 
 def fit_phone_frame_vertical(phone: Image.Image) -> Image.Image:
-    max_h = H_V - CAPTION_RESERVE_V - vsz(400)
+    max_h = H_V - CAPTION_RESERVE_V - vsz(300)
     if phone.height <= max_h:
         return phone
     scale = max_h / phone.height
@@ -519,40 +561,42 @@ def render_frame_vertical(
     rgba = bg_canvas_vertical().convert("RGBA")
     d = ImageDraw.Draw(rgba)
 
-    # Logo — top center
-    lg = logo.copy()
-    lg.thumbnail((vsz(240), vsz(44)), Image.Resampling.LANCZOS)
-    rgba.paste(lg, ((W_V - lg.width) // 2, vsz(44)), lg)
+    paste_logo_vertical(rgba, logo, logo_hires)
 
-    # Copy block — centered, compact
     max_text_w = W_V - MARGIN_X_V * 2
-    y = vsz(108)
-    step_f = vfont(18, bold=True)
+    y = vsz(168)
+    step_f = vfont(20, bold=True)
     step_text = scene["step"]
     if step_text:
-        tw = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(step_text, font=step_f)
+        tw = text_width(step_text, step_f)
         d.text(((W_V - tw) // 2, y), step_text, fill=rgb(C["teal"]), font=step_f)
-        y += vsz(34)
+        y += vsz(36)
 
-    title_f = vfont(46, bold=True)
-    for line in scene["title"].split("\n"):
-        tw = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(line, font=title_f)
-        d.text(((W_V - tw) // 2, y), line, fill=rgb(C["white"]), font=title_f)
-        y += vsz(54)
+    title_f = vfont(52, bold=True)
+    title_lines = scene["title"].split("\n")
+    for i, line in enumerate(title_lines):
+        clean = strip_emoji(line)
+        tw = text_width(clean, title_f)
+        x = (W_V - tw) // 2
+        d.text((x, y), clean, fill=rgb(C["white"]), font=title_f)
+        if scene.get("id") == "approved" and i == len(title_lines) - 1:
+            draw_title_sparkle(d, x + int(tw) + vsz(10), y + vsz(10), size=vsz(16))
+        y += vsz(58)
 
     if scene.get("subtitle"):
-        sub_f = vfont(21)
+        sub_f = vfont(24)
         for line in wrap_lines(scene["subtitle"], sub_f, max_text_w):
-            tw = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(line, font=sub_f)
+            tw = text_width(line, sub_f)
             d.text(((W_V - tw) // 2, y), line, fill=rgb(C["muted"]), font=sub_f)
-            y += vsz(30)
-        y += vsz(8)
+            y += vsz(32)
+        y += vsz(6)
 
-    bullet_f = vfont(17)
+    bullet_f = vfont(19)
     for b in scene["bullets"][:3]:
-        tw = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(f"• {b}", font=bullet_f)
-        d.text(((W_V - tw) // 2, y), f"• {b}", fill=rgb(C["white"]), font=bullet_f)
-        y += vsz(30)
+        label = f"• {b}"
+        tw = text_width(label, bullet_f)
+        d.text(((W_V - tw) // 2, y), label, fill=rgb(C["white"]), font=bullet_f)
+        y += vsz(28)
 
     # Phone / celebration — centered, large
     if scene.get("layout") == "celebration":
@@ -586,7 +630,7 @@ def render_frame_vertical(
     rgba.paste(phone_like, (px, py), phone_like)
 
     # Caption bar — bottom safe area (Instagram UI margin)
-    cap_f = vfont(22, bold=True)
+    cap_f = vfont(26, bold=True)
     cap_lines: list[str] = []
     for block in scene["vo_hi"].split("\n"):
         cap_lines.extend(wrap_lines(block, cap_f, W_V - vsz(96)))
@@ -625,21 +669,45 @@ def fit_screen(path: Path) -> Image.Image:
 
 
 def draw_phone(screen: Image.Image) -> Image.Image:
-    bezel = 14
-    pw, ph = PHONE_W + bezel * 2, PHONE_H + bezel * 2 + 36
+    """iPhone-style frame — thin bezel, Dynamic Island, premium titanium look."""
+    s = PHONE_W / 400.0
+    bezel = max(5, int(9 * s))
+    chin = max(6, int(10 * s))
+    island_w = int(104 * s)
+    island_h = max(7, int(13 * s))
+    radius_outer = int(46 * s)
+    radius_screen = int(40 * s)
+
+    pw = PHONE_W + bezel * 2
+    ph = PHONE_H + bezel * 2 + chin
     frame = Image.new("RGBA", (pw, ph), (0, 0, 0, 0))
     fd = ImageDraw.Draw(frame)
-    for i in range(bezel):
-        shade = 28 + i * 6
-        fd.rounded_rectangle([i, i + 18, pw - 1 - i, ph - 1 - i], radius=52 - i, fill=(shade, shade, shade + 8, 255))
-    fd.rounded_rectangle([bezel, bezel + 18, pw - bezel, ph - bezel], radius=44, fill=(6, 8, 14, 255))
-    fd.rounded_rectangle([pw // 2 - 54, bezel + 6, pw // 2 + 54, bezel + 22], radius=10, fill=(2, 2, 4, 255))
+
+    # Titanium outer shell
+    fd.rounded_rectangle([0, 0, pw - 1, ph - 1], radius=radius_outer, fill=(46, 46, 50, 255))
+    fd.rounded_rectangle([bezel - 1, bezel - 1, pw - bezel + 1, ph - chin + 1], radius=radius_screen + 2, fill=(22, 22, 24, 255))
+    fd.rounded_rectangle([bezel, bezel, pw - bezel, ph - chin], radius=radius_screen, fill=(0, 0, 0, 255))
+
+    # Dynamic Island
+    ix = pw // 2 - island_w // 2
+    iy = bezel + max(3, int(7 * s))
+    fd.rounded_rectangle([ix, iy, ix + island_w, iy + island_h], radius=island_h // 2, fill=(8, 8, 10, 255))
+
+    # Side button
+    btn_w = max(2, int(3 * s))
+    btn_h = int(44 * s)
+    fd.rounded_rectangle([0, ph // 3, btn_w, ph // 3 + btn_h], radius=btn_w, fill=(62, 62, 66, 255))
+
     mask = Image.new("L", (PHONE_W, PHONE_H), 0)
-    ImageDraw.Draw(mask).rounded_rectangle([0, 0, PHONE_W - 1, PHONE_H - 1], radius=38, fill=255)
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, PHONE_W - 1, PHONE_H - 1], radius=radius_screen - 3, fill=255)
     scr = screen.convert("RGBA")
     scr.putalpha(mask)
-    frame.paste(scr, (bezel, bezel + 18), scr)
-    return frame
+    frame.paste(scr, (bezel, bezel), scr)
+
+    gloss = Image.new("RGBA", (pw, ph), (0, 0, 0, 0))
+    gd = ImageDraw.Draw(gloss)
+    gd.rounded_rectangle([bezel + 2, bezel + 2, pw - bezel - 2, bezel + int(72 * s)], radius=radius_screen, fill=(255, 255, 255, 16))
+    return Image.alpha_composite(frame, gloss)
 
 
 def wrap_lines(text: str, fnt: ImageFont.FreeTypeFont, max_w: int) -> list[str]:
@@ -717,8 +785,13 @@ def render_frame(
 
     title_f = font(58, bold=True)
     y = ly + 58
-    for line in scene["title"].split("\n"):
-        d.text((lx, y), line, fill=rgb(C["white"]), font=title_f)
+    title_lines = scene["title"].split("\n")
+    for i, line in enumerate(title_lines):
+        clean = strip_emoji(line)
+        d.text((lx, y), clean, fill=rgb(C["white"]), font=title_f)
+        if scene.get("id") == "approved" and i == len(title_lines) - 1:
+            tw = text_width(clean, title_f)
+            draw_title_sparkle(d, lx + int(tw) + 12, y + 10, size=18)
         y += 68
 
     sub_f = font(24)
@@ -1135,7 +1208,7 @@ async def main(anim_frames: dict[str, list[Path]], anim_frames_v: dict[str, list
             make_silent_audio(dur, vo)
             print(f"  {scene['id']}: {dur:.1f}s (silent — BGM only)")
         else:
-            if vo.exists():
+            if not FORCE_VO_REGEN and vo.exists():
                 r = run(["ffprobe", "-v", "quiet", "-print_format", "json", "-show_format", str(vo)], capture_output=True, text=True)
                 dur = float(json.loads(r.stdout)["format"]["duration"])
             else:

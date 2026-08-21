@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { IconCheckCircle, IconStar } from "@/components/icons";
 
 export default function PromoApprovedPage() {
   return (
@@ -11,13 +12,13 @@ export default function PromoApprovedPage() {
     >
       <div className="relative mx-auto flex min-h-dvh max-w-md flex-col px-5 pb-8 pt-5">
         <Link href="/" className="mb-6 inline-flex w-fit items-center">
-          <Image src="/neercred-logo-header.svg" alt="NeerCred™" width={168} height={56} priority className="h-12 w-auto" />
+          <Image src="/neercred-logo-header.svg" alt="NeerCred" width={220} height={72} priority className="h-14 w-auto" />
         </Link>
 
         <div className="relative flex flex-1 flex-col items-center text-center">
-          <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-center gap-4 text-2xl opacity-80">
-            {["🎉", "😊", "✨", "🎊"].map((e, i) => (
-              <span key={e} className="animate-bounce" style={{ animationDelay: `${i * 0.2}s`, animationDuration: "1.4s" }}>{e}</span>
+          <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-center gap-5 text-[#0F766E] opacity-90">
+            {[IconStar, IconCheckCircle, IconStar, IconCheckCircle].map((Icon, i) => (
+              <Icon key={i} size={22} className="animate-bounce" style={{ animationDelay: `${i * 0.2}s`, animationDuration: "1.4s" } as React.CSSProperties} />
             ))}
           </div>
 
@@ -27,8 +28,8 @@ export default function PromoApprovedPage() {
             </svg>
           </div>
 
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#0F766E]">Congratulations! 🎉</p>
-          <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-[#0B1220]">You May Qualify! 🎉</h1>
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#0F766E]">Congratulations!</p>
+          <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-[#0B1220]">You May Qualify!</h1>
           <p className="mt-2 text-sm text-slate-500">Eligible offer from a lending partner on NeerCred</p>
 
           <div className="mt-8 w-full rounded-3xl border border-[#0F766E]/20 bg-white p-6 shadow-[0_12px_40px_-16px_rgba(15,118,110,0.25)]">
