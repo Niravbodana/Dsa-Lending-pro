@@ -24,13 +24,16 @@ CLEAN_JS = """() => {
   document.querySelectorAll(
     '.loan-guide-root, [class*="cookie"], [class*="Cookie"], [aria-label*="Cookie"], ' +
     'nextjs-portal, [data-nextjs-toast], [data-next-mark], [data-nextjs-dev-tools-button], ' +
-    '#__nextjs-dev-tools-menu, #__nextjs-build-indicator, button.fixed.bottom-6.left-6'
+    '#__nextjs-dev-tools-menu, #__nextjs-build-indicator, button.fixed.bottom-6.left-6, ' +
+    '[class*="BugReport"], [class*="WhatsApp"], [class*="AIChat"], [class*="FloatingCTA"], ' +
+    '[class*="MobileSticky"], .fixed.bottom-0'
   ).forEach(e => e.remove());
   document.querySelectorAll('p, span, div').forEach(el => {
     const t = (el.textContent || '').trim();
     if (t.startsWith('Dev mode OTP') && t.length < 80) el.style.display = 'none';
     if (/RBI|LSP registered|RBI-regulated|RBI LSP/i.test(t) && t.length < 120) el.style.display = 'none';
   });
+  window.scrollTo({ top: 0, behavior: 'instant' });
 }"""
 
 INIT_JS = """
@@ -74,10 +77,15 @@ def capture() -> None:
             page.screenshot(path=str(path), animations="disabled", type="png", full_page=False)
             print(f"  ✓ {name} ({path.stat().st_size // 1024} KB)")
 
-        # Marketing pages — new premium mobile homepage for promo
-        page.goto(f"{BASE}/promo-homepage", wait_until="domcontentloaded", timeout=60000)
-        ready()
+        # Live homepage hero — matches updated neercred.com mobile
+        page.goto(f"{BASE}/", wait_until="domcontentloaded", timeout=60000)
+        ready(3500)
         shot("01-homepage")
+
+        # Promo homepage fallback + how-it-works scroll
+        page.goto(f"{BASE}/promo-homepage", wait_until="domcontentloaded", timeout=60000)
+        ready(2500)
+        shot("01c-promo-homepage")
         shot("01b-how-it-works", scroll=650)
 
         page.goto(f"{BASE}/rates", wait_until="domcontentloaded", timeout=60000)

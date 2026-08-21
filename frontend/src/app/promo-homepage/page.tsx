@@ -2,32 +2,41 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { IconBolt, IconCheckCircle, IconClock, IconShield } from "@/components/icons";
+import { HERO_WEDDING_SRC } from "@/lib/hero-images";
 
 const FEATURES = [
-  { icon: "⚡", title: "Eligible offers up to ₹20 Lakhs", sub: "Fully digital — no branch visits" },
-  { icon: "🛡️", title: "Multiple lending partners", sub: "Compared in one place, side by side" },
-  { icon: "⏱️", title: "Funds to your bank account", sub: "When your lender disburses" },
-] as const;
-
-const CARDS = [
-  { title: "Soft Check Only", sub: "Won't affect your credit score" },
-  { title: "A NeerCred Use Case", sub: "Wedding expenses — one simple form" },
-  { title: "Personalised Pricing", sub: "Offers matched to your profile" },
-  { title: "Compare Offers", sub: "Multiple lenders, one form" },
-  { title: "Fully Digital", sub: "No branch visits" },
-  { title: "Transparent", sub: "No hidden charges" },
+  { icon: IconBolt, text: "Instant offers from top lending partners" },
+  { icon: IconShield, text: "100% secure and digital process" },
+  { icon: IconClock, text: "Quick eligibility in minutes" },
 ] as const;
 
 export default function PromoHomepage() {
   return (
-    <div
-      className="min-h-dvh overflow-x-hidden"
-      style={{ background: "linear-gradient(165deg, #DBEAFE 0%, #E0F2FE 25%, #F0F9FF 50%, #ECFEFF 75%, #F8FAFC 100%)" }}
-    >
-      <div className="mx-auto flex min-h-dvh max-w-md flex-col px-4 pb-5 pt-3">
-        <div className="mb-2 flex items-start justify-between gap-2">
+    <div className="relative min-h-dvh overflow-hidden bg-[#F8FAFC]">
+      <div className="absolute inset-0">
+        <Image
+          src={HERO_WEDDING_SRC}
+          alt="Indian couple celebrating"
+          fill
+          priority
+          className="object-cover object-[72%_28%]"
+          sizes="100vw"
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(to right, rgba(224,242,254,0.93) 28%, rgba(255,255,255,0.78) 44%, rgba(255,255,255,0.12) 100%)",
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-white/25 via-transparent to-transparent" />
+      </div>
+
+      <div className="relative z-10 mx-auto flex min-h-dvh max-w-md flex-col px-4 pb-6 pt-3">
+        <div className="mb-3 flex items-start justify-between gap-2">
           <Link href="/" className="shrink-0">
-            <Image src="/neercred-logo-header.svg" alt="NeerCred™" width={168} height={56} priority className="h-11 w-auto" />
+            <Image src="/neercred-logo-header.svg" alt="NeerCred" width={168} height={56} priority className="h-11 w-auto" />
           </Link>
           <Link
             href="/apply"
@@ -38,58 +47,49 @@ export default function PromoHomepage() {
           </Link>
         </div>
 
-        <div className="mb-3 inline-flex w-fit items-center gap-1.5 rounded-full border border-[#0F766E]/20 bg-white/80 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-wide text-[#0F766E]">
-          <span>✓</span> Digital Lending Aggregator · Financial Services Platform
+        <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-[#0F766E]/25 bg-white/85 px-3 py-1.5 text-[9px] font-bold uppercase tracking-wide text-[#0F766E]">
+          <IconCheckCircle size={12} className="shrink-0 text-[#0F766E]" />
+          Digital Lending Aggregator
         </div>
 
-        <h1 className="text-[1.75rem] font-extrabold leading-[1.12] tracking-tight text-[#0B1220]">
-          One Platform.
-          <br />
-          Every Financial Goal.
+        <h1 className="mt-4 text-[2rem] font-extrabold leading-[1.12] tracking-tight text-[#0B1220]">
+          Dream Big.{" "}
+          <span className="text-[#0F766E]">Borrow Smart.</span>
         </h1>
-        <p className="mt-2 text-xl font-bold text-[#0F766E]">Loans live today.</p>
-        <p className="mt-3 text-sm leading-relaxed text-slate-600">
-          NeerCred matches you with trusted lending partners — borrow smart with a transparent, fully digital journey.
+        <p className="mt-2 text-base font-bold text-[#0B1220]">Personal loans up to ₹15,00,000</p>
+        <p className="mt-2 text-sm leading-relaxed text-slate-600">
+          Compare curated offers from HDFC, ICICI, Bajaj and more — one transparent platform, zero branch visits.
         </p>
 
-        <ul className="mt-3 space-y-2">
-          {FEATURES.map((f) => (
-            <li key={f.title} className="flex gap-3">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/90 text-base shadow-sm">{f.icon}</span>
-              <div>
-                <p className="text-sm font-bold text-[#0B1220]">{f.title}</p>
-                <p className="text-xs text-slate-500">{f.sub}</p>
-              </div>
+        <ul className="mt-4 space-y-2.5">
+          {FEATURES.map(({ icon: Icon, text }) => (
+            <li key={text} className="flex items-center gap-2.5 text-sm font-semibold text-[#0B1220]">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#E6F4F1] text-[#0F766E]">
+                <Icon size={14} />
+              </span>
+              {text}
             </li>
           ))}
         </ul>
 
-        <div className="mt-3 space-y-2">
+        <div className="mt-4 space-y-2">
           <Link
             href="/apply"
             className="flex w-full items-center justify-center rounded-2xl py-4 text-sm font-bold text-white shadow-lg"
             style={{ background: "linear-gradient(135deg, #0B1220, #134E4A, #0F766E)" }}
           >
-            Get Loan Offers →
+            Get My Loan Offer →
           </Link>
-          <button type="button" className="flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white/90 py-3.5 text-sm font-semibold text-[#0B1220]">
-            <span className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 text-xs">▶</span>
-            How It Works
+          <button
+            type="button"
+            className="flex w-full items-center justify-center rounded-2xl border border-slate-200/90 bg-white/90 py-3.5 text-sm font-semibold text-[#0B1220]"
+          >
+            View Interest Rates
           </button>
         </div>
 
-        <p className="mt-3 text-center text-[10px] text-slate-400">Rates from 10.99% p.a. · indicative only</p>
-
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          {CARDS.map((card) => (
-            <div key={card.title} className="rounded-2xl border border-white/80 bg-white/70 p-3 backdrop-blur-sm">
-              <p className="text-[11px] font-bold leading-tight text-[#0B1220]">{card.title}</p>
-              <p className="mt-1 text-[10px] leading-snug text-slate-500">{card.sub}</p>
-            </div>
-          ))}
-        </div>
-
-        <p className="mt-2 shrink-0 text-center text-[10px] font-medium text-slate-400">
+        <p className="mt-3 text-center text-[10px] text-slate-500">Rates from 10.99% p.a. · indicative only</p>
+        <p className="mt-auto pt-4 text-center text-[10px] font-medium text-slate-400">
           Purity & Trust · Built on security and transparency
         </p>
       </div>

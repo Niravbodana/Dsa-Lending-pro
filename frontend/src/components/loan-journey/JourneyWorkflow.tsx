@@ -1,5 +1,7 @@
 "use client";
 
+import { IconCheck } from "@/components/icons";
+
 export type WorkflowStep = { id: string; label: string; phase: string };
 
 const PHASE_COLORS: Record<string, string> = {
@@ -56,7 +58,7 @@ export function JourneyWorkflow({ steps, currentStepId, compact }: Props) {
                         : "bg-slate-200 text-slate-400"
                   }`}
                 >
-                  {done ? "✓" : i + 1}
+                  {done ? <IconCheck size={12} className="text-white" strokeWidth={3} /> : i + 1}
                 </div>
                 <span
                   className={`mt-1 max-w-[52px] truncate text-center text-[9px] font-medium ${

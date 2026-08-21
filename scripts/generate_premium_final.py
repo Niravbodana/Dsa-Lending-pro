@@ -25,17 +25,26 @@ DOWNLOAD = Path("/opt/cursor/artifacts")
 BGM_SOURCE = ASSETS / "soft_morning_keys_piano.mp3"
 
 W, H = 1920, 1080
-W_V, H_V = 1080, 1920  # Native Instagram Reels / Stories full-screen
+V_SCALE = 2  # 4K vertical export: 2160×3840
+W_V, H_V = 1080 * V_SCALE, 1920 * V_SCALE
 FPS = 30
 VOICE = "hi-IN-SwaraNeural"  # Premium Hindi female — warm, clear, natural
 VO_RATE = "+5%"
 VO_PITCH = "+4Hz"
 PHONE_W, PHONE_H = 400, 844
-PHONE_W_V, PHONE_H_V = 520, 1064
+PHONE_W_V, PHONE_H_V = 520 * V_SCALE, 1064 * V_SCALE
 PHONE_X_RATIO = 0.62
 CAPTION_RESERVE = 200
-CAPTION_RESERVE_V = 270
-MARGIN_X_V = 52
+CAPTION_RESERVE_V = 270 * V_SCALE
+MARGIN_X_V = 52 * V_SCALE
+
+
+def vfont(sz: int, bold: bool = False, hindi: bool = False) -> ImageFont.FreeTypeFont:
+    return font(int(round(sz * V_SCALE)), bold, hindi=hindi)
+
+
+def vsz(n: int | float) -> int:
+    return int(round(n * V_SCALE))
 
 # NeerCred Brand & Video Style Guide (dev.neercred.com)
 SCENES = [
@@ -333,25 +342,25 @@ def ensure_greeting_frames() -> list[Path]:
 
 
 def ensure_greeting_frames_vertical() -> list[Path]:
-    """Native 9:16 greeting for Instagram full-screen."""
+    """Native 4K 9:16 greeting for Instagram full-screen."""
     return ensure_animation_frames(
         "greeting_916",
         "http://localhost:3000/promo-greeting",
         n=54,
-        viewport_w=540,
-        viewport_h=960,
+        viewport_w=1080,
+        viewport_h=1920,
         device_scale=2,
     )
 
 
 def ensure_endcard_frames_vertical() -> list[Path]:
-    """Native 9:16 end card for Instagram full-screen."""
+    """Native 4K 9:16 end card for Instagram full-screen."""
     return ensure_animation_frames(
         "endcard_916",
         "http://localhost:3000/promo-endcard",
         n=96,
-        viewport_w=540,
-        viewport_h=960,
+        viewport_w=1080,
+        viewport_h=1920,
         device_scale=2,
     )
 
@@ -438,13 +447,13 @@ def bg_canvas_vertical() -> Image.Image:
 def phone_position_vertical(phone_w: int, phone_h: int) -> tuple[int, int]:
     """Center phone horizontally; sit above caption safe zone."""
     px = (W_V - phone_w) // 2
-    py = H_V - CAPTION_RESERVE_V - phone_h - 36
-    py = max(420, min(py, H_V - CAPTION_RESERVE_V - phone_h - 20))
+    py = H_V - CAPTION_RESERVE_V - phone_h - vsz(36)
+    py = max(vsz(420), min(py, H_V - CAPTION_RESERVE_V - phone_h - vsz(20)))
     return px, py
 
 
 def fit_phone_frame_vertical(phone: Image.Image) -> Image.Image:
-    max_h = H_V - CAPTION_RESERVE_V - 400
+    max_h = H_V - CAPTION_RESERVE_V - vsz(400)
     if phone.height <= max_h:
         return phone
     scale = max_h / phone.height
@@ -512,46 +521,45 @@ def render_frame_vertical(
 
     # Logo — top center
     lg = logo.copy()
-    lg.thumbnail((240, 44), Image.Resampling.LANCZOS)
-    rgba.paste(lg, ((W_V - lg.width) // 2, 44), lg)
+    lg.thumbnail((vsz(240), vsz(44)), Image.Resampling.LANCZOS)
+    rgba.paste(lg, ((W_V - lg.width) // 2, vsz(44)), lg)
 
     # Copy block — centered, compact
-    cx = MARGIN_X_V
     max_text_w = W_V - MARGIN_X_V * 2
-    y = 108
-    step_f = font(18, bold=True)
+    y = vsz(108)
+    step_f = vfont(18, bold=True)
     step_text = scene["step"]
     if step_text:
         tw = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(step_text, font=step_f)
         d.text(((W_V - tw) // 2, y), step_text, fill=rgb(C["teal"]), font=step_f)
-        y += 34
+        y += vsz(34)
 
-    title_f = font(46, bold=True)
+    title_f = vfont(46, bold=True)
     for line in scene["title"].split("\n"):
         tw = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(line, font=title_f)
         d.text(((W_V - tw) // 2, y), line, fill=rgb(C["white"]), font=title_f)
-        y += 54
+        y += vsz(54)
 
     if scene.get("subtitle"):
-        sub_f = font(21)
+        sub_f = vfont(21)
         for line in wrap_lines(scene["subtitle"], sub_f, max_text_w):
             tw = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(line, font=sub_f)
             d.text(((W_V - tw) // 2, y), line, fill=rgb(C["muted"]), font=sub_f)
-            y += 30
-        y += 8
+            y += vsz(30)
+        y += vsz(8)
 
-    bullet_f = font(17)
+    bullet_f = vfont(17)
     for b in scene["bullets"][:3]:
         tw = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(f"• {b}", font=bullet_f)
         d.text(((W_V - tw) // 2, y), f"• {b}", fill=rgb(C["white"]), font=bullet_f)
-        y += 30
+        y += vsz(30)
 
     # Phone / celebration — centered, large
     if scene.get("layout") == "celebration":
         key = scene.get("animation", "ekyc")
         frames = anim_frames.get(key, [])
         panel = celebration_panel_at(frames, frame_t)
-        scale = min(PHONE_W_V / panel.width, (H_V - CAPTION_RESERVE_V - y - 40) / panel.height)
+        scale = min(PHONE_W_V / panel.width, (H_V - CAPTION_RESERVE_V - y - vsz(40)) / panel.height)
         nw, nh = int(panel.width * scale), int(panel.height * scale)
         panel = panel.resize((nw, nh), Image.Resampling.LANCZOS)
         phone_like = Image.new("RGBA", (nw, nh), (0, 0, 0, 0))
@@ -571,25 +579,25 @@ def render_frame_vertical(
 
     nw, nh = phone_like.width, phone_like.height
     px, py = phone_position_vertical(nw, nh)
-    sh = Image.new("RGBA", (nw + 60, nh + 60), (0, 0, 0, 0))
-    ImageDraw.Draw(sh).rounded_rectangle([20, 20, nw + 40, nh + 40], radius=48, fill=(0, 0, 0, 80))
-    sh = sh.filter(ImageFilter.GaussianBlur(24))
-    rgba.paste(sh, (px - 20, py + 10), sh)
+    sh = Image.new("RGBA", (nw + vsz(60), nh + vsz(60)), (0, 0, 0, 0))
+    ImageDraw.Draw(sh).rounded_rectangle([vsz(20), vsz(20), nw + vsz(40), nh + vsz(40)], radius=vsz(48), fill=(0, 0, 0, 80))
+    sh = sh.filter(ImageFilter.GaussianBlur(vsz(24)))
+    rgba.paste(sh, (px - vsz(20), py + vsz(10)), sh)
     rgba.paste(phone_like, (px, py), phone_like)
 
     # Caption bar — bottom safe area (Instagram UI margin)
-    cap_f = font(22, bold=True)
+    cap_f = vfont(22, bold=True, hindi=True)
     cap_lines: list[str] = []
     for block in scene["vo_hi"].split("\n"):
-        cap_lines.extend(wrap_lines(block, cap_f, W_V - 96))
-    line_h = 34
-    pad_top, pad_bottom = 20, 28
+        cap_lines.extend(wrap_lines(block, cap_f, W_V - vsz(96)))
+    line_h = vsz(34)
+    pad_top, pad_bottom = vsz(20), vsz(28)
     bar_h = pad_top + len(cap_lines) * line_h + pad_bottom
-    bar_y = H_V - bar_h - 88
+    bar_y = H_V - bar_h - vsz(88)
 
     bar = Image.new("RGBA", (W_V, bar_h), C["glass"])
     bd = ImageDraw.Draw(bar)
-    bd.line([(0, 0), (W_V, 0)], fill=rgb(C["teal"]) + (120,), width=2)
+    bd.line([(0, 0), (W_V, 0)], fill=rgb(C["teal"]) + (120,), width=vsz(2))
     cy = pad_top
     for line in cap_lines:
         tw = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength(line, font=cap_f)
@@ -597,9 +605,9 @@ def render_frame_vertical(
         cy += line_h
     rgba.paste(bar, (0, bar_y), bar)
 
-    prog_w = int((W_V - 96) * (scene_idx + 1) / n_scenes)
+    prog_w = int((W_V - vsz(96)) * (scene_idx + 1) / n_scenes)
     bd2 = ImageDraw.Draw(rgba)
-    bd2.rounded_rectangle([(W_V - prog_w) // 2, bar_y - 12, (W_V + prog_w) // 2, bar_y - 6], radius=3, fill=rgb(C["gold"]))
+    bd2.rounded_rectangle([(W_V - prog_w) // 2, bar_y - vsz(12), (W_V + prog_w) // 2, bar_y - vsz(6)], radius=vsz(3), fill=rgb(C["gold"]))
 
     return rgba.convert("RGB")
 
@@ -797,7 +805,7 @@ def mobile_encode_args() -> list[str]:
     """H.264 Main + AAC-LC — plays on iPhone & Android gallery/WhatsApp."""
     return [
         "-c:v", "libx264", "-profile:v", "main", "-level", "4.0",
-        "-pix_fmt", "yuv420p", "-crf", "20", "-preset", "medium",
+        "-pix_fmt", "yuv420p", "-crf", "14", "-preset", "slow",
         "-movflags", "+faststart", "-tag:v", "avc1",
         "-c:a", "aac", "-b:a", "128k", "-ar", "44100", "-ac", "2",
         "-brand", "mp42", "-map_metadata", "-1",
@@ -968,6 +976,7 @@ def audit_instagram_video(path: Path) -> dict:
     fmt = data.get("format", {})
     w, h = video.get("width"), video.get("height")
     checks = {
+        "resolution_4k_2160x3840": w == 2160 and h == 3840,
         "resolution_1080x1920": w == 1080 and h == 1920,
         "h264_video": video.get("codec_name") == "h264",
         "aac_audio": audio.get("codec_name") == "aac",
@@ -990,7 +999,10 @@ def audit_instagram_video(path: Path) -> dict:
         checks["no_top_letterbox"] = True
         checks["no_bottom_letterbox"] = True
         checks["full_screen_fill"] = True
-    checks["passed"] = all(v for k, v in checks.items() if k != "passed")
+    checks["passed"] = all(
+        v for k, v in checks.items()
+        if k not in ("passed", "resolution_1080x1920", "resolution_4k_2160x3840")
+    ) and (checks["resolution_4k_2160x3840"] or checks["resolution_1080x1920"])
     return {"path": str(path), "width": w, "height": h, "duration": float(fmt.get("duration", 0)), "checks": checks}
 
 
@@ -1188,6 +1200,10 @@ async def main(anim_frames: dict[str, list[Path]], anim_frames_v: dict[str, list
 
     v_out = await build_vertical_promo(anim_frames_v, logo, logo_hires, scene_durations)
 
+    ig_reels = DOWNLOAD / "NeerCred-Instagram-Reels.mp4"
+    ig_reels.write_bytes(v_out.read_bytes())
+    print(f"  Instagram Reels alias: {ig_reels}")
+
     audit = audit_instagram_video(v_out)
     audit_path = OUT / "instagram_916_audit.json"
     audit_path.write_text(json.dumps(audit, indent=2))
@@ -1202,6 +1218,7 @@ async def main(anim_frames: dict[str, list[Path]], anim_frames_v: dict[str, list
     for src, name in [
         (h_out, "NeerCred-Promo-PREMIUM-16x9.mp4"),
         (v_out, "NeerCred-Promo-PREMIUM-9x16.mp4"),
+        (ig_reels, "NeerCred-Instagram-Reels.mp4"),
         (vo_full, "NeerCred-Voice-Only.mp3"),
         (audit_path, "instagram_916_audit.json"),
     ]:

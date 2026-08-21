@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { IconCheck } from "@/components/icons";
 
 const OFFERS = [
   {
@@ -117,8 +118,9 @@ export default function PromoOffersPage() {
 
               <div className="mt-3 flex flex-wrap gap-1.5">
                 {offer.features.map((f) => (
-                  <span key={f} className="rounded-full bg-teal-50/80 px-2.5 py-1 text-[10px] font-medium text-[#0F766E]">
-                    ✓ {f}
+                  <span key={f} className="inline-flex items-center gap-1 rounded-full bg-teal-50/80 px-2.5 py-1 text-[10px] font-medium text-[#0F766E]">
+                    <IconCheck size={10} className="shrink-0" strokeWidth={3} />
+                    {f}
                   </span>
                 ))}
               </div>
