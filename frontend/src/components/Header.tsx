@@ -61,7 +61,7 @@ export function Header() {
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-2.5 lg:gap-3 lg:py-3">
         <Link href="/" onClick={goHome} aria-label="NeerCred — Go to homepage" className="shrink-0">
-          <NeerCredLogo variant="header" className="h-10 sm:h-11" />
+          <NeerCredLogo variant="header" className="h-11 w-auto sm:h-12" />
         </Link>
 
         <nav className="hidden items-center xl:flex" aria-label="Main navigation">

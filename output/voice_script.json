@@ -1,0 +1,343 @@
+{
+  "project_id": "you-always-say-that",
+  "title": "YOU ALWAYS SAY THAT",
+  "language": "en-IN",
+  "delivery": "natural conversational Indian English",
+  "lines": [
+    {
+      "id": "phone-call_0",
+      "scene_id": "phone-call",
+      "scene_start_sec": 0.0,
+      "at_sec": 0.7,
+      "speaker": "mother",
+      "text": "Hello... yes... how much?",
+      "performance": {
+        "speaker": "mother",
+        "text": "Hello... yes... how much?",
+        "emotional_state": "calm shifting to concern",
+        "speed": "natural",
+        "intensity": "quiet",
+        "pause_before_sec": 0.3,
+        "pauses_in_text": [
+          [
+            "Hello",
+            0.4
+          ]
+        ],
+        "emphasis_words": [],
+        "direction": "Natural conversational English, Indian accent, listening between lines",
+        "on_camera": true
+      },
+      "on_camera": true,
+      "requires_lipsync": true
+    },
+    {
+      "id": "phone-call_1",
+      "scene_id": "phone-call",
+      "scene_start_sec": 0.0,
+      "at_sec": 1.5,
+      "speaker": "mother",
+      "text": "Okay... I'll arrange it.",
+      "performance": {
+        "speaker": "mother",
+        "text": "Okay... I'll arrange it.",
+        "emotional_state": "contained worry",
+        "speed": "slow",
+        "intensity": "quiet",
+        "pause_before_sec": 0.8,
+        "pauses_in_text": [
+          [
+            "Okay",
+            0.5
+          ]
+        ],
+        "emphasis_words": [],
+        "direction": "Small exhale before speaking, forced calm",
+        "on_camera": true
+      },
+      "on_camera": true,
+      "requires_lipsync": true
+    },
+    {
+      "id": "son-notices_2",
+      "scene_id": "son-notices",
+      "scene_start_sec": 5.0,
+      "at_sec": 5.8,
+      "speaker": "son",
+      "text": "Mom... what happened?",
+      "performance": {
+        "speaker": "son",
+        "text": "Mom... what happened?",
+        "emotional_state": "concerned, gentle",
+        "speed": "natural",
+        "intensity": "quiet",
+        "pause_before_sec": 0.4,
+        "pauses_in_text": [],
+        "emphasis_words": [],
+        "direction": "Soft, not accusatory",
+        "on_camera": true
+      },
+      "on_camera": true,
+      "requires_lipsync": true
+    },
+    {
+      "id": "son-notices_3",
+      "scene_id": "son-notices",
+      "scene_start_sec": 5.0,
+      "at_sec": 6.3,
+      "speaker": "mother",
+      "text": "Nothing.",
+      "performance": {
+        "speaker": "mother",
+        "text": "Nothing.",
+        "emotional_state": "deflecting",
+        "speed": "natural",
+        "intensity": "quiet",
+        "pause_before_sec": 0.5,
+        "pauses_in_text": [],
+        "emphasis_words": [],
+        "direction": "",
+        "on_camera": true
+      },
+      "on_camera": true,
+      "requires_lipsync": true
+    },
+    {
+      "id": "son-notices_4",
+      "scene_id": "son-notices",
+      "scene_start_sec": 5.0,
+      "at_sec": 6.9,
+      "speaker": "mother",
+      "text": "You'll be late.",
+      "performance": {
+        "speaker": "mother",
+        "text": "You'll be late.",
+        "emotional_state": "deflecting with care",
+        "speed": "natural",
+        "intensity": "normal",
+        "pause_before_sec": 0.6,
+        "pauses_in_text": [],
+        "emphasis_words": [],
+        "direction": "Small forced smile, changing subject",
+        "on_camera": true
+      },
+      "on_camera": true,
+      "requires_lipsync": true
+    },
+    {
+      "id": "discovery_5",
+      "scene_id": "discovery",
+      "scene_start_sec": 18.0,
+      "at_sec": 18.9,
+      "speaker": "son",
+      "text": "How much do you need?",
+      "performance": {
+        "speaker": "son",
+        "text": "How much do you need?",
+        "emotional_state": "quiet directness",
+        "speed": "slow",
+        "intensity": "quiet",
+        "pause_before_sec": 0.5,
+        "pauses_in_text": [],
+        "emphasis_words": [],
+        "direction": "",
+        "on_camera": true
+      },
+      "on_camera": true,
+      "requires_lipsync": true
+    },
+    {
+      "id": "discovery_6",
+      "scene_id": "discovery",
+      "scene_start_sec": 18.0,
+      "at_sec": 19.3,
+      "speaker": "mother",
+      "text": "It's okay.",
+      "performance": {
+        "speaker": "mother",
+        "text": "It's okay.",
+        "emotional_state": "hiding concern",
+        "speed": "natural",
+        "intensity": "whisper",
+        "pause_before_sec": 0.4,
+        "pauses_in_text": [],
+        "emphasis_words": [],
+        "direction": "",
+        "on_camera": true
+      },
+      "on_camera": true,
+      "requires_lipsync": true
+    },
+    {
+      "id": "discovery_7",
+      "scene_id": "discovery",
+      "scene_start_sec": 18.0,
+      "at_sec": 20.0,
+      "speaker": "mother",
+      "text": "I'll manage.",
+      "performance": {
+        "speaker": "mother",
+        "text": "I'll manage.",
+        "emotional_state": "forced reassurance",
+        "speed": "slow",
+        "intensity": "quiet",
+        "pause_before_sec": 0.7,
+        "pauses_in_text": [
+          [
+            "It's okay",
+            0.5
+          ]
+        ],
+        "emphasis_words": [
+          "manage"
+        ],
+        "direction": "Quiet voice, small pause before I'll manage, slightly forced smile",
+        "on_camera": true
+      },
+      "on_camera": true,
+      "requires_lipsync": true
+    },
+    {
+      "id": "discovery_8",
+      "scene_id": "discovery",
+      "scene_start_sec": 18.0,
+      "at_sec": 21.0,
+      "speaker": "son",
+      "text": "You always say that.",
+      "performance": {
+        "speaker": "son",
+        "text": "You always say that.",
+        "emotional_state": "loving frustration",
+        "speed": "slow",
+        "intensity": "quiet",
+        "pause_before_sec": 1.0,
+        "pauses_in_text": [],
+        "emphasis_words": [
+          "always"
+        ],
+        "direction": "Very natural delivery, not dramatic. Emotional peak.",
+        "on_camera": true
+      },
+      "on_camera": true,
+      "requires_lipsync": true
+    },
+    {
+      "id": "solution_9",
+      "scene_id": "solution",
+      "scene_start_sec": 25.0,
+      "at_sec": 25.9,
+      "speaker": "narrator",
+      "text": "Sometimes, the first step is simply understanding your options.",
+      "performance": {
+        "speaker": "narrator",
+        "text": "Sometimes, the first step is simply understanding your options.",
+        "emotional_state": "warm, understated",
+        "speed": "slow",
+        "intensity": "quiet",
+        "pause_before_sec": 0.5,
+        "pauses_in_text": [],
+        "emphasis_words": [],
+        "direction": "Optional VO \u2014 soft, not salesy",
+        "on_camera": false
+      },
+      "on_camera": false,
+      "requires_lipsync": false
+    },
+    {
+      "id": "payoff_10",
+      "scene_id": "payoff",
+      "scene_start_sec": 34.0,
+      "at_sec": 34.7,
+      "speaker": "mother",
+      "text": "Everything okay?",
+      "performance": {
+        "speaker": "mother",
+        "text": "Everything okay?",
+        "emotional_state": "hopeful, cautious",
+        "speed": "natural",
+        "intensity": "quiet",
+        "pause_before_sec": 0.3,
+        "pauses_in_text": [],
+        "emphasis_words": [],
+        "direction": "",
+        "on_camera": true
+      },
+      "on_camera": true,
+      "requires_lipsync": true
+    },
+    {
+      "id": "payoff_11",
+      "scene_id": "payoff",
+      "scene_start_sec": 34.0,
+      "at_sec": 35.2,
+      "speaker": "son",
+      "text": "Yeah. We'll figure it out.",
+      "performance": {
+        "speaker": "son",
+        "text": "Yeah. We'll figure it out.",
+        "emotional_state": "reassuring",
+        "speed": "natural",
+        "intensity": "normal",
+        "pause_before_sec": 0.5,
+        "pauses_in_text": [],
+        "emphasis_words": [],
+        "direction": "",
+        "on_camera": true
+      },
+      "on_camera": true,
+      "requires_lipsync": true
+    },
+    {
+      "id": "payoff_12",
+      "scene_id": "payoff",
+      "scene_start_sec": 34.0,
+      "at_sec": 35.8,
+      "speaker": "mother",
+      "text": "Together?",
+      "performance": {
+        "speaker": "mother",
+        "text": "Together?",
+        "emotional_state": "tentative hope",
+        "speed": "slow",
+        "intensity": "quiet",
+        "pause_before_sec": 0.6,
+        "pauses_in_text": [],
+        "emphasis_words": [],
+        "direction": "",
+        "on_camera": true
+      },
+      "on_camera": true,
+      "requires_lipsync": true
+    },
+    {
+      "id": "payoff_13",
+      "scene_id": "payoff",
+      "scene_start_sec": 34.0,
+      "at_sec": 36.2,
+      "speaker": "son",
+      "text": "Together.",
+      "performance": {
+        "speaker": "son",
+        "text": "Together.",
+        "emotional_state": "warm certainty",
+        "speed": "slow",
+        "intensity": "quiet",
+        "pause_before_sec": 0.4,
+        "pauses_in_text": [],
+        "emphasis_words": [
+          "Together"
+        ],
+        "direction": "",
+        "on_camera": true
+      },
+      "on_camera": true,
+      "requires_lipsync": true
+    }
+  ],
+  "performance_rules": [
+    "Every line includes emotional_state, speed, intensity, and direction.",
+    "Use micro-pauses and breathing \u2014 actors must NOT sound like they are reading.",
+    "Mother: warm, tired, hiding concern. Son: gentle, direct, loving.",
+    "No American/British announcer delivery."
+  ]
+}

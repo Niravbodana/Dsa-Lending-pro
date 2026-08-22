@@ -1,0 +1,111 @@
+{
+  "id": "mom-doesnt-ask",
+  "title": "MOM DOESN'T ASK",
+  "tagline": "Dream Big. Borrow Smart.",
+  "cta": "Explore your loan options.",
+  "targetDuration": 43,
+  "assetBase": "/reel-cinema/mom-doesnt-ask",
+  "voices": {
+    "mother": { "engine": "en-IN-NeerjaNeural", "rate": "-6%", "pitch": "-5Hz", "mature": true },
+    "son": { "engine": "en-IN-PrabhatNeural", "rate": "-4%", "pitch": "+0Hz" },
+    "narrator": { "engine": "en-IN-NeerjaNeural", "rate": "-16%", "pitch": "-5Hz" }
+  },
+  "speakers": {
+    "mother": { "name": "Mother", "color": "#FDE68A", "align": "left" },
+    "son": { "name": "Son", "color": "#5EEAD4", "align": "right" },
+    "narrator": { "name": "", "color": "#F8FAFC", "align": "center" }
+  },
+  "bgm": {
+    "quiet": { "file": "silent-descent.mp3", "volume": 0.12 },
+    "warm": { "file": "too_many_days_piano.mp3", "volume": 0.28 },
+    "hope": { "file": "soft_morning_keys_piano.mp3", "volume": 0.38 }
+  },
+  "scenes": [
+    {
+      "id": "kitchen-call",
+      "image": "s01-kitchen-call.png",
+      "mood": "quiet",
+      "ken": "in",
+      "timeLabel": "Early morning",
+      "ambient": "kitchen",
+        "durationTarget": 5.0,
+      "lines": [
+          { "speaker": "mother", "text": "Hello... how much do we need?" },
+          { "speaker": "mother", "text": "Okay. I'll manage.", "pauseBefore": 0.5 }
+      ]
+    },
+    {
+      "id": "son-notices",
+      "image": "s02-son-notices.png",
+      "mood": "quiet",
+      "ken": "right",
+      "timeLabel": "",
+      "ambient": "home",
+        "durationTarget": 6.5,
+      "lines": [
+          { "speaker": "son", "text": "Mom, everything okay?" },
+          { "speaker": "mother", "text": "Yeah. All fine.", "pauseBefore": 0.35 },
+          { "speaker": "mother", "text": "Just something we need to handle.", "pauseBefore": 0.4 }
+      ]
+    },
+    {
+      "id": "night-table",
+      "image": "s03-night-table.png",
+      "mood": "warm",
+      "ken": "in",
+      "timeLabel": "Night",
+      "ambient": "night",
+      "durationTarget": 6.0,
+      "lines": []
+    },
+    {
+      "id": "conversation",
+      "image": "s04-conversation.png",
+      "mood": "warm",
+      "ken": "left",
+      "timeLabel": "",
+      "ambient": "night",
+      "durationTarget": 9.0,
+      "highlight": true,
+      "lines": [
+          { "speaker": "son", "text": "How much do you need?" },
+          { "speaker": "mother", "text": "Don't worry. I'll figure it out.", "pauseBefore": 0.4 },
+          { "speaker": "son", "text": "Mom... you don't have to do everything alone.", "pauseBefore": 0.5, "highlight": true }
+      ]
+    },
+    {
+      "id": "neercred",
+      "type": "phone",
+      "image": "s05-phone-research.png",
+      "screens": ["01-homepage.png", "09-offers.png"],
+      "mood": "hope",
+      "ken": "in",
+      "timeLabel": "Next morning",
+      "ambient": "morning",
+        "durationTarget": 9.0,
+      "lines": [
+          { "speaker": "narrator", "text": "When life needs support, the right options make the next step easier." }
+      ]
+    },
+    {
+      "id": "tea-payoff",
+      "image": "s06-tea-payoff.png",
+      "mood": "hope",
+      "ken": "out",
+      "timeLabel": "",
+      "ambient": "morning",
+        "durationTarget": 6.0,
+      "lines": [
+        { "speaker": "mother", "text": "Everything okay?" },
+        { "speaker": "son", "text": "Yeah, Mom. We'll handle it.", "pauseBefore": 0.5 }
+      ]
+    },
+    {
+      "id": "endcard",
+      "type": "endcard",
+      "mood": "uplift",
+        "durationTarget": 3.8,
+      "lines": []
+    }
+  ]
+}
