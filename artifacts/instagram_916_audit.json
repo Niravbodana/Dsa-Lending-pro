@@ -1,0 +1,19 @@
+{
+  "path": "/opt/cursor/artifacts/NeerCred-Promo-PREMIUM-9x16.mp4",
+  "width": 2160,
+  "height": 3840,
+  "duration": 72.8,
+  "checks": {
+    "resolution_4k_2160x3840": true,
+    "resolution_1080x1920": false,
+    "h264_video": true,
+    "aac_audio": true,
+    "has_audio": true,
+    "duration_ok": true,
+    "file_size_ok": true,
+    "no_top_letterbox": true,
+    "no_bottom_letterbox": true,
+    "full_screen_fill": true,
+    "passed": true
+  }
+}

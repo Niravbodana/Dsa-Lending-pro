@@ -1,0 +1,18 @@
+{
+  "characters": [
+    {
+      "id": "mother",
+      "name": "Mother",
+      "success": true,
+      "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/characters/mother_ref.png",
+      "message": ""
+    },
+    {
+      "id": "son",
+      "name": "Son",
+      "success": true,
+      "path": "/workspace/scripts/reel_engine/.work/you-always-say-that/characters/son_ref.png",
+      "message": ""
+    }
+  ]
+}

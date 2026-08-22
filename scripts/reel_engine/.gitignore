@@ -1,0 +1,5 @@
+# Reel engine build artifacts (regenerated on each run)
+.work/
+*.raw.mp3
+*.raw.wav
+.voices/

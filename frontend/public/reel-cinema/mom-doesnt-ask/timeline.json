@@ -1,0 +1,187 @@
+{
+  "id": "mom-doesnt-ask",
+  "title": "MOM DOESN'T ASK",
+  "tagline": "Dream Big. Borrow Smart.",
+  "cta": "Explore your loan options.",
+  "assetBase": "/reel-cinema/mom-doesnt-ask",
+  "totalDuration": 39.3,
+  "speakers": {
+    "mother": {
+      "name": "Mother",
+      "color": "#FDE68A",
+      "align": "left"
+    },
+    "son": {
+      "name": "Son",
+      "color": "#5EEAD4",
+      "align": "right"
+    },
+    "narrator": {
+      "name": "",
+      "color": "#F8FAFC",
+      "align": "center"
+    }
+  },
+  "scenes": [
+    {
+      "id": "kitchen-call",
+      "bg": "s01-kitchen-call.png",
+      "duration": 5.0,
+      "mood": "quiet",
+      "ken": "in",
+      "timeLabel": "Early morning",
+      "lines": [
+        {
+          "speaker": "mother",
+          "name": "Mother",
+          "text": "Hello... how much do we need?",
+          "at": 0.6,
+          "duration": 1.91,
+          "highlight": false
+        },
+        {
+          "speaker": "mother",
+          "name": "Mother",
+          "text": "Okay. I'll manage.",
+          "at": 3.01,
+          "duration": 2.09,
+          "highlight": false
+        }
+      ]
+    },
+    {
+      "id": "son-notices",
+      "bg": "s02-son-notices.png",
+      "duration": 6.5,
+      "mood": "quiet",
+      "ken": "right",
+      "timeLabel": "",
+      "lines": [
+        {
+          "speaker": "son",
+          "name": "Son",
+          "text": "Mom, everything okay?",
+          "at": 0.6,
+          "duration": 2.74,
+          "highlight": false
+        },
+        {
+          "speaker": "mother",
+          "name": "Mother",
+          "text": "Yeah. All fine.",
+          "at": 3.69,
+          "duration": 2.09,
+          "highlight": false
+        },
+        {
+          "speaker": "mother",
+          "name": "Mother",
+          "text": "Just something we need to handle.",
+          "at": 6.18,
+          "duration": 1.91,
+          "highlight": false
+        }
+      ]
+    },
+    {
+      "id": "night-table",
+      "bg": "s03-night-table.png",
+      "duration": 6.0,
+      "mood": "warm",
+      "ken": "in",
+      "timeLabel": "Night",
+      "lines": []
+    },
+    {
+      "id": "conversation",
+      "bg": "s04-conversation.png",
+      "duration": 9.0,
+      "mood": "warm",
+      "ken": "left",
+      "timeLabel": "",
+      "lines": [
+        {
+          "speaker": "son",
+          "name": "Son",
+          "text": "How much do you need?",
+          "at": 0.6,
+          "duration": 2.35,
+          "highlight": false
+        },
+        {
+          "speaker": "mother",
+          "name": "Mother",
+          "text": "Don't worry. I'll figure it out.",
+          "at": 3.35,
+          "duration": 2.53,
+          "highlight": false
+        },
+        {
+          "speaker": "son",
+          "name": "Son",
+          "text": "Mom... you don't have to do everything alone.",
+          "at": 6.38,
+          "duration": 4.1,
+          "highlight": true
+        }
+      ]
+    },
+    {
+      "id": "neercred",
+      "bg": "s05-phone-research.png",
+      "duration": 9.0,
+      "mood": "hope",
+      "ken": "in",
+      "timeLabel": "Next morning",
+      "lines": [
+        {
+          "speaker": "narrator",
+          "name": "",
+          "text": "When life needs support, the right options make the next step easier.",
+          "at": 0.6,
+          "duration": 6.35,
+          "highlight": false
+        }
+      ],
+      "type": "phone",
+      "screens": [
+        "01-homepage.png",
+        "09-offers.png"
+      ]
+    },
+    {
+      "id": "tea-payoff",
+      "bg": "s06-tea-payoff.png",
+      "duration": 6.0,
+      "mood": "hope",
+      "ken": "out",
+      "timeLabel": "",
+      "lines": [
+        {
+          "speaker": "mother",
+          "name": "Mother",
+          "text": "Everything okay?",
+          "at": 0.6,
+          "duration": 1.36,
+          "highlight": false
+        },
+        {
+          "speaker": "son",
+          "name": "Son",
+          "text": "Yeah, Mom. We'll handle it.",
+          "at": 2.46,
+          "duration": 3.94,
+          "highlight": false
+        }
+      ]
+    },
+    {
+      "id": "endcard",
+      "type": "endcard",
+      "mood": "uplift",
+      "duration": 3.8,
+      "ken": "in",
+      "lines": []
+    }
+  ]
+}
