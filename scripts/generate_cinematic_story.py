@@ -504,16 +504,20 @@ async def prepare_vo(scenes: list[dict]) -> list[tuple[dict, float, Path]]:
     return rows
 
 
-async def build_cinematic_video() -> Path:
-    print("=== NeerCred Cinematic Story — 4K 9:16 ===\n")
-    for d in (AUDIO, FRAMES, CLIPS):
-        d.mkdir(parents=True, exist_ok=True)
-
+def capture_cinematic_frames() -> dict[str, list[Path]]:
+    """Sync Playwright capture — must run outside asyncio loop."""
     ekyc = gpf.ensure_celebration_frames()
     transfer = gpf.ensure_transfer_frames()
     anim_frames = ensure_cinematic_anim_frames()
     anim_frames["ekyc_legacy"] = ekyc
     anim_frames["transfer_legacy"] = transfer
+    return anim_frames
+
+
+async def build_cinematic_video(anim_frames: dict[str, list[Path]]) -> Path:
+    print("=== NeerCred Cinematic Story — 4K 9:16 ===\n")
+    for d in (AUDIO, FRAMES, CLIPS):
+        d.mkdir(parents=True, exist_ok=True)
 
     logo = gpf.load_logo()
     logo_hires = gpf.load_logo_hires()
@@ -573,4 +577,5 @@ async def build_cinematic_video() -> Path:
 
 
 if __name__ == "__main__":
-    asyncio.run(build_cinematic_video())
+    frames = capture_cinematic_frames()
+    asyncio.run(build_cinematic_video(frames))
