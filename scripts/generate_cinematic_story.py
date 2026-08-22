@@ -39,117 +39,91 @@ VO_PREFIX = "cine"
 CINEMATIC_SCENES: list[dict] = [
     {
         "id": "open",
-        "layout": "cinematic_card",
-        "chapter": "I",
-        "title": "Every Dream\nDeserves Funding",
-        "subtitle": "A NeerCred Journey",
+        "layout": "cinematic_chapter",
+        "animation": "ch1",
         "vo": "Every dream deserves the right funding. This is how Neer Cred brings eligible loan offers to you — fully digital.",
         "vo_hi": "Every dream deserves funding.\nYour NeerCred journey begins.",
-        "duration": 5.5,
-    },
-    {
-        "id": "dream",
-        "layout": "cinematic_card",
-        "chapter": "II",
-        "title": "Wedding.\nHome.\nTravel.",
-        "subtitle": "Big plans — no time for bank queues.",
-        "vo": "A wedding, a home upgrade, or that dream trip. You need funds quickly — without endless paperwork and branch visits.",
-        "vo_hi": "Big plans ahead.\nNo bank queues.",
         "duration": 6.0,
     },
     {
-        "id": "discover",
-        "layout": "cinematic_card",
-        "chapter": "III",
-        "title": "Meet NeerCred",
-        "subtitle": "Dream Big · Borrow Smart",
-        "vo": "Meet Neer Cred — your digital lending marketplace. Compare eligible offers from HDFC, ICICI, Bajaj and more — all in one place.",
-        "vo_hi": "NeerCred.\nDream Big · Borrow Smart.",
+        "id": "dream",
+        "layout": "cinematic_chapter",
+        "animation": "ch2",
+        "vo": "A wedding, a home upgrade, or that dream trip. You need funds quickly — without endless paperwork and branch visits.",
+        "vo_hi": "Big plans ahead.\nNo bank queues.",
         "duration": 6.5,
     },
     {
+        "id": "discover",
+        "layout": "cinematic_chapter",
+        "animation": "ch3",
+        "vo": "Meet Neer Cred — your digital lending marketplace. Compare eligible offers from HDFC, ICICI, Bajaj and more — all in one place.",
+        "vo_hi": "NeerCred.\nDream Big · Borrow Smart.",
+        "duration": 7.0,
+    },
+    {
         "id": "step_apply",
-        "layout": "cinematic_process",
-        "screen": "02-apply-email.png",
+        "layout": "cinematic_step",
+        "animation": "step_1",
         "step_num": 1,
         "step_total": 7,
-        "step_label": "APPLY",
-        "title": "Start Online",
-        "subtitle": "Email verification in seconds",
         "vo": "Step one — enter your email. A secure OTP arrives in your inbox. Quick, encrypted, and completely private.",
         "vo_hi": "Step 1: Enter email.\nSecure OTP to inbox.",
     },
     {
         "id": "step_otp",
-        "layout": "cinematic_process",
-        "screen": "03-otp-email.png",
+        "layout": "cinematic_step",
+        "animation": "step_2",
         "step_num": 2,
         "step_total": 7,
-        "step_label": "VERIFY",
-        "title": "OTP Confirmed",
-        "subtitle": "Instant email verification",
         "vo": "Step two — verify the OTP. Your session is protected, and you are ready to continue in under a minute.",
         "vo_hi": "Step 2: OTP verified.\nLess than a minute.",
     },
     {
         "id": "step_profile",
-        "layout": "cinematic_process",
-        "screen": "04-profile.png",
+        "layout": "cinematic_step",
+        "animation": "step_3",
         "step_num": 3,
         "step_total": 7,
-        "step_label": "PROFILE",
-        "title": "PAN & Profile",
-        "subtitle": "One guided form",
         "vo": "Step three — enter your PAN and complete your profile. One simple form with guided steps — minimal documentation.",
         "vo_hi": "Step 3: PAN & profile.\nOne simple form.",
     },
     {
         "id": "step_offers",
-        "layout": "cinematic_process",
-        "screen": "09-offers.png",
+        "layout": "cinematic_step",
+        "animation": "step_4",
         "step_num": 4,
         "step_total": 7,
-        "step_label": "COMPARE",
-        "title": "Best Offers",
-        "subtitle": "Side-by-side comparison",
         "vo": "Step four — compare eligible offers from multiple lenders on one screen. Transparent rates, fees, and indicative EMI.",
         "vo_hi": "Step 4: Compare offers.\nBest rates on one screen.",
     },
     {
         "id": "step_approved",
-        "layout": "cinematic_process",
-        "screen": "12-approved.png",
+        "layout": "cinematic_step",
+        "animation": "step_5",
         "step_num": 5,
         "step_total": 7,
-        "step_label": "APPROVED",
-        "title": "You May Qualify",
-        "subtitle": "Up to fifteen lakhs · indicative",
         "vo": "Step five — great news! You may qualify for up to fifteen lakhs. Select your loan amount and move closer to disbursal.",
         "vo_hi": "Step 5: You may qualify!\nUp to fifteen lakhs.",
     },
     {
         "id": "step_kyc",
-        "layout": "cinematic_celebration",
+        "layout": "cinematic_full",
         "animation": "ekyc",
         "step_num": 6,
         "step_total": 7,
-        "step_label": "eKYC",
-        "title": "Aadhaar Verified",
-        "subtitle": "On lender secure platform",
         "vo": "Step six — your Aadhaar eKYC is completed on your lender's secure platform. Verified and ready to proceed.",
         "vo_hi": "Step 6: Aadhaar eKYC.\nVerified on lender platform.",
     },
     {
         "id": "step_transfer",
-        "layout": "cinematic_celebration",
+        "layout": "cinematic_full",
         "animation": "transfer",
         "step_num": 7,
         "step_total": 7,
-        "step_label": "DISBURSE",
-        "title": "Funds to Your Bank",
-        "subtitle": "Quick same-day transfer",
-        "vo": "Step seven — funds are transferring straight to your bank account. Quick, secure, and often same-day disbursal.",
+        "vo": "Step seven — watch your funds fly straight into your bank account. Quick, secure, and often same-day disbursal on Neer Cred.",
         "vo_hi": "Step 7: Funds to your bank.\nQuick and secure.",
+        "duration": 7.5,
     },
     {
         "id": "close",
@@ -166,21 +140,74 @@ CINEMATIC_SCENES: list[dict] = [
 ]
 
 
-def cinematic_bg() -> Image.Image:
-    """Deep cinematic gradient with subtle vignette."""
-    c = Image.new("RGB", (W_V, H_V), (5, 8, 14))
+def neercred_bg() -> Image.Image:
+    """NeerCred.com light theme gradient."""
+    c = Image.new("RGB", (W_V, H_V), (232, 247, 245))
     d = ImageDraw.Draw(c)
-    c0, c1 = (5, 8, 14), (15, 50, 48)
+    top, mid, bot = (232, 247, 245), (244, 251, 250), (255, 255, 255)
     for y in range(H_V):
         t = y / H_V
-        col = tuple(int(c0[i] + (c1[i] - c0[i]) * (t * 0.7)) for i in range(3))
+        if t < 0.42:
+            u = t / 0.42
+            col = tuple(int(top[i] + (mid[i] - top[i]) * u) for i in range(3))
+        else:
+            u = (t - 0.42) / 0.58
+            col = tuple(int(mid[i] + (bot[i] - mid[i]) * u) for i in range(3))
         d.line([(0, y), (W_V, y)], fill=col)
-    vig = Image.new("RGBA", (W_V, H_V), (0, 0, 0, 0))
-    vd = ImageDraw.Draw(vig)
-    vd.ellipse([-W_V * 0.15, -H_V * 0.05, W_V * 1.15, H_V * 1.08], fill=(0, 0, 0, 110))
-    c = c.convert("RGBA")
-    c.paste(vig, (0, 0), vig)
-    return c.convert("RGB")
+    return c
+
+
+def cinematic_bg() -> Image.Image:
+    return neercred_bg()
+
+
+def ensure_cinematic_anim_frames() -> dict[str, list[Path]]:
+    """Capture animated chapter, step, ekyc, transfer pages at native 4K 9:16."""
+    base = "http://localhost:3000"
+    specs = [
+        ("ch1", f"{base}/promo-cinematic-ch1", 78),
+        ("ch2", f"{base}/promo-cinematic-ch2", 78),
+        ("ch3", f"{base}/promo-cinematic-ch3", 78),
+        ("step_1", f"{base}/promo-cinematic-step?step=1", 70),
+        ("step_2", f"{base}/promo-cinematic-step?step=2", 70),
+        ("step_3", f"{base}/promo-cinematic-step?step=3", 70),
+        ("step_4", f"{base}/promo-cinematic-step?step=4", 70),
+        ("step_5", f"{base}/promo-cinematic-step?step=5", 70),
+    ]
+    out: dict[str, list[Path]] = {}
+    for key, url, n in specs:
+        out[key] = gpf.ensure_animation_frames(
+            f"cine_{key}_v2", url, n=n, viewport_w=1080, viewport_h=1920, device_scale=2,
+        )
+    out["ekyc"] = gpf.ensure_animation_frames(
+        "ekyc_v2", f"{base}/promo-ekyc-approved", n=72, viewport_w=1080, viewport_h=1920, device_scale=2,
+    )
+    out["transfer"] = gpf.ensure_animation_frames(
+        "transfer_v2", f"{base}/promo-transfer", n=96, viewport_w=1080, viewport_h=1920, device_scale=2,
+    )
+    out["endcard"] = gpf.ensure_endcard_frames_vertical()
+    return out
+
+
+def render_anim_frame(anim_frames: dict[str, list[Path]], key: str, frame_t: float) -> Image.Image:
+    frames = anim_frames.get(key, [])
+    if not frames:
+        return neercred_bg()
+    cycle = len(frames)
+    idx = min(int(frame_t * cycle * 0.92), cycle - 1)
+    img = Image.open(frames[idx]).convert("RGB")
+    if img.size != (W_V, H_V):
+        img = img.resize((W_V, H_V), Image.Resampling.LANCZOS)
+    return img
+
+
+def overlay_caption(img: Image.Image, scene: dict) -> Image.Image:
+    lines = gpf.caption_lines_from_vo(scene.get("vo_hi", ""), vfont(22, bold=True), W_V - vsz(80))
+    if not lines:
+        return img
+    rgba = img.convert("RGBA")
+    draw_caption_strip(rgba, lines)
+    return rgba.convert("RGB")
 
 
 def draw_letterbox(rgba: Image.Image) -> None:
@@ -228,9 +255,9 @@ def draw_caption_strip(rgba: Image.Image, lines: list[str]) -> int:
     pad_top, pad_bottom = vsz(16), vsz(22)
     bar_h = pad_top + len(lines) * line_h + pad_bottom
     bar_y = H_V - bar_h - vsz(52)
-    bar = Image.new("RGBA", (W_V, bar_h), (4, 8, 16, 235))
+    bar = Image.new("RGBA", (W_V, bar_h), (11, 18, 32, 220))
     bd = ImageDraw.Draw(bar)
-    bd.line([(vsz(48), 0), (W_V - vsz(48), 0)], fill=rgb(C["gold"]) + (180,), width=vsz(2))
+    bd.line([(vsz(48), 0), (W_V - vsz(48), 0)], fill=rgb(C["teal"]) + (200,), width=vsz(3))
     cy = pad_top
     for line in lines:
         tw = text_width(line, cap_f)
@@ -359,13 +386,20 @@ def render_cinematic_frame(
     frame_t: float = 0.0,
 ) -> Image.Image:
     layout = scene.get("layout", "")
-    if layout == "cinematic_card":
-        return render_cinematic_card(scene, logo, logo_hires)
-    if layout in ("cinematic_process", "cinematic_celebration"):
-        return render_cinematic_process(scene, logo, logo_hires, anim_frames, frame_t)
+    anim_frames = anim_frames or {}
+    if layout == "cinematic_chapter":
+        key = scene.get("animation", "ch1")
+        return overlay_caption(render_anim_frame(anim_frames, key, frame_t), scene)
+    if layout == "cinematic_step":
+        key = scene.get("animation", "step_1")
+        return overlay_caption(render_anim_frame(anim_frames, key, frame_t), scene)
+    if layout == "cinematic_full":
+        key = scene.get("animation", "ekyc")
+        return overlay_caption(render_anim_frame(anim_frames, key, frame_t), scene)
     if layout == "endcard_full":
-        return gpf.render_endcard_frame_vertical(anim_frames or {}, frame_t)
-    return cinematic_bg()
+        img = gpf.render_endcard_frame_vertical(anim_frames, frame_t)
+        return overlay_caption(img, scene)
+    return neercred_bg()
 
 
 def render_cinematic_clip(
@@ -380,7 +414,9 @@ def render_cinematic_clip(
     CLIPS.mkdir(parents=True, exist_ok=True)
     out = CLIPS / f"cine_{idx:02d}.mp4"
     total = dur + 0.6
-    animated = scene.get("layout") in ("cinematic_celebration", "endcard_full")
+    animated = scene.get("layout") in (
+        "cinematic_chapter", "cinematic_step", "cinematic_full", "endcard_full",
+    )
     n_frames = max(int(total * FPS), 36)
 
     if animated:
@@ -475,8 +511,9 @@ async def build_cinematic_video() -> Path:
 
     ekyc = gpf.ensure_celebration_frames()
     transfer = gpf.ensure_transfer_frames()
-    endcard_v = gpf.ensure_endcard_frames_vertical()
-    anim_frames = {"ekyc": ekyc, "transfer": transfer, "endcard": endcard_v}
+    anim_frames = ensure_cinematic_anim_frames()
+    anim_frames["ekyc_legacy"] = ekyc
+    anim_frames["transfer_legacy"] = transfer
 
     logo = gpf.load_logo()
     logo_hires = gpf.load_logo_hires()

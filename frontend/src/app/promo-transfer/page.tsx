@@ -1,16 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
+
+type Coin = { id: number; left: number; delay: number; duration: number; size: number };
 
 export default function PromoTransferPage() {
-  const [progress, setProgress] = useState(12);
+  const [progress, setProgress] = useState(8);
+  const [landed, setLanded] = useState(0);
 
   useEffect(() => {
     const start = Date.now();
     const tick = () => {
       const elapsed = Date.now() - start;
-      const p = Math.min(100, 12 + (elapsed / 3200) * 88);
+      const p = Math.min(100, 8 + (elapsed / 4000) * 92);
       setProgress(p);
+      setLanded(Math.min(12, Math.floor((p / 100) * 12)));
       if (p < 100) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
@@ -18,84 +23,123 @@ export default function PromoTransferPage() {
 
   const done = progress >= 99;
 
+  const coins: Coin[] = Array.from({ length: 14 }, (_, i) => ({
+    id: i,
+    left: 8 + (i % 7) * 12,
+    delay: (i % 7) * 0.35,
+    duration: 2.2 + (i % 4) * 0.3,
+    size: 28 + (i % 3) * 6,
+  }));
+
   return (
-    <div className="promo-no-chrome flex min-h-dvh items-center justify-center bg-gradient-to-br from-[#0B1220] via-[#0F766E] to-[#0891B2] px-6">
-      <div className="transfer-card w-full max-w-sm rounded-3xl border border-white/10 bg-white/5 p-8 text-center shadow-[0_0_80px_-20px_rgba(94,234,212,0.5)] backdrop-blur-xl">
-        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0F766E] to-[#0891B2] shadow-lg">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden>
-            <path d="M3 10h18M7 15h1m4 0h1m4 0h1M5 6h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
-          </svg>
+    <>
+      <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet" />
+      <div
+        className="promo-no-chrome relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-5"
+        style={{
+          fontFamily: "Poppins, system-ui, sans-serif",
+          background: "linear-gradient(180deg, #E8F7F5 0%, #F4FBFA 45%, #FFFFFF 100%)",
+        }}
+      >
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute -left-10 top-20 h-48 w-48 rounded-full bg-[#5EEAD4]/25 blur-3xl" />
+          <div className="absolute -right-8 bottom-24 h-56 w-56 rounded-full bg-[#0F766E]/15 blur-3xl" />
         </div>
 
-        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#5EEAD4]">
-          {done ? "Transfer complete" : "Quick transfer"}
-        </p>
-        <h1 className="mt-3 text-2xl font-extrabold leading-tight text-white">
-          {done ? "Money sent to your bank! 🎉" : "Transferring to your bank account"}
-        </h1>
-        <p className="mt-2 text-sm text-slate-300">HDFC Bank · **** 4521</p>
+        <Image src="/neercred-logo-header.svg" alt="NeerCred" width={160} height={48} className="relative z-10 mb-6 h-10 w-auto" />
 
-        <p className="mt-6 text-4xl font-extrabold text-white">₹15,00,000</p>
-        <p className="mt-1 text-xs text-slate-400">Indicative disbursal amount</p>
-
-        <div className="mt-8">
-          <div className="h-2.5 overflow-hidden rounded-full bg-white/10">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-[#0F766E] via-[#5EEAD4] to-[#FDE68A] transition-all duration-100"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-          <div className="mt-2 flex justify-between text-xs text-slate-400">
-            <span>Processing</span>
-            <span className="font-bold text-[#5EEAD4]">{Math.round(progress)}%</span>
-          </div>
-        </div>
-
-        {!done ? (
-          <div className="mt-6 flex items-center justify-center gap-2 text-sm text-slate-300">
-            <span className="pulse-dot h-2 w-2 rounded-full bg-[#5EEAD4]" />
-            <span className="pulse-dot h-2 w-2 rounded-full bg-[#5EEAD4]" style={{ animationDelay: "0.2s" }} />
-            <span className="pulse-dot h-2 w-2 rounded-full bg-[#5EEAD4]" style={{ animationDelay: "0.4s" }} />
-            <span className="ml-2">Fast same-day transfer in progress…</span>
-          </div>
-        ) : (
-          <div className="mt-6 flex justify-center gap-2 text-2xl">
-            {["🎉", "😊", "✨", "💸"].map((e) => (
-              <span key={e} className="bounce-emoji inline-block">{e}</span>
+        <div className="transfer-stage relative z-10 w-full max-w-sm">
+          {/* Flying coins */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-40">
+            {coins.map((c) => (
+              <span
+                key={c.id}
+                className="flying-coin absolute font-bold text-[#0F766E]"
+                style={{
+                  left: `${c.left}%`,
+                  fontSize: c.size,
+                  animationDelay: `${c.delay}s`,
+                  animationDuration: `${c.duration}s`,
+                  opacity: done ? 0 : 1,
+                }}
+              >
+                ₹
+              </span>
             ))}
           </div>
-        )}
+
+          {/* Bank target */}
+          <div className={`bank-target mx-auto flex h-32 w-32 items-center justify-center rounded-3xl bg-gradient-to-br from-[#0B5C56] to-[#0F766E] shadow-[0_20px_60px_-15px_rgba(15,118,110,0.65)] ${done ? "bank-landed" : ""}`}>
+            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path d="M3 10h18M7 15h1m4 0h1m4 0h1M5 6h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
+            {landed > 0 && (
+              <span className="land-badge absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-[#FDE68A] text-xs font-extrabold text-[#0B1220]">
+                +{landed}
+              </span>
+            )}
+          </div>
+
+          <div className="mt-8 rounded-3xl border border-[#0F766E]/15 bg-white p-6 shadow-xl">
+            <p className="text-center text-xs font-bold uppercase tracking-[0.25em] text-[#0F766E]">
+              {done ? "Transfer complete" : "Disbursal in progress"}
+            </p>
+            <h1 className="mt-3 text-center text-2xl font-extrabold text-[#0B1220]">
+              {done ? "Funds credited to your bank!" : "Transferring to your account"}
+            </h1>
+            <p className="mt-2 text-center text-sm text-[#64748B]">HDFC Bank · **** 4521</p>
+            <p className="mt-5 text-center text-4xl font-extrabold text-[#0F766E]">₹15,00,000</p>
+            <p className="text-center text-[11px] text-[#94A3B8]">Indicative disbursal amount</p>
+
+            <div className="mt-6 h-2.5 overflow-hidden rounded-full bg-[#E2E8F0]">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-[#0F766E] via-[#5EEAD4] to-[#FDE68A] transition-all duration-100"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <p className="mt-2 text-center text-xs font-semibold text-[#64748B]">{Math.round(progress)}% complete</p>
+          </div>
+        </div>
       </div>
 
       <style jsx global>{`
-        .promo-no-chrome ~ [role="dialog"],
-        nextjs-portal,
-        [data-nextjs-toast],
-        [data-next-mark],
-        #__nextjs-dev-tools-menu,
-        #__nextjs-build-indicator,
-        button.fixed.bottom-6.left-6 {
-          display: none !important;
-          visibility: hidden !important;
-        }
+        nextjs-portal, [data-nextjs-toast], [data-next-mark], #__nextjs-dev-tools-menu,
+        #__nextjs-build-indicator, button.fixed.bottom-6.left-6 { display: none !important; }
       `}</style>
       <style jsx>{`
-        .transfer-card { animation: cardIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
-        @keyframes cardIn {
-          from { opacity: 0; transform: scale(0.9) translateY(20px); }
-          to { opacity: 1; transform: scale(1) translateY(0); }
+        .transfer-stage { animation: rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        @keyframes rise {
+          from { opacity: 0; transform: translateY(24px); }
+          to { opacity: 1; transform: translateY(0); }
         }
-        .pulse-dot { animation: pulse 1.2s ease-in-out infinite; }
-        @keyframes pulse {
-          0%, 100% { opacity: 0.3; transform: scale(0.8); }
-          50% { opacity: 1; transform: scale(1.2); }
+        .flying-coin {
+          top: -10%;
+          animation: flyToBank ease-in infinite;
+          text-shadow: 0 2px 8px rgba(15, 118, 110, 0.35);
         }
-        .bounce-emoji { animation: bounce 1s ease-in-out infinite; }
-        @keyframes bounce {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-6px); }
+        @keyframes flyToBank {
+          0% { transform: translate(0, 0) scale(0.6) rotate(0deg); opacity: 0; }
+          12% { opacity: 1; }
+          70% { transform: translate(0, 180px) scale(1.1) rotate(20deg); opacity: 1; }
+          100% { transform: translate(0, 220px) scale(0.2) rotate(40deg); opacity: 0; }
+        }
+        .bank-target { animation: bankPulse 2s ease-in-out infinite; }
+        .bank-landed { animation: bankPop 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes bankPulse {
+          0%, 100% { transform: scale(1); box-shadow: 0 20px 60px -15px rgba(15, 118, 110, 0.55); }
+          50% { transform: scale(1.04); box-shadow: 0 24px 70px -12px rgba(15, 118, 110, 0.75); }
+        }
+        @keyframes bankPop {
+          0% { transform: scale(1); }
+          40% { transform: scale(1.12); }
+          100% { transform: scale(1.05); }
+        }
+        .land-badge { animation: badgePop 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        @keyframes badgePop {
+          from { transform: scale(0); }
+          to { transform: scale(1); }
         }
       `}</style>
-    </div>
+    </>
   );
 }
