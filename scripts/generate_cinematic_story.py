@@ -184,11 +184,14 @@ def cinematic_bg() -> Image.Image:
 
 
 def draw_letterbox(rgba: Image.Image) -> None:
-    """Cinematic black bars."""
-    bar = vsz(72)
-    d = ImageDraw.Draw(rgba)
-    d.rectangle([0, 0, W_V, bar], fill=(0, 0, 0, 235))
-    d.rectangle([0, H_V - bar, W_V, H_V], fill=(0, 0, 0, 235))
+    """Subtle cinematic edge fade — full-screen safe for Instagram."""
+    edge = Image.new("RGBA", (W_V, H_V), (0, 0, 0, 0))
+    d = ImageDraw.Draw(edge)
+    for i in range(vsz(28)):
+        alpha = int(90 * (1 - i / vsz(28)))
+        d.line([(0, i), (W_V, i)], fill=(0, 0, 0, alpha))
+        d.line([(0, H_V - 1 - i), (W_V, H_V - 1 - i)], fill=(0, 0, 0, alpha))
+    rgba.alpha_composite(edge)
 
 
 def paste_logo_corner(rgba: Image.Image, logo: Image.Image, logo_hires: Image.Image | None) -> None:
