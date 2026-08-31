@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Assemble a continuous 10s 9:16 dashcam video from locked truck keyframes.
+"""10s 9:16 dashcam: LEFT truck leans on a cutout; RIGHT truck slides in and supports it.
 
-Story beats (physics locked in the keyframe timestamps):
-  0.0–3.5s  only the LEFT truck, lean grows, no right truck
-  4.0–7.0s  RIGHT truck enters, contacts, supports; LEFT recovers only from contact
-  7.0–10.s  both upright, driving side by side
+Physics lock:
+  0–3.5s   LEFT truck only, tilt grows, never self-corrects, horizon stays level
+  3.88–4.9s RIGHT truck cutout enters from off-screen right
+  5.55–7.2s contact; LEFT returns upright only after the right truck is alongside
+  7.2–10s  both upright
 """
 
 from __future__ import annotations
@@ -20,27 +21,17 @@ import cv2
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
-FRAMES_DIR = ROOT / "artifacts" / "truck-support" / "frames"
-OUT_DIR = ROOT / "artifacts" / "truck-support"
+FRAMES = ROOT / "artifacts" / "truck-support" / "frames"
+OUT = ROOT / "artifacts" / "truck-support"
 DURATION = 10.0
 FPS = 30
 
-# Timestamp (seconds) → keyframe filename. Times enforce the physics story.
-KEYFRAMES: list[tuple[float, str]] = [
-    (0.00, "f00_t0.0_start.png"),
-    (0.90, "f01_t0.8_lean12.png"),
-    (2.20, "f02_t2.2_lean30.png"),
-    (3.50, "f03_t3.5_max_tilt.png"),
-    (4.25, "f04_t4.3_right_enters.png"),
-    (5.15, "f05_t5.2_closing.png"),
-    (5.85, "f06_t5.8_contact.png"),
-    (6.65, "f07_t6.6_support.png"),
-    (7.45, "f08_t7.5_both_upright.png"),
-    (10.00, "f09_t9.0_together.png"),
-]
-
-# Pairs where the right truck should appear as a right-edge slide, not a cross-dissolve.
-ENTRANCE_PAIRS = {("f03_t3.5_max_tilt.png", "f04_t4.3_right_enters.png")}
+T_LEAN_END = 3.50
+T_ENTER = 3.88
+T_ALONGSIDE = 4.90
+T_CONTACT = 5.55
+T_UPRIGHT = 7.20
+MAX_TILT = 22.0
 
 
 def smoothstep(t: float) -> float:
@@ -48,200 +39,245 @@ def smoothstep(t: float) -> float:
     return t * t * (3.0 - 2.0 * t)
 
 
-def load_bgr(path: Path) -> np.ndarray:
-    img = cv2.imread(str(path), cv2.IMREAD_COLOR)
+def ease_in(t: float) -> float:
+    t = float(np.clip(t, 0.0, 1.0))
+    return t * t
+
+
+def load(name: str) -> np.ndarray:
+    img = cv2.imread(str(FRAMES / name), cv2.IMREAD_COLOR)
     if img is None:
-        raise FileNotFoundError(path)
+        raise FileNotFoundError(FRAMES / name)
     return img
 
 
-def farneback(a_gray: np.ndarray, b_gray: np.ndarray) -> np.ndarray:
-    return cv2.calcOpticalFlowFarneback(
-        a_gray,
-        b_gray,
-        None,
-        pyr_scale=0.5,
-        levels=5,
-        winsize=28,
-        iterations=3,
-        poly_n=7,
-        poly_sigma=1.5,
-        flags=0,
-    )
+def largest_blob(mask: np.ndarray) -> np.ndarray:
+    cnts, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    out = np.zeros_like(mask)
+    if cnts:
+        cv2.drawContours(out, [max(cnts, key=cv2.contourArea)], -1, 255, -1)
+    return out
 
 
-def remap_with_flow(img: np.ndarray, flow: np.ndarray, scale: float) -> np.ndarray:
+def wrap_mask(img: np.ndarray, x0_frac: float, x1_frac: float) -> np.ndarray:
+    """Teal wrap + white portrait + gold + dark chassis in an x-range."""
     h, w = img.shape[:2]
-    grid_x, grid_y = np.meshgrid(np.arange(w, dtype=np.float32), np.arange(h, dtype=np.float32))
-    map_x = grid_x + flow[:, :, 0] * scale
-    map_y = grid_y + flow[:, :, 1] * scale
-    return cv2.remap(
-        img,
-        map_x,
-        map_y,
-        interpolation=cv2.INTER_LINEAR,
-        borderMode=cv2.BORDER_REPLICATE,
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    teal = cv2.inRange(hsv, (70, 30, 30), (110, 255, 230))
+    white = cv2.inRange(hsv, (0, 0, 180), (180, 45, 255))
+    gold = cv2.inRange(hsv, (12, 35, 70), (42, 255, 255))
+    dark = cv2.inRange(img, (0, 0, 0), (75, 75, 75))
+    body = cv2.bitwise_or(cv2.bitwise_or(teal, white), gold)
+    yy, xx = np.ogrid[:h, :w]
+    body[~((yy > int(0.03 * h)) & (yy < int(0.88 * h)) & (xx > int(x0_frac * w)) & (xx < int(x1_frac * w)))] = 0
+    chassis = (
+        (dark > 0)
+        & (yy > int(0.54 * h))
+        & (yy < int(0.87 * h))
+        & (xx > int((x0_frac + 0.04) * w))
+        & (xx < int((x1_frac - 0.04) * w))
     )
+    mask = cv2.bitwise_or(body, chassis.astype(np.uint8) * 255)
+    k = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (17, 17))
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, k, iterations=3)
+    mask = cv2.dilate(mask, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (11, 11)))
+    mask = largest_blob(mask)
+    return mask
 
 
-def right_edge_slide(base: np.ndarray, incoming: np.ndarray, t: float) -> np.ndarray:
-    """Reveal `incoming` from the right so the second truck enters, it does not pop."""
+def feather(mask: np.ndarray, px: int = 5) -> np.ndarray:
+    a = cv2.GaussianBlur(mask, (0, 0), px).astype(np.float32) / 255.0
+    return np.clip(a, 0.0, 1.0)
+
+
+def bbox(mask: np.ndarray, pad: int = 8) -> tuple[int, int, int, int]:
+    ys, xs = np.where(mask > 0)
+    h, w = mask.shape
+    y0 = max(0, int(ys.min()) - pad)
+    y1 = min(h, int(ys.max()) + pad)
+    x0 = max(0, int(xs.min()) - pad)
+    x1 = min(w, int(xs.max()) + pad)
+    return x0, y0, x1, y1
+
+
+def rotate_sprite(
+    bgr: np.ndarray, alpha: np.ndarray, angle: float, pivot: tuple[float, float]
+) -> tuple[np.ndarray, np.ndarray]:
+    h, w = bgr.shape[:2]
+    m = cv2.getRotationMatrix2D(pivot, angle, 1.0)
+    rb = cv2.warpAffine(bgr, m, (w, h), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+    ra = cv2.warpAffine(alpha, m, (w, h), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+    return rb, ra
+
+
+def blit(base: np.ndarray, overlay: np.ndarray, alpha: np.ndarray, x: int = 0, y: int = 0) -> np.ndarray:
     h, w = base.shape[:2]
-    split = w * (1.0 - 0.78 * smoothstep(t))
-    feather = max(18.0, 0.10 * w)
-    xs = np.linspace(0, w - 1, w, dtype=np.float32)
-    mask = np.clip((xs - (split - feather)) / (2.0 * feather), 0.0, 1.0)
-    mask = np.tile(mask, (h, 1))[:, :, None]
-    return (base.astype(np.float32) * (1.0 - mask) + incoming.astype(np.float32) * mask).astype(
-        np.uint8
+    oh, ow = overlay.shape[:2]
+    sx0, sy0 = max(0, -x), max(0, -y)
+    dx0, dy0 = max(0, x), max(0, y)
+    dx1, dy1 = min(w, x + ow), min(h, y + oh)
+    if dx1 <= dx0 or dy1 <= dy0:
+        return base
+    vw, vh = dx1 - dx0, dy1 - dy0
+    sl = overlay[sy0 : sy0 + vh, sx0 : sx0 + vw].astype(np.float32)
+    al = alpha[sy0 : sy0 + vh, sx0 : sx0 + vw]
+    if al.ndim == 2:
+        al = al[:, :, None]
+    dest = base[dy0:dy1, dx0:dx1].astype(np.float32)
+    out = base.copy()
+    out[dy0:dy1, dx0:dx1] = (sl * al + dest * (1.0 - al)).astype(np.uint8)
+    return out
+
+
+def tilt_deg(t: float) -> float:
+    if t <= T_LEAN_END:
+        return -MAX_TILT * ease_in(t / T_LEAN_END)
+    if t < T_CONTACT:
+        return -MAX_TILT
+    if t < T_UPRIGHT:
+        return -MAX_TILT * (1.0 - smoothstep((t - T_CONTACT) / (T_UPRIGHT - T_CONTACT)))
+    return 0.0
+
+
+def right_dx(t: float, travel: int) -> int:
+    if t <= T_ENTER:
+        return travel
+    if t < T_ALONGSIDE:
+        u = (t - T_ENTER) / (T_ALONGSIDE - T_ENTER)
+        u = 1.0 - (1.0 - u) ** 2
+        return int(travel * (1.0 - u))
+    return 0
+
+
+def handheld(img: np.ndarray, i: int) -> np.ndarray:
+    t = i / FPS
+    dx = 1.4 * math.sin(t * 15.2) + 0.7 * math.sin(t * 6.4 + 0.3)
+    dy = 0.9 * math.sin(t * 12.1 + 0.6) + 0.5 * math.cos(t * 5.0)
+    h, w = img.shape[:2]
+    m = np.array([[1.0, 0.0, dx], [0.0, 1.0, dy]], np.float32)
+    return cv2.warpAffine(img, m, (w, h), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+
+
+def zoom(img: np.ndarray, t: float) -> np.ndarray:
+    h, w = img.shape[:2]
+    z = 1.0 + 0.04 * (t / DURATION)
+    nh, nw = int(h / z), int(w / z)
+    x0 = (w - nw) // 2
+    y0 = int((h - nh) * 0.55)
+    return cv2.resize(img[y0 : y0 + nh, x0 : x0 + nw], (w, h), interpolation=cv2.INTER_LINEAR)
+
+
+def encode(seq: Path, dest: Path, width: int, height: int) -> None:
+    subprocess.run(
+        [
+            "ffmpeg", "-y",
+            "-framerate", str(FPS),
+            "-i", str(seq / "frame_%04d.png"),
+            "-vf", f"scale={width}:{height}:flags=lanczos,unsharp=5:5:0.35:5:5:0.0,format=yuv420p",
+            "-c:v", "libx264", "-preset", "slow", "-crf", "16",
+            "-profile:v", "high", "-pix_fmt", "yuv420p",
+            "-movflags", "+faststart", "-t", f"{DURATION:.2f}",
+            str(dest),
+        ],
+        check=True,
     )
 
 
-def morph_pair(
-    img_a: np.ndarray,
-    img_b: np.ndarray,
-    flow_ab: np.ndarray,
-    flow_ba: np.ndarray,
-    t: float,
-    slide_in: bool,
-) -> np.ndarray:
-    t_e = smoothstep(t)
-    warped_a = remap_with_flow(img_a, flow_ab, t_e)
-    warped_b = remap_with_flow(img_b, flow_ba, 1.0 - t_e)
-    blended = cv2.addWeighted(warped_a, 1.0 - t_e, warped_b, t_e, 0.0)
-    if slide_in:
-        return right_edge_slide(warped_a, blended, t_e)
-    return blended
+def prepare() -> dict:
+    left = load("f00_t0.0_start.png")
+    two = load("f08_t7.5_both_upright.png")
+    h, w = left.shape[:2]
+    if two.shape[:2] != (h, w):
+        two = cv2.resize(two, (w, h), interpolation=cv2.INTER_AREA)
+
+    print("mask left truck", flush=True)
+    left_m = wrap_mask(left, 0.08, 0.92)
+    print("mask right truck", flush=True)
+    right_m = wrap_mask(two, 0.48, 0.99)
+    right_m[:, : int(0.47 * w)] = 0
+    right_m = largest_blob(right_m)
+
+    print("inpaint highway", flush=True)
+    dil = cv2.dilate(left_m, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (41, 41)))
+    bg = cv2.inpaint(left, dil, 8, cv2.INPAINT_TELEA)
+    dash = int(0.90 * h)
+    bg[dash:] = left[dash:]
+
+    left_a = feather(left_m, 4)
+    right_a = feather(right_m, 5)
+    rx0, ry0, rx1, ry1 = bbox(right_m, pad=6)
+    sprite = two[ry0:ry1, rx0:rx1]
+    salpha = right_a[ry0:ry1, rx0:rx1]
+    # Left dual tires as pivot.
+    pivot = (0.32 * w, 0.78 * h)
+    travel = w - rx0 + 8
+    return {
+        "bg": bg,
+        "left": left,
+        "left_a": left_a,
+        "sprite": sprite,
+        "salpha": salpha,
+        "park_x": rx0,
+        "park_y": ry0,
+        "travel": travel,
+        "pivot": pivot,
+        "dash": dash,
+        "h": h,
+        "w": w,
+    }
 
 
-def handheld_offset(frame_index: int, fps: float) -> tuple[float, float]:
-    t = frame_index / fps
-    dx = 1.8 * math.sin(t * 15.1) + 1.0 * math.sin(t * 6.4 + 0.7)
-    dy = 1.3 * math.sin(t * 12.6 + 0.4) + 0.7 * math.cos(t * 4.8)
-    return dx, dy
-
-
-def apply_handheld(img: np.ndarray, dx: float, dy: float) -> np.ndarray:
-    h, w = img.shape[:2]
-    matrix = np.array([[1.0, 0.0, dx], [0.0, 1.0, dy]], dtype=np.float32)
-    return cv2.warpAffine(img, matrix, (w, h), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
-
-
-def motion_blur(current: np.ndarray, previous: np.ndarray | None, amount: float = 0.28) -> np.ndarray:
-    if previous is None:
-        return current
-    return cv2.addWeighted(current, 1.0 - amount, previous, amount, 0.0)
-
-
-def encode_mp4(sequence_dir: Path, out_path: Path, width: int, height: int) -> None:
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    cmd = [
-        "ffmpeg",
-        "-y",
-        "-framerate",
-        str(FPS),
-        "-i",
-        str(sequence_dir / "frame_%04d.png"),
-        "-vf",
-        (
-            f"scale={width}:{height}:flags=lanczos,"
-            "unsharp=5:5:0.35:5:5:0.0,"
-            "format=yuv420p"
-        ),
-        "-c:v",
-        "libx264",
-        "-preset",
-        "slow",
-        "-crf",
-        "16",
-        "-profile:v",
-        "high",
-        "-pix_fmt",
-        "yuv420p",
-        "-movflags",
-        "+faststart",
-        "-t",
-        f"{DURATION:.2f}",
-        str(out_path),
-    ]
-    subprocess.run(cmd, check=True)
+def render_frame(t: float, a: dict) -> np.ndarray:
+    frame = a["bg"].copy()
+    angle = tilt_deg(t)
+    rot_b, rot_a = rotate_sprite(a["left"], a["left_a"], angle, a["pivot"])
+    frame = blit(frame, rot_b, rot_a, 0, 0)
+    if t >= T_ENTER:
+        dx = right_dx(t, a["travel"])
+        frame = blit(frame, a["sprite"], a["salpha"], a["park_x"] + dx, a["park_y"])
+    frame[a["dash"] :] = a["left"][a["dash"] :]
+    return zoom(frame, t)
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--skip-encode", action="store_true")
+    parser.add_argument("--preview", action="store_true")
     args = parser.parse_args()
+    assets = prepare()
 
-    loaded: dict[str, np.ndarray] = {}
-    for _, name in KEYFRAMES:
-        loaded[name] = load_bgr(FRAMES_DIR / name)
-
-    h, w = next(iter(loaded.values())).shape[:2]
-    for name, img in loaded.items():
-        if img.shape[:2] != (h, w):
-            loaded[name] = cv2.resize(img, (w, h), interpolation=cv2.INTER_AREA)
-
-    pairs: list[dict] = []
-    for (t0, n0), (t1, n1) in zip(KEYFRAMES, KEYFRAMES[1:]):
-        a = loaded[n0]
-        b = loaded[n1]
-        ga = cv2.cvtColor(a, cv2.COLOR_BGR2GRAY)
-        gb = cv2.cvtColor(b, cv2.COLOR_BGR2GRAY)
-        print(f"flow {n0} → {n1}", flush=True)
-        pairs.append(
-            {
-                "t0": t0,
-                "t1": t1,
-                "a": a,
-                "b": b,
-                "flow_ab": farneback(ga, gb),
-                "flow_ba": farneback(gb, ga),
-                "slide": (n0, n1) in ENTRANCE_PAIRS,
-            }
-        )
-
-    seq_dir = OUT_DIR / "_sequence"
-    if seq_dir.exists():
-        shutil.rmtree(seq_dir)
-    seq_dir.mkdir(parents=True)
-
-    total = int(DURATION * FPS)
-    previous = None
-    pair_idx = 0
-    for i in range(total):
-        t = i / FPS
-        while pair_idx < len(pairs) - 1 and t > pairs[pair_idx]["t1"]:
-            pair_idx += 1
-        pair = pairs[pair_idx]
-        span = max(1e-6, pair["t1"] - pair["t0"])
-        local_t = float(np.clip((t - pair["t0"]) / span, 0.0, 1.0))
-        frame = morph_pair(
-            pair["a"],
-            pair["b"],
-            pair["flow_ab"],
-            pair["flow_ba"],
-            local_t,
-            pair["slide"],
-        )
-        dx, dy = handheld_offset(i, FPS)
-        frame = apply_handheld(frame, dx, dy)
-        frame = motion_blur(frame, previous)
-        previous = frame
-        cv2.imwrite(str(seq_dir / f"frame_{i:04d}.png"), frame)
-        if i % 30 == 0:
-            print(f"render {i}/{total} t={t:.2f}s", flush=True)
-
-    if args.skip_encode:
+    preview_dir = OUT / "verify"
+    preview_dir.mkdir(parents=True, exist_ok=True)
+    if args.preview:
+        for t in (0.0, 1.2, 2.4, 3.5, 4.2, 5.0, 5.6, 6.5, 7.3, 9.0, 9.9):
+            img = handheld(render_frame(t, assets), int(t * FPS))
+            cv2.imwrite(str(preview_dir / f"p_{int(round(t * 10)):03d}.png"), img)
+            print(f"preview t={t:.1f} tilt={tilt_deg(t):.1f}", flush=True)
         return 0
 
-    hd = OUT_DIR / "DrJeevahSetpal-truck-support-9x16-1080.mp4"
-    uhd = OUT_DIR / "DrJeevahSetpal-truck-support-9x16-4K.mp4"
-    print("encode 1080x1920", flush=True)
-    encode_mp4(seq_dir, hd, 1080, 1920)
-    print("encode 2160x3840", flush=True)
-    encode_mp4(seq_dir, uhd, 2160, 3840)
-    print(f"wrote {hd}")
-    print(f"wrote {uhd}")
+    seq = OUT / "_sequence"
+    if seq.exists():
+        shutil.rmtree(seq)
+    seq.mkdir(parents=True)
+    total = int(DURATION * FPS)
+    prev = None
+    for i in range(total):
+        t = i / FPS
+        frame = handheld(render_frame(t, assets), i)
+        if prev is not None:
+            frame = cv2.addWeighted(frame, 0.84, prev, 0.16, 0.0)
+        prev = frame
+        cv2.imwrite(str(seq / f"frame_{i:04d}.png"), frame)
+        if i % 30 == 0:
+            print(f"render {i}/{total} t={t:.2f} tilt={tilt_deg(t):.1f}", flush=True)
+
+    hd = OUT / "DrJeevahSetpal-truck-support-9x16-1080.mp4"
+    uhd = OUT / "DrJeevahSetpal-truck-support-9x16-4K.mp4"
+    print("encode 1080", flush=True)
+    encode(seq, hd, 1080, 1920)
+    print("encode 4K", flush=True)
+    encode(seq, uhd, 2160, 3840)
+    print("wrote", hd)
+    print("wrote", uhd)
     return 0
 
 
