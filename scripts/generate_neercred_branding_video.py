@@ -57,35 +57,6 @@ def kenburns(img: np.ndarray, t: float, z0: float = 1.0, z1: float = 1.06, bias:
     return cv2.resize(crop, (w, h), interpolation=cv2.INTER_LINEAR)
 
 
-def farneback(a: np.ndarray, b: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    ga = cv2.cvtColor(a, cv2.COLOR_BGR2GRAY)
-    gb = cv2.cvtColor(b, cv2.COLOR_BGR2GRAY)
-    kw = dict(pyr_scale=0.5, levels=4, winsize=24, iterations=3, poly_n=7, poly_sigma=1.4, flags=0)
-    return (
-        cv2.calcOpticalFlowFarneback(ga, gb, None, **kw),
-        cv2.calcOpticalFlowFarneback(gb, ga, None, **kw),
-    )
-
-
-def remap_flow(img: np.ndarray, flow: np.ndarray, scale: float) -> np.ndarray:
-    h, w = img.shape[:2]
-    gx, gy = np.meshgrid(np.arange(w, dtype=np.float32), np.arange(h, dtype=np.float32))
-    return cv2.remap(
-        img,
-        gx + flow[:, :, 0] * scale,
-        gy + flow[:, :, 1] * scale,
-        interpolation=cv2.INTER_LINEAR,
-        borderMode=cv2.BORDER_REPLICATE,
-    )
-
-
-def morph(a: np.ndarray, b: np.ndarray, fab: np.ndarray, fba: np.ndarray, t: float) -> np.ndarray:
-    t = smooth(t)
-    wa = remap_flow(a, fab, t)
-    wb = remap_flow(b, fba, 1.0 - t)
-    return lerp(wa, wb, t)
-
-
 def handheld(img: np.ndarray, i: int, amount: float = 1.0) -> np.ndarray:
     if amount <= 0:
         return img
@@ -100,13 +71,14 @@ def handheld(img: np.ndarray, i: int, amount: float = 1.0) -> np.ndarray:
 def segment_at(t: float) -> tuple[str, float]:
     """Return (segment_id, local 0–1)."""
     beats = [
-        (0.00, 3.50, "lean"),
-        (3.50, 4.05, "hold_peak"),
-        (4.05, 4.55, "xfade_enter"),
-        (4.55, 6.40, "support"),
-        (6.40, 7.35, "xfade_upright"),
-        (7.35, 8.15, "together"),
-        (8.15, 8.95, "xfade_brand"),
+        (0.00, 1.35, "establish"),
+        (1.35, 1.75, "xfade_peak"),
+        (1.75, 3.70, "hold_peak"),
+        (3.70, 4.35, "xfade_enter"),
+        (4.35, 6.45, "support"),
+        (6.45, 7.35, "xfade_upright"),
+        (7.35, 8.20, "together"),
+        (8.20, 8.95, "xfade_brand"),
         (8.95, 12.00, "brand"),
     ]
     for a, b, name in beats:
@@ -140,26 +112,25 @@ def main() -> int:
     upright = load_fit(PLATES / "f08_both_upright.png")
     brand = load_fit(BRAND)
 
-    print("optical flow lean (same truck)", flush=True)
-    fab, fba = farneback(falling0, peak)
-
     seq = OUT / "_sequence"
     if seq.exists():
         shutil.rmtree(seq)
     seq.mkdir(parents=True)
 
     total = int(DURATION * FPS)
-    prev = None
     for i in range(total):
         t = i / FPS
         seg, u = segment_at(min(t, DURATION - 1e-4))
         shake = 1.0
 
-        if seg == "lean":
-            frame = morph(falling0, peak, fab, fba, u)
-            frame = kenburns(frame, t / 3.5, 1.0, 1.04, 0.58)
+        if seg == "establish":
+            frame = kenburns(falling0, u, 1.0, 1.04, 0.58)
+        elif seg == "xfade_peak":
+            a = kenburns(falling0, 1.0, 1.04, 1.04, 0.58)
+            b = kenburns(peak, 0.0, 1.02, 1.03, 0.58)
+            frame = lerp(a, b, smooth(u))
         elif seg == "hold_peak":
-            frame = kenburns(peak, 0.35 + 0.2 * u, 1.03, 1.05, 0.58)
+            frame = kenburns(peak, u, 1.02, 1.05, 0.58)
         elif seg == "xfade_enter":
             a = kenburns(peak, 0.55, 1.05, 1.05, 0.58)
             b = kenburns(enters, 0.0, 1.0, 1.02, 0.55)
@@ -182,9 +153,6 @@ def main() -> int:
             shake = 0.0
 
         frame = handheld(frame, i, shake)
-        if prev is not None and shake > 0:
-            frame = cv2.addWeighted(frame, 0.86, prev, 0.14, 0.0)
-        prev = frame
         cv2.imwrite(str(seq / f"frame_{i:04d}.png"), frame)
         if i % 30 == 0:
             print(f"render {i}/{total} t={t:.2f} {seg}", flush=True)
