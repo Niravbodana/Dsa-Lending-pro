@@ -218,6 +218,7 @@ def segment_at(t: float) -> tuple[str, float]:
 
 
 def encode(seq: Path, dest: Path) -> None:
+    """H.264 Main + silent AAC so iPhone / QuickTime / WhatsApp will open the file."""
     dest.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run(
         [
@@ -227,6 +228,10 @@ def encode(seq: Path, dest: Path) -> None:
             str(FPS),
             "-i",
             str(seq / "frame_%04d.png"),
+            "-f",
+            "lavfi",
+            "-i",
+            "anullsrc=channel_layout=stereo:sample_rate=44100",
             "-vf",
             "unsharp=5:5:0.35:5:5:0.0,format=yuv420p",
             "-c:v",
@@ -236,9 +241,16 @@ def encode(seq: Path, dest: Path) -> None:
             "-crf",
             "20",
             "-profile:v",
-            "high",
+            "main",
+            "-level",
+            "4.1",
             "-pix_fmt",
             "yuv420p",
+            "-c:a",
+            "aac",
+            "-b:a",
+            "96k",
+            "-shortest",
             "-movflags",
             "+faststart",
             "-t",
@@ -373,6 +385,12 @@ def main() -> int:
             "slow",
             "-crf",
             "21",
+            "-profile:v",
+            "main",
+            "-c:a",
+            "aac",
+            "-b:a",
+            "96k",
             "-movflags",
             "+faststart",
             str(uhd),
