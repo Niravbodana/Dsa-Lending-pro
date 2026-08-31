@@ -1,0 +1,32 @@
+{
+  "title": "NeerCred — when things start to fall",
+  "aspect_ratio": "9:16",
+  "duration_sec": 12,
+  "fps": 30,
+  "camera": "continuous following-car cinematic dashcam, no cuts",
+  "physics_lock": {
+    "fall_direction": "viewer RIGHT (clockwise from rear camera)",
+    "opencv_rotation": "positive degrees = right-side-down",
+    "pivot": "lower-right dual tires",
+    "self_correct": false,
+    "support_side": "NeerCred arrives from frame-right and braces the falling right flank"
+  },
+  "branding": {
+    "name": "NeerCred",
+    "tagline": "DREAM BIG · BORROW SMART",
+    "offer": "APPROVED AMOUNT ₹ 5 LAKH",
+    "cta": "CONTINUE APPLY NOW",
+    "social": "@neercred",
+    "web": "neercred.com"
+  },
+  "beats": [
+    { "t": 0.0, "note": "upright black truck only, YOUR FINANCIAL CONDITIONS" },
+    { "t": 0.7, "note": "clockwise lean begins — right side down, left wheels unloading" },
+    { "t": 3.45, "note": "peak right-side-down, still alone" },
+    { "t": 4.2, "note": "NeerCred truck on the right, bracing the falling right flank" },
+    { "t": 6.4, "note": "physical contact / support" },
+    { "t": 7.2, "note": "recovery only because of the right-side support" },
+    { "t": 8.15, "note": "both upright, driving on" },
+    { "t": 8.95, "note": "exact NeerCred brand page" }
+  ]
+}
