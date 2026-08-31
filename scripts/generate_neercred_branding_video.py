@@ -2,7 +2,7 @@
 """NeerCred cinematic branding video — 12s 9:16.
 
 Physics lock (rear dashcam, viewer coordinates):
-  OpenCV positive rotation = clockwise on a y-down image = RIGHT SIDE DOWN.
+  OpenCV NEGATIVE rotation drops the viewer's RIGHT roof (clockwise on screen).
   Pivot = lower-right tires, so the left wheels lift and the right tires stay planted.
   The black truck never self-corrects. It only returns upright after NeerCred
   arrives on the RIGHT and braces the falling right flank.
@@ -33,7 +33,9 @@ OUT = ROOT / "artifacts" / "truck-support"
 DURATION = 12.0
 FPS = 30
 W, H = 1080, 1920
-MAX_TILT = 17.5  # degrees, OpenCV-positive = right-side-down
+MAX_TILT = 17.5  # magnitude in degrees
+# OpenCV getRotationMatrix2D: NEGATIVE angle drops the viewer's RIGHT roof
+# (verified by transforming the cargo-box top corners). Do not invert.
 
 
 def load_bgr(path: Path) -> np.ndarray:
@@ -170,7 +172,7 @@ def cine_grade(img: np.ndarray, grain_seed: int, grain_amp: float = 1.0) -> np.n
     x *= vig[:, :, None]
     out = np.clip(x * 255.0, 0, 255)
     rng = np.random.default_rng(grain_seed)
-    grain = rng.normal(0.0, 2.1 * grain_amp, (h, w, 1))
+    grain = rng.normal(0.0, 1.15 * grain_amp, (h, w, 1))
     out = np.clip(out + grain, 0, 255).astype(np.uint8)
     return out
 
@@ -184,26 +186,27 @@ def find_pivot(rgba: np.ndarray) -> tuple[float, float]:
 
 
 def tilt_at(t: float) -> float:
-    """Right-side-down angle. Grows 0.7–3.45s, holds until NeerCred is in, then eases back."""
-    if t < 0.70:
+    """Signed OpenCV angle. Negative = viewer's right side down. Never self-corrects until support."""
+    sign = -1.0
+    if t < 0.50:
         return 0.0
     if t < 3.45:
-        return MAX_TILT * ease_in((t - 0.70) / 2.75)
+        u = (t - 0.50) / 2.95
+        # Mix linear + quad so the right-lean is visible well before peak.
+        mag = MAX_TILT * (0.28 * u + 0.72 * u * u)
+        return sign * mag
     if t < 5.55:
-        return MAX_TILT
+        return sign * MAX_TILT
     if t < 7.15:
-        return MAX_TILT * (1.0 - smooth((t - 5.55) / 1.60))
+        return sign * MAX_TILT * (1.0 - smooth((t - 5.55) / 1.60))
     return 0.0
 
 
 def segment_at(t: float) -> tuple[str, float]:
     beats = [
-        (0.00, 0.70, "establish"),
-        (0.70, 3.45, "fall_right"),
-        (3.45, 4.20, "xfade_support"),
-        (4.20, 5.70, "support"),
-        (5.70, 6.40, "xfade_contact"),
-        (6.40, 7.20, "xfade_recover"),
+        (0.00, 0.55, "establish"),
+        (0.55, 3.50, "fall_right"),
+        (3.50, 7.20, "support_in"),
         (7.20, 8.15, "together"),
         (8.15, 8.95, "xfade_brand"),
         (8.95, 12.00, "brand"),
@@ -231,7 +234,7 @@ def encode(seq: Path, dest: Path) -> None:
             "-preset",
             "slow",
             "-crf",
-            "16",
+            "20",
             "-profile:v",
             "high",
             "-pix_fmt",
@@ -246,38 +249,69 @@ def encode(seq: Path, dest: Path) -> None:
     )
 
 
-def falling_composite(bg: np.ndarray, truck: np.ndarray, pivot: tuple[float, float], t: float, i: int) -> np.ndarray:
+def neer_slide(t: float) -> float:
+    """0 = fully off-screen right, 1 = braced alongside the falling truck."""
+    if t < 3.50:
+        return 0.0
+    if t < 4.85:
+        return smooth((t - 3.50) / 1.35)
+    return 1.0
+
+
+def shift_rgba(rgba: np.ndarray, dx: float, dy: float = 0.0) -> np.ndarray:
+    h, w = rgba.shape[:2]
+    m = np.array([[1.0, 0.0, dx], [0.0, 1.0, dy]], np.float32)
+    bgr = cv2.warpAffine(rgba[:, :, :3], m, (w, h), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+    a = cv2.warpAffine(rgba[:, :, 3], m, (w, h), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+    return np.dstack([bgr, a])
+
+
+def falling_composite(
+    bg: np.ndarray,
+    truck: np.ndarray,
+    neer: np.ndarray,
+    pivot: tuple[float, float],
+    t: float,
+    i: int,
+) -> np.ndarray:
     angle = tilt_at(t)
-    # Slight settle into the right tires as it rolls clockwise.
-    settle = np.array([[1.0, 0.0, 4.0 * (angle / MAX_TILT)], [0.0, 1.0, 7.0 * (angle / MAX_TILT)]], np.float32)
+    k = abs(angle) / MAX_TILT
+    settle = np.array([[1.0, 0.0, 5.0 * k], [0.0, 1.0, 8.0 * k]], np.float32)
     bg_shift = cv2.warpAffine(bg, settle, (W, H), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+
+    # NeerCred slides in from the RIGHT on the same locked camera, wheels on the road.
+    slide = neer_slide(t)
+    frame = bg_shift
+    if slide > 0.01:
+        # At slide=0 the truck is ~420px off the right edge; at 1 it sits in its native lane.
+        dx = (1.0 - slide) * 430.0
+        nrgba = shift_rgba(neer, dx, 18.0)
+        frame = over(frame, nrgba, shadow=True, angle=0.0)
+
     rgba = rotate_rgba(truck, angle, pivot)
-    frame = over(bg_shift, rgba, shadow=True, angle=angle)
-    # Dust at the compressed RIGHT tires.
-    cx = int(pivot[0] + 20 + 40 * (angle / MAX_TILT))
-    cy = int(pivot[1] + 8)
-    frame = dust_right(frame, amount=angle / MAX_TILT, seed=i * 17 + 3, cx=cx, cy=cy)
+    frame = over(frame, rgba, shadow=True, angle=angle)
+    cx = int(pivot[0] + 24 + 48 * k)
+    cy = int(pivot[1] + 10)
+    frame = dust_right(frame, amount=k * (1.0 - 0.6 * slide), seed=i * 17 + 3, cx=cx, cy=cy)
     dtilt = abs(tilt_at(min(t + 1.0 / FPS, DURATION)) - angle)
     frame = directional_blur(frame, 3 + 10 * (dtilt / 0.8))
-    # Slow push-in while falling.
-    u = min(1.0, t / 3.45)
-    frame = kenburns(frame, u, 1.0, 1.055, 0.57)
+    # Continuous dashcam push-in across the whole action, not a still hold.
+    u = min(1.0, t / 7.20)
+    frame = kenburns(frame, u, 1.0, 1.07, 0.56)
     return frame
 
 
 def main() -> int:
     bg = load_bgr(PLATES / "bg_empty_highway.png")
     truck = load_rgba(PLATES / "mattes" / "falling_truck_rgba.png")
-    # Keep dashboard of the background plate; don't let matte crumbs cover it.
+    neer = load_rgba(PLATES / "mattes" / "neercred_truck_rgba.png")
     truck[int(0.84 * H) :, :, 3] = 0
-    support = load_bgr(PLATES / "f04_support_right.png")
-    contact = load_bgr(PLATES / "f06_contact_right.png")
-    recover = load_bgr(PLATES / "f07_recovering.png")
+    neer[int(0.84 * H) :, :, 3] = 0
     upright = load_bgr(PLATES / "f08_both_upright.png")
     brand = load_bgr(BRAND)
     photoreal_start = load_bgr(PLATES / "f00_upright.png")
     pivot = find_pivot(truck)
-    print(f"pivot={pivot} (lower-right tires, clockwise = right-side-down)", flush=True)
+    print(f"pivot={pivot} (lower-right tires; negative OpenCV angle = right-side-down)", flush=True)
 
     seq = OUT / "_sequence"
     if seq.exists():
@@ -291,31 +325,17 @@ def main() -> int:
         shake = 1.15
 
         if seg == "establish":
-            a = kenburns(photoreal_start, u, 1.0, 1.025, 0.57)
-            b = falling_composite(bg, truck, pivot, t, i)
+            a = kenburns(photoreal_start, u, 1.0, 1.02, 0.56)
+            b = falling_composite(bg, truck, neer, pivot, t, i)
             frame = lerp(a, b, smooth(u))
-        elif seg == "fall_right":
-            frame = falling_composite(bg, truck, pivot, t, i)
-            shake = 1.15 + 0.55 * (tilt_at(t) / MAX_TILT)
-        elif seg == "xfade_support":
-            a = falling_composite(bg, truck, pivot, t, i)
-            b = kenburns(support, 0.0, 1.02, 1.02, 0.55)
-            frame = lerp(a, b, smooth(u))
-        elif seg == "support":
-            frame = kenburns(support, u, 1.02, 1.05, 0.54)
-            shake = 1.0
-        elif seg == "xfade_contact":
-            a = kenburns(support, 1.0, 1.05, 1.05, 0.54)
-            b = kenburns(contact, 0.0, 1.02, 1.03, 0.53)
-            frame = lerp(a, b, smooth(u))
-        elif seg == "xfade_recover":
-            a = kenburns(contact, 0.4, 1.03, 1.03, 0.53)
-            b = kenburns(recover, u * 0.5, 1.0, 1.03, 0.52)
-            frame = lerp(a, b, smooth(u))
+        elif seg in ("fall_right", "support_in"):
+            frame = falling_composite(bg, truck, neer, pivot, t, i)
+            shake = 1.15 + 0.5 * (abs(tilt_at(t)) / MAX_TILT)
         elif seg == "together":
-            a = kenburns(recover, 0.5, 1.03, 1.03, 0.52)
+            a = falling_composite(bg, truck, neer, pivot, t, i)
             b = kenburns(upright, u, 1.0, 1.04, 0.52)
-            frame = lerp(a, b, smooth(min(1.0, u * 1.4)))
+            frame = lerp(a, b, smooth(u))
+            shake = 1.0 - 0.4 * smooth(u)
         elif seg == "xfade_brand":
             a = kenburns(upright, 1.0, 1.04, 1.04, 0.52)
             b = kenburns(brand, 0.0, 1.0, 1.02, 0.50)
@@ -352,7 +372,7 @@ def main() -> int:
             "-preset",
             "slow",
             "-crf",
-            "17",
+            "21",
             "-movflags",
             "+faststart",
             str(uhd),
