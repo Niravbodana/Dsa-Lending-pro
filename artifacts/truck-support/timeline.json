@@ -1,0 +1,34 @@
+{
+  "title": "Dr. Jeevah Setpal — truck support rescue",
+  "aspect_ratio": "9:16",
+  "duration_sec": 10,
+  "fps": 30,
+  "camera": "continuous following-car dashcam, no cuts, no angle change",
+  "branding": {
+    "name": "Dr. Jeevah Setpal",
+    "tagline": "PHYSIOTHERAPY • SPORTS REHAB",
+    "logo": "gold JS circle",
+    "location": "Mumbai",
+    "phone": "75062 88788",
+    "colors": { "teal": "#004d4d", "gold": "#d4af37", "white": "#ffffff" }
+  },
+  "physics_rules": [
+    "LEFT truck never self-corrects",
+    "LEFT truck stays tilted until RIGHT truck contact",
+    "RIGHT truck is the only cause of LEFT becoming upright",
+    "RIGHT truck not visible before ~4s",
+    "no crash, no flip, no explosion"
+  ],
+  "beats": [
+    { "t": 0.0, "file": "f00_t0.0_start.png", "note": "LEFT truck only, beginning of imbalance" },
+    { "t": 0.9, "file": "f01_t0.8_lean12.png", "note": "LEFT lean growing" },
+    { "t": 2.2, "file": "f02_t2.2_lean30.png", "note": "severe left roll, still alone" },
+    { "t": 3.5, "file": "f03_t3.5_max_tilt.png", "note": "peak danger, no right truck" },
+    { "t": 4.25, "file": "f04_t4.3_right_enters.png", "note": "RIGHT truck enters from frame right" },
+    { "t": 5.15, "file": "f05_t5.2_closing.png", "note": "RIGHT closes gap, LEFT still tilted" },
+    { "t": 5.85, "file": "f06_t5.8_contact.png", "note": "physical contact / support begins" },
+    { "t": 6.65, "file": "f07_t6.6_support.png", "note": "RIGHT pushes, LEFT rotates toward upright" },
+    { "t": 7.45, "file": "f08_t7.5_both_upright.png", "note": "both upright after support" },
+    { "t": 10.0, "file": "f09_t9.0_together.png", "note": "both drive forward side by side" }
+  ]
+}
